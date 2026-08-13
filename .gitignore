@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+node-bin/
+node.zip
+
+# Python & Django
+__pycache__/
+*.pyc
+*.pyo
+backend/__pycache__/
+backend/api/__pycache__/
+backend/portfolio_backend/__pycache__/
+*.sqlite3
+backend/db.sqlite3
+
+# Environment & Build outputs
+.env
+frontend/dist/
+frontend/build/
+.DS_Store
+*.log

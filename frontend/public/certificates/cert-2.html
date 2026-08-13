@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certificate of Achievement - Muthu Selvam | HP LIFE</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 2rem;
+      background: #0f172a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      color: #1e293b;
+    }
+    .certificate-card {
+      width: 100%;
+      max-width: 900px;
+      background: #ffffff;
+      border: 12px solid #0284c7;
+      border-radius: 16px;
+      padding: 3.5rem 3rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      box-sizing: border-box;
+      text-align: center;
+    }
+    .cert-header {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #0284c7;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .cert-sub {
+      font-size: 1.1rem;
+      color: #64748b;
+      margin-bottom: 2rem;
+    }
+    .cert-name {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #0f172a;
+      border-bottom: 2px solid #0284c7;
+      display: inline-block;
+      padding-bottom: 0.4rem;
+      margin: 1.5rem 0;
+    }
+    .cert-body {
+      font-size: 1.2rem;
+      line-height: 1.8;
+      color: #334155;
+      max-width: 720px;
+      margin: 0 auto 2.5rem;
+    }
+    .cert-footer {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e2e8f0;
+    }
+    .seal-badge {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      box-shadow: 0 10px 20px rgba(2, 132, 199, 0.4);
+      border: 4px solid #fff;
+    }
+    .btn-print {
+      background: #0284c7;
+      color: #ffffff;
+      border: none;
+      padding: 0.75rem 2rem;
+      font-weight: 700;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div className="certificate-card">
+    <div className="cert-header">CERTIFICATE OF ACHIEVEMENT</div>
+    <div className="cert-sub">HP LIFE Global Learning Program</div>
+    <p>This certificate is presented to</p>
+    <div className="cert-name">MUTHU SELVAM</div>
+    <div className="cert-body">
+      for successfully completing the specialized course in<br>
+      <strong>Data Analytics for Business & Software Optimization</strong>
+    </div>
+    <div className="cert-footer">
+      <div>Authorized Signatory<br>HP Foundation</div>
+      <div className="seal-badge">HP LIFE<br>VERIFIED</div>
+      <div>Credential ID: HP-DA-2025<br>Issued: 2025</div>
+    </div>
+  </div>
+  <div style="margin-top: 2rem;">
+    <button className="btn-print" onclick="window.print()">Print / Save Certificate</button>
+  </div>
+</body>
+</html>
