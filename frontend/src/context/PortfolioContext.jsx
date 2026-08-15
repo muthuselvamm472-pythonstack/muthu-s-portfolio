@@ -4,6 +4,7 @@
  */
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { mockPortfolioData } from '../mockData';
+import { getApiUrl } from '../apiConfig';
 
 const PortfolioContext = createContext(null);
 
@@ -50,7 +51,7 @@ const api = async (url, method = 'GET', body = null) => {
   const opts = { method, headers };
   if (body) opts.body = JSON.stringify(body);
   try {
-    return await fetch(url, opts);
+    return await fetch(getApiUrl(url), opts);
   } catch (err) {
     console.warn(`API ${method} ${url} failed:`, err);
     return null;
@@ -215,10 +216,13 @@ export const PortfolioProvider = ({ children }) => {
   // Fetch API data & merge intelligently
   const refreshPortfolioData = useCallback(async () => {
     try {
-      const res = await fetch('/api/portfolio/');
+      const res = await fetch(getApiUrl('/api/portfolio/'));
       if (res && res.ok) {
-        const apiData = await res.json();
-        setData(prev => formatAndMerge(apiData, prev));
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const apiData = await res.json();
+          setData(prev => formatAndMerge(apiData, prev));
+        }
       }
     } catch (err) {
       console.warn('Backend fetch failed, relying on local cache:', err);
@@ -590,7 +594,7 @@ export const PortfolioProvider = ({ children }) => {
 
   // ─── MESSAGES ──────────────────────────────────────────────────────────────
   const addMessage = useCallback(async (msg) => {
-    await fetch('/api/contact/', {
+    await fetch(getApiUrl('/api/contact/'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(msg),

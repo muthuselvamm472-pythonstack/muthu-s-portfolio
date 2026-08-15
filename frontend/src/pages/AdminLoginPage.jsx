@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ShieldCheck, Lock, User, AlertCircle, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Lock, User, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 import '../styles/admin.css';
 
 export const AdminLoginPage = () => {
@@ -40,9 +40,11 @@ export const AdminLoginPage = () => {
         </div>
 
         {error && (
-          <div className="admin-auth-error">
-            <AlertCircle size={18} />
-            <span>{error}</span>
+          <div className="admin-auth-error" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <AlertCircle size={18} style={{ flexShrink: 0 }} />
+              <span>{error}</span>
+            </div>
           </div>
         )}
 
@@ -81,7 +83,9 @@ export const AdminLoginPage = () => {
 
           <button type="submit" className="btn btn-primary admin-login-btn" disabled={isSubmitting}>
             {isSubmitting ? (
-              <span>Authenticating...</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Loader2 size={18} className="spin-icon" /> Connecting to server...
+              </span>
             ) : (
               <>
                 Sign In to Dashboard <ArrowRight size={18} />
@@ -97,3 +101,4 @@ export const AdminLoginPage = () => {
     </div>
   );
 };
+

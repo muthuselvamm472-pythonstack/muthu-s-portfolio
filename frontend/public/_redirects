@@ -1,0 +1,4 @@
+# Netlify API Proxy Rewrites
+/api/*   https://muthu-portfolio-backend.onrender.com/api/:splat   200
+/media/* https://muthu-portfolio-backend.onrender.com/media/:splat 200
+/*       /index.html                                             200

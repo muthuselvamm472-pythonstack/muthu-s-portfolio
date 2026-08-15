@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getApiUrl } from '../apiConfig';
 
 const AuthContext = createContext();
 
@@ -16,14 +17,19 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       try {
-        const res = await fetch('/api/auth/me/', {
+        const res = await fetch(getApiUrl('/api/auth/me/'), {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
         if (res.ok) {
-          const userData = await res.json();
-          setUser(userData);
+          const contentType = res.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const userData = await res.json();
+            setUser(userData);
+          } else {
+            logout();
+          }
         } else {
           // Token expired or invalid
           logout();
@@ -40,16 +46,31 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const res = await fetch('/api/auth/login/', {
+      const loginUrl = getApiUrl('/api/auth/login/');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout for Render cold start
+
+      const res = await fetch(loginUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username, password }),
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
+
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        return {
+          success: false,
+          error: 'Server returned non-JSON response. Please check server URL or wait 30s if backend is sleeping.'
+        };
+      }
 
       const data = await res.json();
 
       if (!res.ok) {
-        return { success: false, error: data.error || 'Invalid credentials' };
+        return { success: false, error: data.error || data.detail || 'Invalid credentials' };
       }
 
       // Save tokens
@@ -61,14 +82,24 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true };
     } catch (err) {
-      return { success: false, error: 'Server connection failed' };
+      if (err.name === 'AbortError') {
+        return {
+          success: false,
+          error: 'Server response timed out. Backend may be waking up from sleep, please try again in 15 seconds.'
+        };
+      }
+      console.error('Login request error:', err);
+      return {
+        success: false,
+        error: 'Unable to connect to backend server. If using Render, please wait 30 seconds for the backend to wake up and try again.'
+      };
     }
   };
 
   const logout = async () => {
     if (token && refreshToken) {
       try {
-        await fetch('/api/auth/logout/', {
+        await fetch(getApiUrl('/api/auth/logout/'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -90,7 +121,7 @@ export const AuthProvider = ({ children }) => {
 
   const changeCredentials = async (newUsername, currentPassword, newPassword) => {
     try {
-      const res = await fetch('/api/auth/change-credentials/', {
+      const res = await fetch(getApiUrl('/api/auth/change-credentials/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -102,6 +133,11 @@ export const AuthProvider = ({ children }) => {
           new_password: newPassword
         })
       });
+
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        return { success: false, error: 'Server connection failed' };
+      }
 
       const data = await res.json();
       if (!res.ok) {
@@ -148,3 +184,4 @@ export const useAuth = () => {
   }
   return context;
 };
+
