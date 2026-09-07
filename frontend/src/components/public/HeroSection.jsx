@@ -15,28 +15,38 @@ export const HeroSection = () => {
     index === self.findIndex((t) => (t.platform || '').toLowerCase().trim() === (link.platform || '').toLowerCase().trim())
   );
 
-  const typewriterRoles = [
-    "REACT",
-    "PYTHON FULL STACK DEVELOPER",
-    "DJANGO REST API SPECIALIST",
-    "REACT.JS & ORACLE SQL DEVELOPER"
-  ];
+  const typewriterRoles = (Array.isArray(profile.typewriterRoles) && profile.typewriterRoles.length > 0)
+    ? profile.typewriterRoles
+    : [
+        "REACT",
+        "PYTHON FULL STACK DEVELOPER",
+        "DJANGO REST API SPECIALIST",
+        "REACT.JS & ORACLE SQL DEVELOPER"
+      ];
+
+  const statusBadgeText = profile.statusBadgeText || "Available for Full Stack Opportunities";
+  const showStatusBadge = profile.showStatusBadge !== false;
+  const line1 = profile.heroLine1 !== undefined ? profile.heroLine1 : "I'm Muthu Selvam,";
+  const line2 = profile.heroLine2 !== undefined ? profile.heroLine2 : "A Python Full Stack";
+  const line3 = profile.heroLine3 !== undefined ? profile.heroLine3 : "developer";
 
   return (
     <section id="hero" className="portfolio-section" style={{ position: 'relative' }}>
       <div className="container hero-grid">
         <ScrollReveal delay={100} className="hero-content">
           {/* Status Pill */}
-          <div
-            className="status-pill"
-            style={{
-              color: '#10b981',
-              backgroundColor: 'rgba(16, 185, 129, 0.14)',
-              borderColor: 'rgba(16, 185, 129, 0.4)'
-            }}
-          >
-            <Sparkles size={14} style={{ color: '#10b981' }} /> Available for Full Stack Opportunities
-          </div>
+          {showStatusBadge && (
+            <div
+              className="status-pill"
+              style={{
+                color: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.14)',
+                borderColor: 'rgba(16, 185, 129, 0.4)'
+              }}
+            >
+              <Sparkles size={14} style={{ color: '#10b981' }} /> {statusBadgeText}
+            </div>
+          )}
 
           {/* Typewriter Identity Line (e.g. REACT |) */}
           <div className="hero-identity" style={{ color: '#06b6d4', fontWeight: 600 }}>
@@ -44,23 +54,29 @@ export const HeroSection = () => {
           </div>
 
           {/*
-            Hero Headline — Exact layout & typography matching user screenshot:
+            Hero Headline — Exact layout & typography matching user preferences:
             Line 1: "I'm Muthu Selvam,"      → Bold editorial serif white
             Line 2: "A Python Full Stack"    → Bold Italic Playfair/Instrument Serif, radiant gold
             Line 3: "developer"              → Bold editorial serif white
           */}
           <h1 className="hero-name-exact">
-            <span className="hero-line-white">
-              I'm Muthu Selvam,
-            </span>
-            <br />
-            <span className="hero-line-gold">
-              A Python Full Stack
-            </span>
-            <br />
-            <span className="hero-line-white hero-line-lower">
-              developer
-            </span>
+            {line1 && (
+              <span className="hero-line-white">
+                {line1}
+              </span>
+            )}
+            {line1 && line2 && <br />}
+            {line2 && (
+              <span className="hero-line-gold">
+                {line2}
+              </span>
+            )}
+            {line2 && line3 && <br />}
+            {line3 && (
+              <span className="hero-line-white hero-line-lower">
+                {line3}
+              </span>
+            )}
           </h1>
 
           <p className="hero-tagline" style={{ color: 'var(--text-secondary)' }}>

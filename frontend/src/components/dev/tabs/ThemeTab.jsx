@@ -26,11 +26,11 @@ export const ThemeTab = ({ data, updateThemeSettings, showToast }) => {
     setThemeMode(mode);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    updateThemeSettings(form);
+    await updateThemeSettings(form);
     setAdminDefaultTheme(form.themeMode);
-    showToast(`Default website mode updated to ${form.themeMode.toUpperCase()} mode!`, 'success');
+    showToast(`✅ Default website theme saved to database as ${form.themeMode.toUpperCase()} mode!`, 'success');
   };
 
   return (

@@ -1,9 +1,11 @@
 import React from 'react';
+import { getApiUrl } from '../../apiConfig';
 
 export const Button = ({ children, variant = 'primary', href, onClick, className = '', type = 'button', ...props }) => {
   const baseClass = `btn btn-${variant} ${className}`;
 
   if (href) {
+    const resolvedHref = (typeof href === 'string' && href.startsWith('/media/')) ? getApiUrl(href) : href;
     const handleClick = (e) => {
       if (href === '#' || href === '') {
         e.preventDefault();
@@ -12,7 +14,7 @@ export const Button = ({ children, variant = 'primary', href, onClick, className
     };
 
     return (
-      <a href={href} className={baseClass} onClick={handleClick} {...props}>
+      <a href={resolvedHref} className={baseClass} onClick={handleClick} {...props}>
         {children}
       </a>
     );

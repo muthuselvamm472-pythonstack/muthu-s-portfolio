@@ -8,12 +8,12 @@ import { getApiUrl } from '../apiConfig';
 
 const PortfolioContext = createContext(null);
 
-const STORAGE_KEY = 'muthu_portfolio_v7';
-const DELETED_KEY = 'muthu_deleted_ids_v7';
+const STORAGE_KEY = 'muthu_portfolio_v8';
+const DELETED_KEY = 'muthu_deleted_ids_v8';
 
 // Clear legacy cache keys
 try {
-  ['muthu_portfolio_v6', 'muthu_portfolio_v5', 'muthu_portfolio_v4', 'muthu_portfolio_v3', 'muthu_portfolio_data_v2', 'muthu_portfolio_data'].forEach(k => localStorage.removeItem(k));
+  ['muthu_portfolio_v7', 'muthu_portfolio_v6', 'muthu_portfolio_v5', 'muthu_portfolio_v4', 'muthu_portfolio_v3', 'muthu_portfolio_data_v2', 'muthu_portfolio_data'].forEach(k => localStorage.removeItem(k));
 } catch (_) {}
 
 // Helper to manage deleted IDs in localStorage
@@ -42,16 +42,48 @@ const isNumericId = (id) => {
   return !isNaN(num) && Number.isInteger(num) && num > 0 && !String(id).includes('_');
 };
 
-// ─── JWT API helper ───────────────────────────────────────────────────────────
+// Helper to refresh JWT token transparently
+const tryRefreshToken = async () => {
+  const refresh = localStorage.getItem('muthu_admin_jwt_refresh');
+  if (!refresh) return null;
+  try {
+    const res = await fetch(getApiUrl('/api/auth/token/refresh/'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.access) {
+        localStorage.setItem('muthu_admin_jwt', data.access);
+        return data.access;
+      }
+    }
+  } catch (err) {
+    console.warn('Silent token refresh failed in PortfolioContext:', err);
+  }
+  return null;
+};
+
+// ─── JWT API helper with Auto-Token Refresh ────────────────────────────────────
 const api = async (url, method = 'GET', body = null) => {
-  const token = localStorage.getItem('muthu_admin_jwt');
+  let token = localStorage.getItem('muthu_admin_jwt');
   const headers = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (body) headers['Content-Type'] = 'application/json';
   const opts = { method, headers };
   if (body) opts.body = JSON.stringify(body);
   try {
-    return await fetch(getApiUrl(url), opts);
+    let res = await fetch(getApiUrl(url), opts);
+    // If token expired (401), automatically refresh token and retry the mutation
+    if (res && res.status === 401) {
+      const freshToken = await tryRefreshToken();
+      if (freshToken) {
+        headers['Authorization'] = `Bearer ${freshToken}`;
+        res = await fetch(getApiUrl(url), opts);
+      }
+    }
+    return res;
   } catch (err) {
     console.warn(`API ${method} ${url} failed:`, err);
     return null;
@@ -148,6 +180,12 @@ const formatAndMerge = (apiData, prev) => {
       tagline:        p.tagline                || prev?.profile?.tagline         || mockPortfolioData.profile.tagline,
       heroDescription:p.hero_description       || prev?.profile?.heroDescription || mockPortfolioData.profile.heroDescription,
       profileImage:   p.profile_image          || prev?.profile?.profileImage    || mockPortfolioData.profile.profileImage,
+      statusBadgeText: p.status_badge_text !== undefined ? p.status_badge_text : (prev?.profile?.statusBadgeText ?? mockPortfolioData.profile.statusBadgeText),
+      showStatusBadge: p.show_status_badge !== undefined ? p.show_status_badge : (prev?.profile?.showStatusBadge ?? true),
+      typewriterRoles: (Array.isArray(p.typewriter_roles) && p.typewriter_roles.length > 0) ? p.typewriter_roles : (prev?.profile?.typewriterRoles || mockPortfolioData.profile.typewriterRoles),
+      heroLine1:       p.hero_line1 !== undefined ? p.hero_line1 : (prev?.profile?.heroLine1 ?? mockPortfolioData.profile.heroLine1),
+      heroLine2:       p.hero_line2 !== undefined ? p.hero_line2 : (prev?.profile?.heroLine2 ?? mockPortfolioData.profile.heroLine2),
+      heroLine3:       p.hero_line3 !== undefined ? p.hero_line3 : (prev?.profile?.heroLine3 ?? mockPortfolioData.profile.heroLine3),
       email:          p.email                  || prev?.profile?.email           || mockPortfolioData.profile.email,
       phone:          p.phone                  || prev?.profile?.phone           || mockPortfolioData.profile.phone,
       location:       p.location               || prev?.profile?.location        || mockPortfolioData.profile.location,
@@ -182,7 +220,16 @@ const formatAndMerge = (apiData, prev) => {
       contact:        s.show_contact        !== false,
       footer:         s.show_footer         !== false,
     },
-    themeSettings: prev?.themeSettings || mockPortfolioData.themeSettings,
+    themeSettings: {
+      ...(prev?.themeSettings || mockPortfolioData.themeSettings),
+      themeMode: s.theme_mode || prev?.themeSettings?.themeMode || mockPortfolioData.themeSettings.themeMode,
+      primaryColor: s.primary_color || prev?.themeSettings?.primaryColor || mockPortfolioData.themeSettings.primaryColor,
+      accentColor: s.accent_color || prev?.themeSettings?.accentColor || mockPortfolioData.themeSettings.accentColor,
+      backgroundColor: s.background_color || prev?.themeSettings?.backgroundColor || mockPortfolioData.themeSettings.backgroundColor,
+      textColor: s.text_color || prev?.themeSettings?.textColor || mockPortfolioData.themeSettings.textColor,
+      cardColor: s.card_color || prev?.themeSettings?.cardColor || mockPortfolioData.themeSettings.cardColor,
+      borderRadius: s.border_radius || prev?.themeSettings?.borderRadius || mockPortfolioData.themeSettings.borderRadius,
+    },
   };
 };
 
@@ -222,6 +269,16 @@ export const PortfolioProvider = ({ children }) => {
         if (contentType && contentType.includes('application/json')) {
           const apiData = await res.json();
           setData(prev => formatAndMerge(apiData, prev));
+
+          // If backend settings specify a theme_mode, apply it as default theme
+          if (apiData?.settings?.theme_mode) {
+            localStorage.setItem('muthu_portfolio_default_theme', apiData.settings.theme_mode);
+            const manualTheme = localStorage.getItem('muthu_portfolio_user_selected_theme');
+            if (!manualTheme) {
+              localStorage.setItem('muthu_portfolio_theme_mode', apiData.settings.theme_mode);
+              document.documentElement.setAttribute('data-theme', apiData.settings.theme_mode);
+            }
+          }
         }
       }
     } catch (err) {
@@ -259,11 +316,19 @@ export const PortfolioProvider = ({ children }) => {
   const updateProfile = useCallback(async (fields) => {
     setData(prev => ({
       ...prev,
-      profile: { ...prev.profile, ...fields },
+      profile: {
+        ...prev.profile,
+        ...fields,
+        button2Url: fields.resumeUrl || fields.button2Url || prev.profile.button2Url
+      },
+      about: {
+        ...prev.about,
+        resumeUrl: fields.resumeUrl || prev.about?.resumeUrl || prev.profile.resumeUrl
+      },
       // Keep contact in sync with profile
       contact: { ...prev.contact, email: fields.email || prev.profile.email, phone: fields.phone || prev.profile.phone, location: fields.location || prev.profile.location }
     }));
-    await api('/api/admin/profile/', 'PUT', {
+    const res = await api('/api/admin/profile/', 'PUT', {
       full_name: fields.fullName,
       professional_title: fields.title,
       tagline: fields.tagline,
@@ -271,7 +336,32 @@ export const PortfolioProvider = ({ children }) => {
       email: fields.email,
       phone: fields.phone,
       location: fields.location,
+      resume_url: fields.resumeUrl,
+      button2_url: fields.resumeUrl,
+      status_badge_text: fields.statusBadgeText,
+      show_status_badge: fields.showStatusBadge,
+      typewriter_roles: fields.typewriterRoles,
+      hero_line1: fields.heroLine1,
+      hero_line2: fields.heroLine2,
+      hero_line3: fields.heroLine3,
     });
+    if (res && res.ok) {
+      const updated = await res.json();
+      if (updated && updated.resume_url) {
+        setData(prev => ({
+          ...prev,
+          profile: {
+            ...prev.profile,
+            resumeUrl: updated.resume_url,
+            button2Url: updated.resume_url,
+          },
+          about: {
+            ...prev.about,
+            resumeUrl: updated.resume_url,
+          }
+        }));
+      }
+    }
   }, [setData]);
 
   // ─── ABOUT ─────────────────────────────────────────────────────────────────
@@ -573,23 +663,25 @@ export const PortfolioProvider = ({ children }) => {
 
   // ─── SECTION VISIBILITY ────────────────────────────────────────────────────
   const toggleSection = useCallback(async (key) => {
+    let nextValue;
     setData(prev => {
       const currentValue = prev.sectionVisibility?.[key] !== false;
-      const newValue = !currentValue;
-      const updated = {
+      nextValue = !currentValue;
+      return {
         ...prev,
-        sectionVisibility: { ...(prev.sectionVisibility || {}), [key]: newValue },
+        sectionVisibility: { ...(prev.sectionVisibility || {}), [key]: nextValue },
       };
-      const fieldMap = {
-        hero: 'show_hero', about: 'show_about', skills: 'show_skills',
-        experience: 'show_experience', certifications: 'show_certifications',
-        projects: 'show_projects', contact: 'show_contact', footer: 'show_footer',
-      };
-      if (fieldMap[key]) {
-        api('/api/admin/settings/', 'PUT', { [fieldMap[key]]: newValue });
-      }
-      return updated;
     });
+
+    const fieldMap = {
+      hero: 'show_hero', about: 'show_about', skills: 'show_skills',
+      experience: 'show_experience', certifications: 'show_certifications',
+      projects: 'show_projects', contact: 'show_contact', footer: 'show_footer',
+    };
+
+    if (fieldMap[key] && nextValue !== undefined) {
+      await api('/api/admin/settings/', 'PUT', { [fieldMap[key]]: nextValue });
+    }
   }, [setData]);
 
   // ─── MESSAGES ──────────────────────────────────────────────────────────────
@@ -614,7 +706,8 @@ export const PortfolioProvider = ({ children }) => {
       await api(`/api/admin/messages/${id}/`, 'DELETE');
     }
   }, []);
-  const updateThemeSettings = useCallback((newSettings) => {
+
+  const updateThemeSettings = useCallback(async (newSettings) => {
     setData((prev) => {
       const updatedTheme = {
         ...(prev.themeSettings || {}),
@@ -624,12 +717,28 @@ export const PortfolioProvider = ({ children }) => {
       saveCache(updatedData);
       return updatedData;
     });
+
     if (newSettings.themeMode) {
       localStorage.setItem('muthu_portfolio_default_theme', newSettings.themeMode);
       localStorage.setItem('muthu_portfolio_theme_mode', newSettings.themeMode);
       document.documentElement.setAttribute('data-theme', newSettings.themeMode);
     }
-  }, []);
+
+    // Persist to backend database so settings stay permanently across restarts
+    try {
+      await api('/api/admin/settings/', 'PUT', {
+        theme_mode: newSettings.themeMode,
+        primary_color: newSettings.primaryColor,
+        accent_color: newSettings.accentColor,
+        background_color: newSettings.backgroundColor,
+        text_color: newSettings.textColor,
+        card_color: newSettings.cardColor,
+        border_radius: newSettings.borderRadius,
+      });
+    } catch (err) {
+      console.warn('Failed to persist theme settings to backend:', err);
+    }
+  }, [setData]);
 
   const value = {
     data,

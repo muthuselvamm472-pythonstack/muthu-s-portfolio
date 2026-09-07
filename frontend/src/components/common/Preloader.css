@@ -1,0 +1,180 @@
+/* Preloader.css - Minimal & Professional Multilingual Intro with Light & Dark Theme Support */
+
+.preloader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-color, #0d1117);
+  color: var(--text-primary, #f0f6fc);
+  z-index: 9999999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  will-change: transform;
+  transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1), background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Light Theme Styling */
+[data-theme="light"] .preloader-overlay,
+.preloader-overlay.light,
+.preloader-overlay[data-theme="light"] {
+  background-color: #fafaf9;
+  color: #1c1917;
+}
+
+/* Dark Theme Styling */
+[data-theme="dark"] .preloader-overlay,
+.preloader-overlay.dark,
+.preloader-overlay[data-theme="dark"] {
+  background-color: #0d1117;
+  color: #f0f6fc;
+}
+
+.preloader-overlay.slide-up {
+  transform: translateY(-100%);
+}
+
+/* Content Layout */
+.preloader-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 900px;
+  height: 100vh;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Minimal Greeting Word Animation */
+.preloader-greeting-box {
+  margin: auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: preloaderWordFade 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes preloaderWordFade {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.preloader-greeting-text {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-size: clamp(3.2rem, 8vw, 6rem);
+  font-weight: 600;
+  color: var(--text-primary, #f0f6fc);
+  letter-spacing: -0.02em;
+  text-align: center;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+
+[data-theme="light"] .preloader-greeting-text,
+.preloader-overlay.light .preloader-greeting-text,
+.preloader-overlay[data-theme="light"] .preloader-greeting-text {
+  color: #1c1917;
+}
+
+[data-theme="dark"] .preloader-greeting-text,
+.preloader-overlay.dark .preloader-greeting-text,
+.preloader-overlay[data-theme="dark"] .preloader-greeting-text {
+  color: #f0f6fc;
+}
+
+/* Footer & Hairline Progress Bar */
+.preloader-footer {
+  width: 100%;
+  max-width: 480px;
+  margin-bottom: 1.5rem;
+}
+
+.preloader-line-container {
+  width: 100%;
+  height: 2px;
+  background: var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+  transition: background-color 0.3s ease;
+}
+
+[data-theme="light"] .preloader-line-container,
+.preloader-overlay.light .preloader-line-container,
+.preloader-overlay[data-theme="light"] .preloader-line-container {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .preloader-line-container,
+.preloader-overlay.dark .preloader-line-container,
+.preloader-overlay[data-theme="dark"] .preloader-line-container {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.preloader-line-fill {
+  height: 100%;
+  background: var(--primary-color, #f59e0b);
+  border-radius: 2px;
+  transition: width 0.15s ease-out;
+}
+
+.preloader-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.78rem;
+  color: var(--text-muted, #6e7681);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+[data-theme="light"] .preloader-meta,
+.preloader-overlay.light .preloader-meta,
+.preloader-overlay[data-theme="light"] .preloader-meta {
+  color: #78716c;
+}
+
+[data-theme="dark"] .preloader-meta,
+.preloader-overlay.dark .preloader-meta,
+.preloader-overlay[data-theme="dark"] .preloader-meta {
+  color: #6e7681;
+}
+
+.preloader-author {
+  color: var(--text-secondary, #8b949e);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+[data-theme="light"] .preloader-author,
+.preloader-overlay.light .preloader-author,
+.preloader-overlay[data-theme="light"] .preloader-author {
+  color: #57534e;
+}
+
+[data-theme="dark"] .preloader-author,
+.preloader-overlay.dark .preloader-author,
+.preloader-overlay[data-theme="dark"] .preloader-author {
+  color: #8b949e;
+}
+
+.preloader-counter {
+  color: var(--primary-color, #f59e0b);
+  font-weight: 600;
+}
+

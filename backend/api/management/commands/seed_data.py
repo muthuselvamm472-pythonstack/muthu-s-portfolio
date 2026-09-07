@@ -30,13 +30,13 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS('Created superuser "muthu" with password "muthu2026"'))
 
         # 2. Profile
-        Profile.objects.get_or_create(
+        Profile.objects.update_or_create(
             id=1,
             defaults={
                 'full_name': 'MUTHU SELVAM.M',
                 'professional_title': 'PYTHON FULL STACK DEVELOPER',
-                'tagline': 'Driven BCA graduate with a strong academic foundation in Python, SQL, HTML5, CSS3, and React.js.',
-                'hero_description': 'I specialize in web application development with Python, SQL databases, HTML5/CSS3, and React.js.',
+                'tagline': 'Motivated software development professional with a strong foundation in Python, SQL, HTML5, CSS3, React.js, and Manual Testing.',
+                'hero_description': 'Motivated software development professional with a strong foundation in Python, SQL, HTML5, CSS3, and Manual Testing. Eager to contribute to the development and testing of efficient, responsive, and reliable applications while applying analytical thinking, problem-solving skills, attention to detail, and a commitment to continuous learning to support organizational success.',
                 'profile_image_url': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
                 'email': 'muthuselvamm472@gmail.com',
                 'phone': '+91 8678922362',
@@ -50,27 +50,30 @@ class Command(BaseCommand):
         )
 
         # 3. About
-        About.objects.get_or_create(
+        About.objects.update_or_create(
             id=1,
             defaults={
                 'heading': 'Driven BCA graduate with a strong academic foundation in Python, SQL, and Web Technologies.',
-                'short_description': 'Bachelor of Computer Applications (CGPA: 7.8) graduate from Agurchand Manmull Jain College, Mennambakkam, Chennai.',
-                'detailed_description': 'Eager to contribute to the development of efficient, responsive, and scalable web applications while applying analytical thinking, problem-solving abilities, and a commitment to continuous learning to support organizational success.',
-                'current_focus': 'Python Full Stack Development (Qspiders), Django REST Framework, React.js & Relational Databases.',
-                'core_technologies': 'PYTHON • SQL • HTML5 • CSS3 • REACT.JS • Microsoft Office',
+                'short_description': 'Bachelor of Computer Application (CGPA: 7.8) from Agurchand Manmull Jain College, Mennambakkam, Chennai | HSC 12th (80%) from St. Sebastian Matriculation Higher Secondary School, Pallavaram.',
+                'detailed_description': 'Motivated software development professional with a strong foundation in Python, SQL, HTML5, CSS3, and Manual Testing. Eager to contribute to the development and testing of efficient, responsive, and reliable applications while applying analytical thinking, problem-solving skills, attention to detail, and a commitment to continuous learning to support organizational success.',
+                'current_focus': 'Python Full Stack Development (Qspiders), Django REST Framework, React.js, Manual Testing & SQL.',
+                'core_technologies': 'PYTHON3 • SQL • HTML5 • CSS3 • REACT.JS • MANUAL TESTING • MICROSOFT OFFICE',
                 'show_resume_button': True
             }
         )
 
         # 4. Skills
         initial_skills = [
-            {'name': 'Python', 'category': 'Programming', 'icon': 'Code', 'display_order': 1},
+            {'name': 'Python 3', 'category': 'Programming', 'icon': 'Code', 'display_order': 1},
             {'name': 'SQL', 'category': 'Programming', 'icon': 'Code', 'display_order': 2},
             {'name': 'HTML5', 'category': 'Frontend', 'icon': 'Layout', 'display_order': 1},
             {'name': 'CSS3', 'category': 'Frontend', 'icon': 'Layout', 'display_order': 2},
             {'name': 'React.js', 'category': 'Frontend', 'icon': 'Layout', 'display_order': 3},
+            {'name': 'Manual Testing', 'category': 'Testing & QA', 'icon': 'CheckCircle', 'display_order': 1},
             {'name': 'Microsoft Office (Excel / Word)', 'category': 'Tools', 'icon': 'Wrench', 'display_order': 1},
             {'name': 'Git & GitHub', 'category': 'Tools', 'icon': 'Wrench', 'display_order': 2},
+            {'name': 'Languages: English, Tamil', 'category': 'Languages & Soft Skills', 'icon': 'User', 'display_order': 1},
+            {'name': 'Soft Skills: Collaboration, Time Management, Creative Thinking, Multitasking', 'category': 'Languages & Soft Skills', 'icon': 'User', 'display_order': 2},
         ]
         for item in initial_skills:
             Skill.objects.get_or_create(name=item['name'], defaults=item)
@@ -83,7 +86,7 @@ class Command(BaseCommand):
                 'location': 'Chennai, India',
                 'start_date': 'Jan 2024',
                 'end_date': 'Feb 2024',
-                'description': 'Collaborated closely with the design team to implement UI/UX designs using HTML & CSS. Actively learned and followed UI development best practices, contributing to a clean, responsive, and user-friendly interface.',
+                'description': 'Collaborated closely with the design team to implement UI/UX designs and used technologies like HTML, CSS. Actively learned and followed UI development best practices, contributing to a clean, responsive, and user-friendly interface.',
                 'technologies': ['HTML5', 'CSS3', 'UI/UX Design', 'Responsive Web Design'],
                 'display_order': 1
             },
@@ -109,7 +112,8 @@ class Command(BaseCommand):
             {'name': 'TCS iON Career Edge - Young Professional', 'organization': 'TCS iON', 'issue_date': '2025', 'credential_url': 'https://learning.tcsionhub.in', 'display_order': 4},
             {'name': 'Python for Data Science', 'organization': 'NPTEL', 'issue_date': '2025', 'credential_url': 'https://nptel.ac.in', 'display_order': 5},
             {'name': "Web Design Certificate", 'organization': "Zoho Tech's Training & Placement Services", 'issue_date': '2024', 'credential_url': '#', 'display_order': 6},
-            {'name': 'Web Development Certificate', 'organization': 'WHYTAB GLOBAL SERVICES', 'issue_date': '2025', 'credential_url': '#', 'display_order': 7},
+            {'name': 'Data Entry Certificate', 'organization': 'Aassaan Educare Foundation', 'issue_date': '2025', 'credential_url': '#', 'display_order': 7},
+            {'name': 'Web Development Certificate', 'organization': 'WHYTAB GLOBAL SERVICES', 'issue_date': '2025', 'credential_url': '#', 'display_order': 8},
         ]
         for cert in initial_certs:
             Certification.objects.get_or_create(name=cert['name'], organization=cert['organization'], defaults=cert)

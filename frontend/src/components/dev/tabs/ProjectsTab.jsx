@@ -265,15 +265,28 @@ export const ProjectsTab = ({ data, addProject, updateProject, deleteProject, sh
 
               <div className="form-group">
                 <label>Project Screenshot Image</label>
-                <div className="file-upload-wrapper">
-                  <label className="btn btn-secondary file-upload-btn">
+                <div className="file-upload-wrapper" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <label className="btn btn-secondary file-upload-btn" style={{ margin: 0, cursor: 'pointer' }}>
                     <Upload size={16} /> Choose Image File
                     <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
                   </label>
+                  {form.image && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setForm(prev => ({ ...prev, image: '' }));
+                        showToast('Project photo removed. Click "Save Project" to confirm.', 'info');
+                      }}
+                      className="btn btn-outline flex-center gap-1"
+                      style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.4)', fontSize: '0.85rem', padding: '0.45rem 0.85rem' }}
+                    >
+                      <Trash2 size={14} /> Remove Photo
+                    </button>
+                  )}
                 </div>
                 {form.image && (
-                  <div className="img-preview-thumb margin-top">
-                    <img src={form.image} alt="Project Preview" />
+                  <div className="img-preview-thumb margin-top" style={{ marginTop: '0.75rem' }}>
+                    <img src={form.image} alt="Project Preview" style={{ maxHeight: '180px', borderRadius: '8px' }} />
                   </div>
                 )}
               </div>

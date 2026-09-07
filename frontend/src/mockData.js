@@ -2,13 +2,25 @@ export const mockPortfolioData = {
   profile: {
     fullName: "MUTHU SELVAM.M",
     title: "PYTHON FULL STACK DEVELOPER",
-    tagline: "Driven BCA graduate with a strong academic foundation in Python, SQL, HTML5, CSS3, and React.js.",
-    heroDescription: "I specialize in web application development with Python, SQL databases, HTML5/CSS3, and React.js.",
+    tagline: "Motivated software development professional with a strong foundation in Python, SQL, HTML5, CSS3, React.js, and Manual Testing.",
+    heroDescription: "Motivated software development professional with a strong foundation in Python, SQL, HTML5, CSS3, and Manual Testing. Eager to contribute to the development and testing of efficient, responsive, and reliable applications while applying analytical thinking, problem-solving skills, attention to detail, and a commitment to continuous learning to support organizational success.",
     profileImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
+    statusBadgeText: "Available for Full Stack Opportunities",
+    showStatusBadge: true,
+    typewriterRoles: [
+      "REACT",
+      "PYTHON FULL STACK DEVELOPER",
+      "DJANGO REST API SPECIALIST",
+      "REACT.JS & ORACLE SQL DEVELOPER"
+    ],
+    heroLine1: "I'm Muthu Selvam,",
+    heroLine2: "A Python Full Stack",
+    heroLine3: "developer",
     button1Text: "View My Work",
     button1Url: "#projects",
     button2Text: "Download Resume",
     button2Url: "/Muthu_Selvam_Resume.pdf",
+    resumeUrl: "/Muthu_Selvam_Resume.pdf",
     showHeroButtons: true,
     email: "muthuselvamm472@gmail.com",
     phone: "+91 8678922362",
@@ -16,20 +28,23 @@ export const mockPortfolioData = {
   },
   about: {
     heading: "Driven BCA graduate with a strong academic foundation in Python, SQL, and Web Technologies.",
-    shortDescription: "Bachelor of Computer Applications (CGPA: 7.8) graduate from Agurchand Manmull Jain College, Mennambakkam, Chennai.",
-    detailedDescription: "Eager to contribute to the development of efficient, responsive, and scalable web applications while applying analytical thinking, problem-solving abilities, and a commitment to continuous learning to support organizational success.",
-    currentFocus: "Python Full Stack Development (Qspiders), Django REST Framework, React.js & Relational Databases.",
-    coreTechnologies: "PYTHON • SQL • HTML5 • CSS3 • REACT.JS • Microsoft Office",
+    shortDescription: "Bachelor of Computer Application (CGPA: 7.8) from Agurchand Manmull Jain College, Mennambakkam, Chennai | HSC 12th (80%) from St. Sebastian Matriculation Higher Secondary School, Pallavaram.",
+    detailedDescription: "Motivated software development professional with a strong foundation in Python, SQL, HTML5, CSS3, and Manual Testing. Eager to contribute to the development and testing of efficient, responsive, and reliable applications while applying analytical thinking, problem-solving skills, attention to detail, and a commitment to continuous learning to support organizational success.",
+    currentFocus: "Python Full Stack Development (Qspiders), Django REST Framework, React.js, Manual Testing & SQL.",
+    coreTechnologies: "PYTHON3 • SQL • HTML5 • CSS3 • REACT.JS • MANUAL TESTING • MICROSOFT OFFICE",
     resumeUrl: "/Muthu_Selvam_Resume.pdf"
   },
   skills: [
-    { id: 1, name: "Python", category: "Programming", icon: "Code", order: 1, isVisible: true },
+    { id: 1, name: "Python 3", category: "Programming", icon: "Code", order: 1, isVisible: true },
     { id: 2, name: "SQL", category: "Programming", icon: "Code", order: 2, isVisible: true },
     { id: 3, name: "HTML5", category: "Frontend", icon: "Layout", order: 1, isVisible: true },
     { id: 4, name: "CSS3", category: "Frontend", icon: "Layout", order: 2, isVisible: true },
     { id: 5, name: "React.js", category: "Frontend", icon: "Layout", order: 3, isVisible: true },
-    { id: 6, name: "Microsoft Office (Excel / Word)", category: "Tools", icon: "Wrench", order: 1, isVisible: true },
-    { id: 7, name: "Git & GitHub", category: "Tools", icon: "Wrench", order: 2, isVisible: true }
+    { id: 6, name: "Manual Testing", category: "Testing & QA", icon: "CheckCircle", order: 1, isVisible: true },
+    { id: 7, name: "Microsoft Office (Excel / Word)", category: "Tools", icon: "Wrench", order: 1, isVisible: true },
+    { id: 8, name: "Git & GitHub", category: "Tools", icon: "Wrench", order: 2, isVisible: true },
+    { id: 9, name: "Languages: English, Tamil", category: "Languages & Soft Skills", icon: "User", order: 1, isVisible: true },
+    { id: 10, name: "Soft Skills: Collaboration, Time Management, Creative Thinking, Multitasking", category: "Languages & Soft Skills", icon: "User", order: 2, isVisible: true }
   ],
   experiences: [
     {
@@ -39,7 +54,7 @@ export const mockPortfolioData = {
       location: "Chennai, India",
       startDate: "Jan 2024",
       endDate: "Feb 2024",
-      description: "Collaborated closely with the design team to implement UI/UX designs using HTML & CSS. Actively learned and followed UI development best practices, contributing to a clean, responsive, and user-friendly interface.",
+      description: "Collaborated closely with the design team to implement UI/UX designs and used technologies like HTML, CSS. Actively learned and followed UI development best practices, contributing to a clean, responsive, and user-friendly interface.",
       technologies: ["HTML5", "CSS3", "UI/UX Design", "Responsive Web Design"],
       order: 1
     },
@@ -106,11 +121,19 @@ export const mockPortfolioData = {
     },
     {
       id: 7,
+      name: "Data Entry Certificate",
+      organization: "Aassaan Educare Foundation",
+      issueDate: "2025",
+      credentialUrl: "#",
+      order: 7
+    },
+    {
+      id: 8,
       name: "Web Development Certificate",
       organization: "WHYTAB GLOBAL SERVICES",
       issueDate: "2025",
       credentialUrl: "#",
-      order: 7
+      order: 8
     }
   ],
   projects: [

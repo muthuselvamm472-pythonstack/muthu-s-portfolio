@@ -18,11 +18,13 @@ export const ThemeProvider = ({ children }) => {
 
   const setAdminDefaultTheme = (mode) => {
     localStorage.setItem('muthu_portfolio_default_theme', mode);
+    localStorage.removeItem('muthu_portfolio_user_selected_theme');
     setThemeMode(mode);
   };
 
   const toggleTheme = () => {
     const nextMode = themeMode === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('muthu_portfolio_user_selected_theme', nextMode);
     setThemeMode(nextMode);
   };
 

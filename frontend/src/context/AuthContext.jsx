@@ -12,17 +12,57 @@ export const AuthProvider = ({ children }) => {
   // Check auth state on mount
   useEffect(() => {
     const verifyAuth = async () => {
-      if (!token) {
+      let currentToken = token || localStorage.getItem('muthu_admin_jwt');
+      const currentRefresh = refreshToken || localStorage.getItem('muthu_admin_jwt_refresh');
+
+      if (!currentToken && !currentRefresh) {
         setLoading(false);
         return;
       }
-      try {
-        const res = await fetch(getApiUrl('/api/auth/me/'), {
-          headers: {
-            'Authorization': `Bearer ${token}`
+
+      // Helper to refresh token
+      const doRefresh = async () => {
+        if (!currentRefresh) return null;
+        try {
+          const rfRes = await fetch(getApiUrl('/api/auth/token/refresh/'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh: currentRefresh })
+          });
+          if (rfRes.ok) {
+            const data = await rfRes.json();
+            if (data.access) {
+              localStorage.setItem('muthu_admin_jwt', data.access);
+              setToken(data.access);
+              return data.access;
+            }
           }
-        });
-        if (res.ok) {
+        } catch (e) {
+          console.warn('Silent refresh error:', e);
+        }
+        return null;
+      };
+
+      try {
+        let res = null;
+        if (currentToken) {
+          res = await fetch(getApiUrl('/api/auth/me/'), {
+            headers: { 'Authorization': `Bearer ${currentToken}` }
+          });
+        }
+
+        // If no token or token expired (401), try refreshing
+        if (!res || res.status === 401) {
+          const newAccess = await doRefresh();
+          if (newAccess) {
+            currentToken = newAccess;
+            res = await fetch(getApiUrl('/api/auth/me/'), {
+              headers: { 'Authorization': `Bearer ${newAccess}` }
+            });
+          }
+        }
+
+        if (res && res.ok) {
           const contentType = res.headers.get('content-type');
           if (contentType && contentType.includes('application/json')) {
             const userData = await res.json();
@@ -31,7 +71,7 @@ export const AuthProvider = ({ children }) => {
             logout();
           }
         } else {
-          // Token expired or invalid
+          // Both token and refresh failed
           logout();
         }
       } catch (err) {

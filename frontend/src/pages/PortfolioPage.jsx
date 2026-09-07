@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navbar } from '../components/public/Navbar';
 import { ScrollProgressBar } from '../components/common/ScrollProgressBar';
+import { Preloader } from '../components/common/Preloader';
 import { HeroSection } from '../components/public/HeroSection';
 import { AboutSection } from '../components/public/AboutSection';
 import { SkillsSection } from '../components/public/SkillsSection';
@@ -19,6 +20,7 @@ export const PortfolioPage = () => {
 
   return (
     <div className="portfolio-app">
+      <Preloader />
       <ScrollProgressBar />
       <Navbar />
       <main>

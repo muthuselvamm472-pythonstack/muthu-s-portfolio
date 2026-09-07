@@ -234,15 +234,28 @@ export const CertificationsTab = ({ data, toggleSection, addCertification, updat
 
               <div className="form-group">
                 <label>Upload Certificate Image (Photos/Scans)</label>
-                <div className="file-upload-wrapper">
-                  <label className="btn btn-secondary file-upload-btn">
+                <div className="file-upload-wrapper" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <label className="btn btn-secondary file-upload-btn" style={{ margin: 0, cursor: 'pointer' }}>
                     <Upload size={16} /> Select Certificate Image
                     <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
                   </label>
+                  {form.certificateImg && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setForm(prev => ({ ...prev, certificateImg: '' }));
+                        showToast('Certificate photo removed. Click "Save Certification" to confirm.', 'info');
+                      }}
+                      className="btn btn-outline flex-center gap-1"
+                      style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.4)', fontSize: '0.85rem', padding: '0.45rem 0.85rem' }}
+                    >
+                      <Trash2 size={14} /> Remove Photo
+                    </button>
+                  )}
                 </div>
                 {form.certificateImg && (
-                  <div className="img-preview-thumb">
-                    <img src={form.certificateImg} alt="Certificate preview" />
+                  <div className="img-preview-thumb margin-top" style={{ marginTop: '0.75rem' }}>
+                    <img src={form.certificateImg} alt="Certificate preview" style={{ maxHeight: '180px', borderRadius: '8px' }} />
                   </div>
                 )}
               </div>

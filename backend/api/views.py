@@ -5,8 +5,11 @@ Public endpoints return portfolio data without auth.
 """
 import os
 import base64
+from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.db.models import Q
 from rest_framework import status, generics
 from rest_framework.decorators import api_view, permission_classes
@@ -212,7 +215,50 @@ class AdminProfileView(APIView):
 
     def put(self, request):
         profile = get_profile()
-        serializer = ProfileSerializer(profile, data=request.data, partial=True,
+        data = request.data.copy() if hasattr(request.data, 'copy') else dict(request.data)
+
+        # Check if resume_url is a base64 encoded PDF document
+        raw_resume = data.get('resume_url', '')
+        if isinstance(raw_resume, str) and raw_resume.startswith('data:'):
+            try:
+                header, base64_str = raw_resume.split(';base64,', 1)
+                decoded_file = base64.b64decode(base64_str)
+                file_name = 'Muthu_Selvam_Resume.pdf'
+                rel_path = f'resume/{file_name}'
+                if default_storage.exists(rel_path):
+                    default_storage.delete(rel_path)
+                if profile.resume_file and profile.resume_file.name != rel_path:
+                    try:
+                        profile.resume_file.delete(save=False)
+                    except Exception:
+                        pass
+                profile.resume_file.save(file_name, ContentFile(decoded_file), save=False)
+                resume_media_url = profile.resume_file.url  # e.g. '/media/resume/Muthu_Selvam_Resume.pdf'
+                data['resume_url'] = resume_media_url
+                data['button2_url'] = resume_media_url
+
+                # Also copy to frontend/public for fallback offline access
+                try:
+                    frontend_public = settings.BASE_DIR.parent / 'frontend' / 'public'
+                    if frontend_public.exists():
+                        with open(frontend_public / 'Muthu_Selvam_Resume.pdf', 'wb') as f:
+                            f.write(decoded_file)
+                        with open(frontend_public / 'Muthu Selvam(RESUME).pdf', 'wb') as f:
+                            f.write(decoded_file)
+                except Exception as ex:
+                    print('Note: Could not copy to frontend/public:', ex)
+            except Exception as e:
+                print('Error decoding resume base64:', e)
+        elif raw_resume == '':
+            profile.resume_file = None
+            data['resume_url'] = ''
+
+        # Check if profile_image is cleared
+        if data.get('profile_image') == '':
+            profile.profile_image = None
+            data['profile_image_url'] = ''
+
+        serializer = ProfileSerializer(profile, data=data, partial=True,
                                        context={'request': request})
         if serializer.is_valid():
             # Handle profile image upload
@@ -221,6 +267,7 @@ class AdminProfileView(APIView):
             # Handle resume file upload
             if 'resume_file_upload' in request.FILES:
                 profile.resume_file = request.FILES['resume_file_upload']
+                profile.resume_url = profile.resume_file.url
             serializer.save()
             return Response(ProfileSerializer(profile, context={'request': request}).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -390,6 +437,13 @@ class AdminCertDetailView(APIView):
         cert = self.get_object(pk)
         if not cert:
             return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # If certificate image was removed/cleared
+        if request.data.get('certificate_image_data') == '' or request.data.get('certificate_image') == '':
+            cert.certificate_image = None
+            cert.certificate_image_data = ''
+            cert.save()
+
         serializer = CertificationSerializer(cert, data=request.data, partial=True,
                                               context={'request': request})
         if serializer.is_valid():
@@ -444,6 +498,13 @@ class AdminProjectDetailView(APIView):
         proj = self.get_object(pk)
         if not proj:
             return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # If project image was removed/cleared
+        if request.data.get('project_image_url') == '' or request.data.get('project_image') == '':
+            proj.project_image = None
+            proj.project_image_url = ''
+            proj.save()
+
         serializer = ProjectSerializer(proj, data=request.data, partial=True,
                                         context={'request': request})
         if serializer.is_valid():

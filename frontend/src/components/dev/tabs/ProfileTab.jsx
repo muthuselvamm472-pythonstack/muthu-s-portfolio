@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Save, ShieldCheck, Lock, User, KeyRound } from 'lucide-react';
+import { Save, ShieldCheck, Lock, User, KeyRound, FileText, Upload, ExternalLink, Trash2, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
+import { getApiUrl } from '../../../apiConfig';
 
 export const ProfileTab = ({ data, updateProfile, showToast }) => {
   const { user, changeCredentials } = useAuth();
@@ -11,7 +12,11 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
     email:    data.profile?.email    || '',
     phone:    data.profile?.phone    || '',
     location: data.profile?.location || '',
+    resumeUrl: data.profile?.resumeUrl || '/Muthu_Selvam_Resume.pdf',
   });
+
+  const [pendingResumeFile, setPendingResumeFile] = useState(null);
+  const [pendingResumeBase64, setPendingResumeBase64] = useState(null);
 
   // Admin Account Credentials form state
   const [credForm, setCredForm] = useState({
@@ -38,19 +43,78 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
         email:    data.profile.email    || prev.email,
         phone:    data.profile.phone    || prev.phone,
         location: data.profile.location || prev.location,
+        resumeUrl: data.profile.resumeUrl || prev.resumeUrl,
       }));
     }
-  }, [data.profile?.fullName, data.profile?.title, data.profile?.email]);
+  }, [data.profile?.fullName, data.profile?.title, data.profile?.email, data.profile?.resumeUrl]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleResumeFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
+      showToast('Please upload a valid PDF document file (.pdf)', 'warning');
+    }
+
+    setPendingResumeFile(file);
+    // Keep the input text clean and readable with filename
+    setForm(prev => ({ ...prev, resumeUrl: `/media/resume/${file.name}` }));
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPendingResumeBase64(reader.result);
+      showToast(`📄 Selected "${file.name}"! Click "Save Profile & Resume Changes" to activate.`, 'info');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handlePreviewResume = (e) => {
+    e.preventDefault();
+    if (pendingResumeFile) {
+      const blobUrl = URL.createObjectURL(pendingResumeFile);
+      window.open(blobUrl, '_blank');
+      return;
+    }
+    if (form.resumeUrl && form.resumeUrl.startsWith('data:')) {
+      fetch(form.resumeUrl)
+        .then(res => res.blob())
+        .then(blob => {
+          const blobUrl = URL.createObjectURL(blob);
+          window.open(blobUrl, '_blank');
+        })
+        .catch(() => window.open(form.resumeUrl, '_blank'));
+      return;
+    }
+    if (form.resumeUrl) {
+      const targetUrl = form.resumeUrl.startsWith('http')
+        ? form.resumeUrl
+        : getApiUrl(form.resumeUrl);
+      window.open(targetUrl, '_blank');
+    }
+  };
+
+  const handleClearResume = () => {
+    setPendingResumeFile(null);
+    setPendingResumeBase64(null);
+    setForm(prev => ({ ...prev, resumeUrl: '' }));
+    showToast('Resume cleared. Click "Save Profile Changes" to activate.', 'info');
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    updateProfile(form);
-    showToast('✅ Profile updated! Changes are live on the website.', 'success');
+    const payload = {
+      ...form,
+      resumeUrl: pendingResumeBase64 || form.resumeUrl,
+    };
+    updateProfile(payload);
+    setPendingResumeBase64(null);
+    setPendingResumeFile(null);
+    showToast('✅ Profile & Resume settings updated! Changes are live on the website.', 'success');
   };
 
   const handleCredsSubmit = async (e) => {
@@ -117,11 +181,60 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
               <label>Location</label>
               <input type="text" name="location" value={form.location} onChange={handleChange} />
             </div>
+
+            <div className="form-group span-2">
+              <label className="flex-center gap-2">
+                <FileText size={16} style={{ color: 'var(--admin-accent)' }} /> Resume File & Document Link
+              </label>
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                <input
+                  type="text"
+                  name="resumeUrl"
+                  value={form.resumeUrl}
+                  onChange={handleChange}
+                  placeholder="/media/resume/Muthu_Selvam_Resume.pdf or URL link"
+                  style={{ flex: '1 1 240px' }}
+                />
+                <label className="btn btn-secondary flex-center gap-2" style={{ cursor: 'pointer', margin: 0, padding: '0.6rem 1rem' }}>
+                  <Upload size={16} /> Upload New PDF
+                  <input type="file" accept=".pdf,application/pdf" onChange={handleResumeFileUpload} style={{ display: 'none' }} />
+                </label>
+                {form.resumeUrl && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handlePreviewResume}
+                      className="btn btn-outline flex-center gap-1"
+                      style={{ padding: '0.6rem 1rem', cursor: 'pointer' }}
+                    >
+                      <ExternalLink size={15} /> Preview
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleClearResume}
+                      className="btn btn-outline flex-center gap-1"
+                      style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.4)', padding: '0.6rem 1rem' }}
+                      title="Clear resume link"
+                    >
+                      <Trash2 size={15} /> Clear
+                    </button>
+                  </>
+                )}
+              </div>
+              {pendingResumeFile && (
+                <div style={{ marginTop: '0.4rem', color: '#10b981', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <CheckCircle2 size={14} /> Selected local PDF: <strong>{pendingResumeFile.name}</strong> ({Math.round(pendingResumeFile.size / 1024)} KB) — Click "Save Profile & Resume Changes" below to activate.
+                </div>
+              )}
+              <p className="field-hint" style={{ marginTop: '0.4rem', fontSize: '0.85rem' }}>
+                Upload a new PDF file from your computer or enter a URL. Visitors can view/download this file when clicking "Download Resume".
+              </p>
+            </div>
           </div>
 
           <div className="form-actions margin-top">
             <button type="submit" className="btn btn-primary flex-center gap-2">
-              <Save size={18} /> Save Profile Changes
+              <Save size={18} /> Save Profile & Resume Changes
             </button>
           </div>
         </div>
