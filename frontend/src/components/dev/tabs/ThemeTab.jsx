@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Save, Palette, Sun, Moon, CheckCircle2 } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 
@@ -15,6 +15,21 @@ export const ThemeTab = ({ data, updateThemeSettings, showToast }) => {
     cardColor: theme.cardColor || '#ffffff',
     borderRadius: theme.borderRadius || '18px'
   });
+
+  useEffect(() => {
+    if (data.themeSettings) {
+      setForm(prev => ({
+        ...prev,
+        themeMode: data.themeSettings.themeMode || prev.themeMode,
+        primaryColor: data.themeSettings.primaryColor || prev.primaryColor,
+        accentColor: data.themeSettings.accentColor || prev.accentColor,
+        backgroundColor: data.themeSettings.backgroundColor || prev.backgroundColor,
+        textColor: data.themeSettings.textColor || prev.textColor,
+        cardColor: data.themeSettings.cardColor || prev.cardColor,
+        borderRadius: data.themeSettings.borderRadius || prev.borderRadius,
+      }));
+    }
+  }, [data.themeSettings]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

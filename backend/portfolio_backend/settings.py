@@ -20,7 +20,7 @@ SECRET_KEY = config('DJANGO_SECRET_KEY', default='muthu-portfolio-dev-secret-key
 
 DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', default='localhost,127.0.0.1,testserver,*').split(',')
+ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', default='localhost,127.0.0.1,testserver,*', cast=Csv())
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -134,8 +134,13 @@ CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=True, cast=boo
 
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
-    default='http://localhost:3000,http://127.0.0.1:3000,https://muthu-s-portfolio.vercel.app'
-).split(',')
+    default='http://localhost:3000,http://127.0.0.1:3000,https://muthu-s-portfolio.vercel.app',
+    cast=Csv()
+)
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https:\/\/.*\.vercel\.app$",
+]
 
 CORS_ALLOW_CREDENTIALS = True
 

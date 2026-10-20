@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Save } from 'lucide-react';
 
 export const AboutTab = ({ data, updateAbout, showToast }) => {
@@ -10,6 +10,20 @@ export const AboutTab = ({ data, updateAbout, showToast }) => {
     coreTechnologies: data.about?.coreTechnologies || '',
     showResumeButton: data.about?.showResumeButton !== false,
   });
+
+  useEffect(() => {
+    if (data.about) {
+      setForm(prev => ({
+        ...prev,
+        heading: data.about.heading || '',
+        shortDescription: data.about.shortDescription || '',
+        detailedDescription: data.about.detailedDescription || '',
+        currentFocus: data.about.currentFocus || '',
+        coreTechnologies: data.about.coreTechnologies || '',
+        showResumeButton: data.about.showResumeButton !== false,
+      }));
+    }
+  }, [data.about]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
