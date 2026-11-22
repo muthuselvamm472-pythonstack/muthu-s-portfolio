@@ -15,6 +15,7 @@ export const Navbar = () => {
   const [scrollDir, setScrollDir] = useState('up');
 
   const navItems = [
+    { id: 'hero', label: 'Home', show: sections.hero !== false },
     { id: 'about', label: 'About', show: sections.about !== false },
     { id: 'skills', label: 'Skills', show: sections.skills !== false },
     { id: 'experience', label: 'Experience', show: sections.experience !== false },
@@ -51,7 +52,7 @@ export const Navbar = () => {
           break;
         }
       }
-      if (currentY < 80) {
+      if (currentY < 120) {
         setActiveNav('hero');
       }
     };
@@ -66,6 +67,10 @@ export const Navbar = () => {
     setMobileMenuOpen(false);
     // Small delay so menu close animation completes before scroll
     setTimeout(() => {
+      if (itemId === 'hero') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
       const elem = document.getElementById(itemId);
       if (elem) elem.scrollIntoView({ behavior: 'smooth' });
     }, 50);
@@ -90,7 +95,7 @@ export const Navbar = () => {
     <header className={`navbar-wrapper ${isScrolled ? 'is-scrolled' : ''} scroll-dir-${scrollDir}`}>
       <nav className="navbar container">
         <div className="navbar-container">
-          <a href="#hero" className="nav-brand">
+          <a href="#hero" className="nav-brand" onClick={(e) => handleNavClick(e, 'hero')}>
             {renderBrand()}
           </a>
 
