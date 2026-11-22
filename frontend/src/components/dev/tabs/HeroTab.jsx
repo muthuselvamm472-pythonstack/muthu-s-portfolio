@@ -156,17 +156,17 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
 
         {/* ── Typewriter Animation Words ── */}
         <div className="admin-section-box margin-bottom" style={{
-          border: '1px solid rgba(6, 182, 212, 0.25)',
-          background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.04) 0%, var(--admin-card-bg) 100%)'
+          border: '1px solid rgba(147, 97, 66, 0.35)',
+          background: 'linear-gradient(135deg, rgba(147, 97, 66, 0.06) 0%, var(--admin-card-bg) 100%)'
         }}>
           <div className="flex-center gap-2" style={{ marginBottom: '0.3rem' }}>
-            <Type size={20} style={{ color: '#06b6d4' }} />
-            <h3 style={{ margin: 0 }}>Typography Animation Words (Typewriter Rotation)</h3>
+            <Type size={20} style={{ color: 'var(--admin-accent)' }} />
+            <h3 style={{ margin: 0, color: 'var(--admin-text-main)' }}>Typography Animation Words (Typewriter Rotation)</h3>
             <span style={{
               marginLeft: 'auto',
-              background: 'rgba(6, 182, 212, 0.15)',
-              border: '1px solid rgba(6, 182, 212, 0.3)',
-              color: '#06b6d4',
+              background: 'rgba(147, 97, 66, 0.12)',
+              border: '1px solid rgba(147, 97, 66, 0.35)',
+              color: 'var(--admin-accent)',
               fontSize: '0.75rem',
               fontWeight: 700,
               padding: '0.2rem 0.65rem',
@@ -177,7 +177,7 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
               {form.typewriterRoles.length} word{form.typewriterRoles.length !== 1 ? 's' : ''} rotating
             </span>
           </div>
-          <p className="field-hint" style={{ marginBottom: '1.25rem', fontSize: '0.83rem' }}>
+          <p className="field-hint" style={{ marginBottom: '1.25rem', fontSize: '0.85rem', color: 'var(--admin-text-muted)' }}>
             These words rotate dynamically above your headline with a smooth typing &amp; deleting animation.
             Drag chips to reorder. Words auto-convert to UPPERCASE.
           </p>
@@ -187,13 +187,13 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
             <div style={{
               display: 'flex',
               alignItems: 'stretch',
-              border: `2px solid ${inputFocused ? '#06b6d4' : 'rgba(6, 182, 212, 0.25)'}`,
+              border: `2px solid ${inputFocused ? 'var(--admin-accent)' : 'rgba(172, 138, 105, 0.45)'}`,
               borderRadius: '14px',
-              background: 'var(--admin-bg)',
+              background: 'var(--admin-input-bg)',
               overflow: 'hidden',
               transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
               boxShadow: inputFocused
-                ? '0 0 0 4px rgba(6, 182, 212, 0.12), 0 4px 20px rgba(6, 182, 212, 0.08)'
+                ? '0 0 0 4px rgba(147, 97, 66, 0.15), 0 4px 18px rgba(147, 97, 66, 0.10)'
                 : 'none',
             }}>
               <div style={{ flex: 1, position: 'relative' }}>
@@ -217,7 +217,7 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
                     background: 'transparent',
                     color: 'var(--admin-text-main)',
                     fontSize: '0.92rem',
-                    fontWeight: 500,
+                    fontWeight: 600,
                     fontFamily: 'inherit',
                     letterSpacing: '0.01em',
                     boxSizing: 'border-box',
@@ -229,9 +229,9 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
                     right: '0.75rem',
                     top: '50%',
                     transform: 'translateY(-50%)',
-                    fontSize: '0.72rem',
+                    fontSize: '0.75rem',
                     fontWeight: 700,
-                    color: charsLeft < 10 ? '#ef4444' : 'rgba(148,163,184,0.7)',
+                    color: charsLeft < 10 ? '#ef4444' : 'var(--admin-text-muted)',
                     pointerEvents: 'none',
                   }}>
                     {charsLeft}
@@ -248,11 +248,11 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
                   gap: '0.45rem',
                   padding: '0.7rem 1.25rem',
                   background: newRoleInput.trim()
-                    ? 'linear-gradient(135deg, #06b6d4, #0891b2)'
-                    : 'rgba(6, 182, 212, 0.08)',
-                  color: newRoleInput.trim() ? '#ffffff' : '#94a3b8',
+                    ? 'linear-gradient(135deg, #936142, #835336)'
+                    : 'rgba(147, 97, 66, 0.12)',
+                  color: newRoleInput.trim() ? '#ffffff' : 'var(--admin-text-muted)',
                   border: 'none',
-                  borderLeft: '1px solid rgba(6, 182, 212, 0.2)',
+                  borderLeft: '1px solid rgba(147, 97, 66, 0.25)',
                   cursor: newRoleInput.trim() ? 'pointer' : 'not-allowed',
                   fontSize: '0.875rem',
                   fontWeight: 700,
@@ -269,14 +269,16 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
             </div>
 
             {!newRoleInput && (
-              <p style={{ marginTop: '0.45rem', fontSize: '0.78rem', color: '#94a3b8', paddingLeft: '0.25rem' }}>
+              <p style={{ marginTop: '0.45rem', fontSize: '0.82rem', color: 'var(--admin-text-muted)', paddingLeft: '0.25rem' }}>
                 Press{' '}
                 <kbd style={{
-                  padding: '0.1rem 0.4rem',
-                  border: '1px solid rgba(148,163,184,0.3)',
+                  padding: '0.15rem 0.45rem',
+                  border: '1px solid rgba(172, 138, 105, 0.45)',
                   borderRadius: '4px',
-                  fontSize: '0.72rem',
-                  background: 'rgba(148,163,184,0.1)',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  background: 'rgba(147, 97, 66, 0.12)',
+                  color: 'var(--admin-text-main)',
                   fontFamily: 'inherit',
                 }}>Enter</kbd>
                 {' '}to quickly add · Max {MAX_CHARS} characters per word
@@ -291,9 +293,9 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
               flexWrap: 'wrap',
               gap: '0.55rem',
               padding: '0.75rem',
-              background: 'rgba(6, 182, 212, 0.04)',
+              background: 'rgba(147, 97, 66, 0.05)',
               borderRadius: '12px',
-              border: '1px dashed rgba(6, 182, 212, 0.2)',
+              border: '1px dashed rgba(147, 97, 66, 0.35)',
               minHeight: '64px',
               alignItems: 'flex-start',
               alignContent: 'flex-start',
@@ -313,28 +315,29 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
                     padding: '0.45rem 0.75rem 0.45rem 0.55rem',
                     borderRadius: '22px',
                     background: dragOverIdx === idx
-                      ? 'rgba(6, 182, 212, 0.25)'
-                      : 'linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.08))',
+                      ? 'rgba(147, 97, 66, 0.28)'
+                      : 'linear-gradient(135deg, rgba(147, 97, 66, 0.16), rgba(147, 97, 66, 0.08))',
                     border: dragOverIdx === idx
-                      ? '2px solid #06b6d4'
-                      : '1.5px solid rgba(6, 182, 212, 0.35)',
-                    color: '#06b6d4',
+                      ? '2px solid #936142'
+                      : '1.5px solid rgba(147, 97, 66, 0.40)',
+                    color: 'var(--admin-accent)',
                     fontWeight: 700,
                     fontSize: '0.82rem',
                     letterSpacing: '0.04em',
                     cursor: 'grab',
                     userSelect: 'none',
                     transition: 'all 0.15s ease',
-                    boxShadow: dragOverIdx === idx ? '0 0 0 3px rgba(6,182,212,0.15)' : 'none',
+                    boxShadow: dragOverIdx === idx ? '0 0 0 3px rgba(147, 97, 66, 0.20)' : 'none',
                     transform: dragOverIdx === idx ? 'scale(1.04)' : 'scale(1)',
                   }}
                 >
-                  <GripVertical size={11} style={{ color: 'rgba(6,182,212,0.5)', flexShrink: 0 }} />
+                  <GripVertical size={11} style={{ color: 'rgba(147, 97, 66, 0.65)', flexShrink: 0 }} />
                   <span style={{
                     maxWidth: '220px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
+                    color: 'var(--admin-text-main)',
                   }}>{role}</span>
                   <button
                     type="button"
@@ -342,7 +345,7 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
                     style={{
                       background: 'none',
                       border: 'none',
-                      color: 'rgba(6,182,212,0.4)',
+                      color: 'rgba(147, 97, 66, 0.65)',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
@@ -353,7 +356,7 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
                       flexShrink: 0,
                     }}
                     onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; }}
-                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(6,182,212,0.4)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(147, 97, 66, 0.65)'; }}
                     title={`Remove "${role}"`}
                   >
                     <Trash2 size={12} />
@@ -365,16 +368,16 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
             <div style={{
               padding: '1.5rem',
               textAlign: 'center',
-              color: '#94a3b8',
+              color: 'var(--admin-text-muted)',
               fontSize: '0.85rem',
-              border: '1px dashed rgba(6,182,212,0.2)',
+              border: '1px dashed rgba(147, 97, 66, 0.35)',
               borderRadius: '12px',
             }}>
               No words added yet. Add your first role above ↑
             </div>
           )}
 
-          <p style={{ marginTop: '0.6rem', fontSize: '0.76rem', color: '#64748b', paddingLeft: '0.1rem' }}>
+          <p style={{ marginTop: '0.6rem', fontSize: '0.80rem', color: 'var(--admin-text-muted)', fontWeight: 500, paddingLeft: '0.1rem' }}>
             💡 Tip: Drag the grip icon on each chip to reorder words in the animation sequence.
           </p>
         </div>

@@ -146,12 +146,14 @@
   margin: 0 auto;
   position: relative;
   pointer-events: auto;
-  background: rgba(238, 230, 222, 0.94) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(172, 138, 105, 0.35) !important;
+  background: rgba(238, 230, 222, 0.75) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.65) !important;
   border-radius: 999px;
-  box-shadow: 0 12px 32px -8px rgba(65, 73, 66, 0.12), 0 2px 8px rgba(65, 73, 66, 0.05) !important;
+  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.85),
+    0 14px 34px -8px rgba(65, 73, 66, 0.12),
+    0 2px 8px rgba(65, 73, 66, 0.04) !important;
   padding: 0 1.5rem;
   transition: transform 0.48s cubic-bezier(0.34, 1.56, 0.64, 1),
     box-shadow 0.48s cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -160,15 +162,23 @@
 }
 
 [data-theme="light"] .navbar {
-  background: rgba(238, 230, 222, 0.94) !important;
-  border: 1px solid rgba(172, 138, 105, 0.35) !important;
-  box-shadow: 0 12px 32px -8px rgba(65, 73, 66, 0.12), 0 2px 8px rgba(65, 73, 66, 0.05) !important;
+  background: rgba(238, 230, 222, 0.75) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.65) !important;
+  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.85),
+    0 14px 34px -8px rgba(65, 73, 66, 0.12),
+    0 2px 8px rgba(65, 73, 66, 0.04) !important;
 }
 
 [data-theme="dark"] .navbar {
-  background: rgba(35, 39, 36, 0.94) !important;
-  border: 1px solid rgba(172, 138, 105, 0.30) !important;
-  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.45) !important;
+  background: rgba(35, 39, 36, 0.72) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.18),
+    0 16px 40px -8px rgba(0, 0, 0, 0.50),
+    0 2px 10px rgba(0, 0, 0, 0.25) !important;
 }
 
 .navbar-container {
@@ -232,18 +242,22 @@
 
 .nav-link:hover {
   color: var(--primary-color) !important;
-  background: rgba(147, 97, 66, 0.12);
-  border-color: rgba(147, 97, 66, 0.3);
+  background: rgba(147, 97, 66, 0.12) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(147, 97, 66, 0.3) !important;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(65, 73, 66, 0.08);
 }
 
-/* Solid Editorial Active Nav Button with Quiet Luxury Drop Shadow (No Shine) */
+/* Apple Liquid Glass Active Nav Button */
 .nav-link.active {
   color: #ffffff !important;
-  background: var(--primary-color) !important;
-  border: 1px solid var(--primary-color);
-  box-shadow: 0 4px 14px rgba(147, 97, 66, 0.35);
+  background: linear-gradient(135deg, rgba(147, 97, 66, 0.92), rgba(131, 83, 54, 0.96)) !important;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45), 0 4px 14px rgba(147, 97, 66, 0.35);
   font-weight: 700;
   transform: translateY(-2px);
 }
@@ -254,15 +268,15 @@
 
 [data-theme="light"] .nav-link:hover {
   color: var(--primary-color) !important;
-  background: rgba(147, 97, 66, 0.12);
-  border-color: rgba(147, 97, 66, 0.3);
+  background: rgba(147, 97, 66, 0.12) !important;
+  border: 1px solid rgba(147, 97, 66, 0.3) !important;
 }
 
 [data-theme="light"] .nav-link.active {
   color: #ffffff !important;
-  background: var(--primary-color) !important;
-  border: 1px solid var(--primary-color);
-  box-shadow: 0 4px 14px rgba(147, 97, 66, 0.35);
+  background: linear-gradient(135deg, rgba(147, 97, 66, 0.92), rgba(131, 83, 54, 0.96)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45), 0 4px 14px rgba(147, 97, 66, 0.35);
   font-weight: 700;
 }
 
@@ -312,7 +326,7 @@
   box-shadow: var(--card-shadow-hover);
 }
 
-/* Apple Liquid Glass Buttons - Restored Glossy Specular Reflection Sheen & Smooth Liquid Animations */
+/* Apple Liquid Glass Buttons - Translucent Glossy Specular Reflection Sheen & Smooth Liquid Animations */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -325,52 +339,63 @@
   position: relative;
   overflow: hidden;
   letter-spacing: 0.01em;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
     box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
     background 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.3s ease;
 }
 
 .btn-primary {
-  background: var(--primary-color) !important;
+  background: linear-gradient(135deg, rgba(147, 97, 66, 0.90), rgba(131, 83, 54, 0.95)) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   color: #ffffff !important;
-  box-shadow: 0 8px 20px -3px rgba(147, 97, 66, 0.35);
-  border: 1px solid var(--primary-color);
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.45), 0 8px 22px -3px rgba(147, 97, 66, 0.38);
 }
 
 .btn-primary:hover {
   transform: translateY(-3px) scale(1.02);
-  background: var(--primary-hover) !important;
-  box-shadow: 0 12px 26px -4px rgba(147, 97, 66, 0.45);
+  background: linear-gradient(135deg, rgba(168, 112, 80, 0.95), rgba(147, 97, 66, 0.98)) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6), 0 12px 28px -4px rgba(147, 97, 66, 0.48);
   color: #ffffff !important;
 }
 
 .btn-secondary {
-  background: #EDE3D8;
+  background: rgba(237, 227, 216, 0.70) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   color: #414942 !important;
-  border: 1px solid var(--secondary-color, #AC8A69);
-  box-shadow: 0 4px 12px -2px rgba(65, 73, 66, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.80) !important;
+  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.95), 0 4px 14px -2px rgba(65, 73, 66, 0.08);
 }
 
 .btn-secondary:hover {
-  background: #E5D9CD;
-  border-color: var(--primary-color);
+  background: rgba(237, 227, 216, 0.88) !important;
+  border-color: rgba(147, 97, 66, 0.45) !important;
   color: var(--primary-color) !important;
   transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 8px 18px -3px rgba(65, 73, 66, 0.12);
+  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 1), 0 8px 20px -3px rgba(65, 73, 66, 0.12);
 }
 
 [data-theme="dark"] .btn-secondary {
   background: rgba(237, 227, 216, 0.10) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   color: #EDE3D8 !important;
-  border: 1px solid rgba(172, 138, 105, 0.45) !important;
-  box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.18), 0 6px 18px -2px rgba(0, 0, 0, 0.40);
 }
 
 [data-theme="dark"] .btn-secondary:hover {
-  background: rgba(147, 97, 66, 0.25) !important;
-  border-color: var(--primary-color) !important;
-  color: #EDE3D8 !important;
+  background: rgba(147, 97, 66, 0.28) !important;
+  border-color: rgba(197, 137, 112, 0.60) !important;
+  color: #FFFFFF !important;
+  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.25), 0 8px 24px -3px rgba(0, 0, 0, 0.50);
 }
 
 .badge {
@@ -451,20 +476,22 @@
   padding: 0.5rem 0 3.5rem 0;
 }
 
-/* High Contrast Green Status Pill for "Available for Full Stack Opportunities" */
+/* Apple Liquid Glass Status Pill */
 .status-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.45rem 1.1rem;
   border-radius: 999px;
-  background: #EDE3D8 !important;
-  border: 1px solid var(--secondary-color, #AC8A69) !important;
+  background: rgba(237, 227, 216, 0.70) !important;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.75) !important;
   color: #414942 !important;
   font-size: 0.85rem;
   font-weight: 700;
   margin-bottom: 1.25rem;
-  box-shadow: 0 4px 12px -2px rgba(65, 73, 66, 0.08);
+  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.9), 0 4px 14px -2px rgba(65, 73, 66, 0.08);
 }
 
 .status-pill svg {
@@ -473,9 +500,11 @@
 
 [data-theme="dark"] .status-pill {
   background: rgba(237, 227, 216, 0.10) !important;
-  border: 1px solid rgba(172, 138, 105, 0.40) !important;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
   color: #EDE3D8 !important;
-  box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.16), 0 4px 14px -2px rgba(0, 0, 0, 0.35);
 }
 
 [data-theme="dark"] .status-pill svg {
@@ -619,9 +648,11 @@
   gap: 0.45rem;
   padding: 0.45rem 0.95rem;
   border-radius: 999px;
-  background: #EDE3D8;
-  border: 1px solid rgba(172, 138, 105, 0.40);
-  box-shadow: 0 2px 8px rgba(65, 73, 66, 0.06);
+  background: rgba(237, 227, 216, 0.70);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.9), 0 2px 8px rgba(65, 73, 66, 0.06);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -631,17 +662,19 @@
 
 .social-link-item:hover {
   color: var(--primary-color) !important;
-  background: #E5D9CD;
+  background: rgba(237, 227, 216, 0.90);
   border-color: var(--primary-color);
   transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(65, 73, 66, 0.10);
+  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 1), 0 6px 16px rgba(65, 73, 66, 0.12);
 }
 
 [data-theme="dark"] .social-link-item {
   background: rgba(237, 227, 216, 0.10) !important;
-  border: 1px solid rgba(172, 138, 105, 0.45) !important;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
   color: #EDE3D8 !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 2px 10px rgba(0, 0, 0, 0.35);
 }
 
 [data-theme="dark"] .social-link-item svg {
@@ -968,25 +1001,43 @@
   align-items: center;
   padding: 0.45rem 0.85rem;
   border-radius: 8px;
-  background: #F2EAE1;
-  border: 1px solid rgba(172, 138, 105, 0.35);
+  background: #F2EAE1 !important;
+  border: 1px solid rgba(172, 138, 105, 0.45) !important;
   font-family: var(--font-mono);
   font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text-primary) !important;
+  font-weight: 700;
+  color: #414942 !important;
   letter-spacing: 0.02em;
+  box-shadow: 0 2px 6px rgba(65, 73, 66, 0.05);
   transition: all 0.25s ease;
 }
 
 [data-theme="light"] .aside-tech-pill {
-  background: #F2EAE1;
-  border-color: #AC8A69;
+  background: #F2EAE1 !important;
+  border: 1px solid rgba(172, 138, 105, 0.45) !important;
+  color: #414942 !important;
 }
 
-.aside-tech-pill:hover {
-  background: rgba(147, 97, 66, 0.12);
-  border-color: rgba(147, 97, 66, 0.45);
-  color: var(--primary-color) !important;
+[data-theme="dark"] .aside-tech-pill {
+  background: rgba(237, 227, 216, 0.10) !important;
+  border: 1px solid rgba(172, 138, 105, 0.40) !important;
+  color: #EDE3D8 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.30);
+}
+
+.aside-tech-pill:hover,
+[data-theme="light"] .aside-tech-pill:hover {
+  background: rgba(147, 97, 66, 0.14) !important;
+  border-color: #936142 !important;
+  color: #936142 !important;
+  transform: translateY(-2px);
+}
+
+[data-theme="dark"] .aside-tech-pill:hover {
+  background: rgba(147, 97, 66, 0.30) !important;
+  border-color: #C58970 !important;
+  color: #FFFFFF !important;
+  transform: translateY(-2px);
 }
 
 .aside-plain-text {
