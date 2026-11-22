@@ -65,16 +65,8 @@ class About(models.Model):
 class Skill(models.Model):
     """Individual skills displayed in the Skills section."""
     objects = models.Manager()
-    CATEGORIES = [
-        ('Programming', 'Programming'),
-        ('Frontend', 'Frontend'),
-        ('Backend', 'Backend'),
-        ('Database', 'Database'),
-        ('Tools', 'Tools'),
-        ('Other', 'Other'),
-    ]
     name = models.CharField(max_length=100)
-    category = models.CharField(max_length=50, choices=CATEGORIES, default='Other')
+    category = models.CharField(max_length=100, default='Other')
     icon = models.CharField(max_length=50, blank=True, default='Code')
     display_order = models.IntegerField(default=0)
     is_visible = models.BooleanField(default=True)
@@ -180,18 +172,7 @@ class Message(models.Model):
 class SocialLink(models.Model):
     """Social media and professional profile links."""
     objects = models.Manager()
-    PLATFORMS = [
-        ('GitHub', 'GitHub'),
-        ('LinkedIn', 'LinkedIn'),
-        ('Email', 'Email'),
-        ('YouTube', 'YouTube'),
-        ('LeetCode', 'LeetCode'),
-        ('HackerRank', 'HackerRank'),
-        ('Twitter', 'Twitter'),
-        ('Instagram', 'Instagram'),
-        ('Other', 'Other'),
-    ]
-    platform = models.CharField(max_length=50, choices=PLATFORMS)
+    platform = models.CharField(max_length=100, default='Other')
     url = models.CharField(max_length=500)
     icon = models.CharField(max_length=50, blank=True, default='')
     display_order = models.IntegerField(default=0)

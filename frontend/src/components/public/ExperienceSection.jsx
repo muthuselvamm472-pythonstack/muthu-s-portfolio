@@ -2,6 +2,7 @@ import React from 'react';
 import { Card } from '../common/Card';
 import { Badge } from '../common/Badge';
 import { ScrollReveal } from '../common/ScrollReveal';
+import { FormattedText } from '../common/FormattedText';
 import { usePortfolio } from '../../context/PortfolioContext';
 
 export const ExperienceSection = () => {
@@ -41,7 +42,7 @@ export const ExperienceSection = () => {
                   </div>
                 )}
 
-                <p className="exp-desc">{exp.description}</p>
+                <FormattedText text={exp.description} className="exp-desc" />
 
                 {exp.technologies && exp.technologies.length > 0 && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>

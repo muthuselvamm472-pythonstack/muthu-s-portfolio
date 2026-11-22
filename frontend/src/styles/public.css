@@ -781,12 +781,14 @@
   color: var(--text-primary) !important;
   font-weight: 500;
   margin-bottom: 1.15rem;
+  white-space: pre-line;
 }
 
 .about-paragraph {
   font-size: 0.98rem;
   line-height: 1.75;
   color: var(--text-secondary) !important;
+  white-space: pre-line;
 }
 
 /* Subtle, quiet meta strip (no tacky dashboard badges) */
@@ -1194,6 +1196,8 @@
 .exp-desc {
   color: var(--text-secondary) !important;
   margin-bottom: 1.25rem;
+  white-space: pre-line;
+  line-height: 1.7;
 }
 
 /* Certifications Section */
@@ -1264,6 +1268,59 @@
 .project-desc {
   color: var(--text-secondary) !important;
   margin-bottom: 1.25rem;
+  white-space: pre-line;
+  line-height: 1.7;
+}
+
+/* Editorial Point-by-Point Lists & Formatted Text Blocks */
+.editorial-point-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 1.25rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.editorial-point-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary) !important;
+}
+
+.editorial-point-marker {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.45);
+  margin-top: 0.52rem;
+  flex-shrink: 0;
+}
+
+.editorial-point-content {
+  flex: 1;
+}
+
+.formatted-paragraphs-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.formatted-paragraph-item {
+  margin: 0;
+  white-space: pre-line;
+  line-height: 1.7;
+}
+
+.formatted-text-block {
+  white-space: pre-line;
+  line-height: 1.7;
 }
 
 .project-tech-stack {

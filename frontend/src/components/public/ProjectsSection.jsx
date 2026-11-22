@@ -3,6 +3,7 @@ import { Card } from '../common/Card';
 import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
 import { ScrollReveal } from '../common/ScrollReveal';
+import { FormattedText } from '../common/FormattedText';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { Github, ExternalLink, Folder } from 'lucide-react';
 
@@ -30,11 +31,9 @@ export const ProjectsSection = () => {
               <div className="project-info">
                 <div className="project-number">0{idx + 1} // FEATURED PROJECT</div>
                 <h3 className="project-title">{project.title}</h3>
-                <p className="project-desc">{project.shortDescription}</p>
+                <FormattedText text={project.shortDescription} className="project-desc" />
                 {project.detailedDescription && (
-                  <p className="project-desc" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                    {project.detailedDescription}
-                  </p>
+                  <FormattedText text={project.detailedDescription} className="project-desc" />
                 )}
 
                 {project.technologies && project.technologies.length > 0 && (
@@ -92,9 +91,7 @@ export const ProjectsSection = () => {
                     </div>
 
                     <h4 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>{project.title}</h4>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>
-                      {project.shortDescription}
-                    </p>
+                    <FormattedText text={project.shortDescription} className="secondary-project-desc" />
                     {project.image && (
                       <div className="secondary-project-img-wrap" style={{ borderRadius: '10px', overflow: 'hidden', marginBottom: '1.25rem', maxHeight: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.25)', border: '1px solid var(--glass-border)', padding: '0.5rem' }}>
                         <img src={project.image} alt={project.title} style={{ maxWidth: '100%', maxHeight: '160px', width: 'auto', height: 'auto', objectFit: 'contain' }} />

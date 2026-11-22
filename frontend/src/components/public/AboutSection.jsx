@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '../common/Button';
 import { ScrollReveal } from '../common/ScrollReveal';
+import { FormattedText } from '../common/FormattedText';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { FileText, ArrowUpRight, Compass, Code2 } from 'lucide-react';
 
@@ -38,10 +39,10 @@ export const AboutSection = () => {
 
             <div className="about-story-text">
               {about.shortDescription && (
-                <p className="about-paragraph lead">{about.shortDescription}</p>
+                <FormattedText text={about.shortDescription} className="about-paragraph lead" />
               )}
               {about.detailedDescription && (
-                <p className="about-paragraph">{about.detailedDescription}</p>
+                <FormattedText text={about.detailedDescription} className="about-paragraph" />
               )}
             </div>
 
