@@ -1,23 +1,27 @@
 /* ─── ADMIN CMS STYLESHEET ─────────────────────────────────────────────────── */
 
 :root {
-  --admin-bg: #f8fafc;
-  --admin-sidebar-bg: #ffffff;
-  --admin-card-bg: #ffffff;
-  --admin-border: #e2e8f0;
-  --admin-text-main: #0f172a;
-  --admin-text-muted: #64748b;
-  --admin-accent: #f59e0b;
-  --admin-accent-hover: #d97706;
+  --admin-bg: #CCBBA9;
+  --admin-sidebar-bg: #E5D9CD;
+  --admin-card-bg: #EAE0D5;
+  --admin-border: rgba(172, 138, 105, 0.35);
+  --admin-text-main: #414942;
+  --admin-text-muted: #68716A;
+  --admin-accent: #936142;
+  --admin-accent-hover: #835336;
+  --admin-input-bg: #F5EFE9;
 }
 
 [data-theme="dark"] {
-  --admin-bg: #0f172a;
-  --admin-sidebar-bg: #1e293b;
-  --admin-card-bg: #1e293b;
-  --admin-border: #334155;
-  --admin-text-main: #f8fafc;
-  --admin-text-muted: #94a3b8;
+  --admin-bg: #2b302c;
+  --admin-sidebar-bg: #232724;
+  --admin-card-bg: #353b36;
+  --admin-border: rgba(172, 138, 105, 0.28);
+  --admin-text-main: #EDE3D8;
+  --admin-text-muted: #AC8A69;
+  --admin-accent: #936142;
+  --admin-accent-hover: #A87050;
+  --admin-input-bg: #3E4540;
 }
 
 /* ─── UTILITY CLASSES ───────────────────────────────────────────────────────── */
@@ -54,11 +58,12 @@
 .btn-primary {
   background: var(--admin-accent);
   color: #ffffff;
+  box-shadow: 0 4px 14px rgba(147, 97, 66, 0.3);
 }
 
 .btn-primary:hover {
   background: var(--admin-accent-hover);
-  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 6px 18px rgba(147, 97, 66, 0.45);
 }
 
 .btn-secondary {
@@ -223,9 +228,9 @@
 }
 
 .topbar-user-badge {
-  background: rgba(245, 158, 11, 0.12);
+  background: rgba(147, 97, 66, 0.12);
   color: var(--admin-accent);
-  border: 1px solid rgba(245, 158, 11, 0.25);
+  border: 1px solid rgba(172, 138, 105, 0.35);
   font-size: 0.82rem;
   font-weight: 700;
   padding: 0.35rem 0.75rem;
@@ -316,14 +321,14 @@
 }
 
 .sidebar-nav-item:hover {
-  background: rgba(245, 158, 11, 0.1);
+  background: rgba(147, 97, 66, 0.12);
   color: var(--admin-accent);
 }
 
 .sidebar-nav-item.active {
   background: var(--admin-accent);
   color: #ffffff !important;
-  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+  box-shadow: 0 4px 14px rgba(147, 97, 66, 0.35);
 }
 
 .nav-badge {
@@ -408,7 +413,7 @@
 
 .stat-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 24px rgba(65, 73, 66, 0.08);
 }
 
 .stat-icon {
@@ -420,11 +425,11 @@
   justify-content: center;
 }
 
-.icon-projects { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
-.icon-skills { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
-.icon-exp { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-.icon-certs { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
-.icon-messages { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.icon-projects { background: rgba(147, 97, 66, 0.15); color: #936142; }
+.icon-skills { background: rgba(172, 138, 105, 0.20); color: #AC8A69; }
+.icon-exp { background: rgba(197, 137, 112, 0.20); color: #C58970; }
+.icon-certs { background: rgba(147, 97, 66, 0.15); color: #936142; }
+.icon-messages { background: rgba(65, 73, 66, 0.15); color: #414942; }
 
 .stat-value {
   font-size: 1.6rem;
@@ -507,11 +512,11 @@
   padding: 0.75rem 1rem;
   border-radius: 10px;
   border: 1px solid var(--admin-border);
-  background: var(--admin-bg);
+  background: var(--admin-input-bg, #F5EFE9);
   color: var(--admin-text-main);
   font-family: inherit;
   font-size: 0.9rem;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .form-group input:focus,
@@ -519,7 +524,7 @@
 .form-group select:focus {
   outline: none;
   border-color: var(--admin-accent);
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+  box-shadow: 0 0 0 3px rgba(147, 97, 66, 0.2);
 }
 
 .field-hint {
@@ -552,7 +557,7 @@
   position: absolute;
   cursor: pointer;
   inset: 0;
-  background-color: #cbd5e1;
+  background-color: #D0C5B8;
   transition: 0.3s;
   border-radius: 24px;
 }
@@ -567,10 +572,11 @@
   background-color: white;
   transition: 0.3s;
   border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(65, 73, 66, 0.2);
 }
 
 input:checked + .toggle-slider {
-  background-color: #10b981;
+  background-color: var(--admin-accent);
 }
 
 input:checked + .toggle-slider:before {
@@ -607,7 +613,7 @@ input:checked + .toggle-slider:before {
 }
 
 .admin-table tr.row-unread {
-  background: rgba(245, 158, 11, 0.05);
+  background: rgba(147, 97, 66, 0.08);
   font-weight: 600;
 }
 
@@ -628,16 +634,16 @@ input:checked + .toggle-slider:before {
 }
 
 .status-active {
-  background: rgba(16, 185, 129, 0.12);
-  color: #10b981;
-  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(147, 97, 66, 0.14);
+  color: var(--admin-accent);
+  border-color: rgba(147, 97, 66, 0.35);
 }
 
 .status-active:hover {
-  background: #10b981;
+  background: var(--admin-accent);
   color: #ffffff;
-  border-color: #10b981;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+  border-color: var(--admin-accent);
+  box-shadow: 0 4px 12px rgba(147, 97, 66, 0.25);
 }
 
 .status-disabled {
@@ -662,14 +668,14 @@ input:checked + .toggle-slider:before {
   font-weight: 600;
 }
 
-.badge-success { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-.badge-warning { background: rgba(245, 158, 11, 0.15); color: #d97706; }
-.badge-info { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
-.badge-neutral { background: rgba(148, 163, 184, 0.15); color: #64748b; }
+.badge-success { background: rgba(90, 122, 92, 0.15); color: #5A7A5C; }
+.badge-warning { background: rgba(197, 137, 112, 0.18); color: #936142; }
+.badge-info { background: rgba(172, 138, 105, 0.18); color: #AC8A69; }
+.badge-neutral { background: rgba(104, 113, 106, 0.15); color: #68716A; }
 .badge-disabled { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
-.badge-featured { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.badge-featured { background: rgba(197, 137, 112, 0.2); color: #C58970; }
 .badge-tech { background: var(--admin-bg); border: 1px solid var(--admin-border); color: var(--admin-text-main); }
-.badge-category { background: rgba(245, 158, 11, 0.1); color: var(--admin-accent); }
+.badge-category { background: rgba(147, 97, 66, 0.1); color: var(--admin-accent); }
 
 /* Buttons & Action Controls */
 .action-buttons {
@@ -693,7 +699,7 @@ input:checked + .toggle-slider:before {
 }
 
 .btn-icon:hover {
-  background: rgba(245, 158, 11, 0.1);
+  background: rgba(147, 97, 66, 0.1);
   color: var(--admin-accent);
   border-color: var(--admin-accent);
 }
@@ -705,7 +711,7 @@ input:checked + .toggle-slider:before {
 }
 
 .btn-icon-warning {
-  color: #f59e0b;
+  color: #936142;
 }
 
 .btn-sm {
@@ -742,7 +748,7 @@ input:checked + .toggle-slider:before {
   background: var(--admin-card-bg);
   border: 1px solid var(--admin-border);
   border-radius: 20px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 20px 45px -10px rgba(65, 73, 66, 0.25);
   overflow: hidden;
   max-height: 90vh;
   display: flex;
@@ -879,7 +885,7 @@ input:checked + .toggle-slider:before {
 
 .theme-mode-card.active {
   border-color: var(--admin-accent);
-  background: rgba(245, 158, 11, 0.1);
+  background: rgba(147, 97, 66, 0.12);
   color: var(--admin-accent);
 }
 
@@ -982,7 +988,7 @@ input:checked + .toggle-slider:before {
   border: 1px solid var(--admin-border);
   border-radius: 24px;
   padding: 2.5rem 2rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 45px -10px rgba(65, 73, 66, 0.2);
 }
 
 .admin-login-header {
@@ -994,7 +1000,7 @@ input:checked + .toggle-slider:before {
   width: 64px;
   height: 64px;
   border-radius: 20px;
-  background: rgba(245, 158, 11, 0.15);
+  background: rgba(147, 97, 66, 0.15);
   color: var(--admin-accent);
   display: flex;
   align-items: center;
@@ -1077,7 +1083,7 @@ input:checked + .toggle-slider:before {
 .spinner {
   width: 36px;
   height: 36px;
-  border: 3px solid rgba(245, 158, 11, 0.2);
+  border: 3px solid rgba(147, 97, 66, 0.2);
   border-top-color: var(--admin-accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;

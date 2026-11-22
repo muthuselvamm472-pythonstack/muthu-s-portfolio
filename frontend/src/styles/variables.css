@@ -1,42 +1,37 @@
-/* CSS Theme Variables - Human-Crafted Warm Editorial Palette */
+/* CSS Theme Variables - Warm Linen Sand & Terracotta Chestnut Editorial Palette */
 :root {
-  /* Dark Mode Palette - Warm Slate Charcoal & Champagne Gold */
-  --bg-color: #0d1117;
-  --bg-grid-color: rgba(245, 158, 11, 0.10);
-  /* Warm Amber Grid Lines */
+  /* Warm Linen Sand Canvas & Terracotta Editorial Palette */
+  --bg-color: #CCBBA9;
+  --bg-grid-color: rgba(172, 138, 105, 0.22);
   --bg-gradient: linear-gradient(var(--bg-grid-color) 1px, transparent 1px),
     linear-gradient(90deg, var(--bg-grid-color) 1px, transparent 1px);
   --bg-grid-size: 44px 44px;
 
-  --surface-color: rgba(22, 27, 34, 0.72);
-  --surface-hover: rgba(33, 38, 45, 0.85);
-  --border-color: rgba(255, 255, 255, 0.1);
-  --border-hover: rgba(245, 158, 11, 0.45);
+  --surface-color: #E5D9CD;
+  --surface-hover: #EFE6DC;
+  --border-color: rgba(172, 138, 105, 0.35);
+  --border-hover: #936142;
 
-  --glass-bg: rgba(12, 12, 14, 0.85);
-  --glass-border: rgba(255, 255, 255, 0.14);
-  --glass-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), inset 0 -1px 1px rgba(0, 0, 0, 0.3), 0 20px 40px -10px rgba(0, 0, 0, 0.7);
-  --glass-blur: blur(28px) saturate(180%);
+  --glass-bg: rgba(238, 230, 222, 0.94);
+  --glass-border: rgba(172, 138, 105, 0.35);
+  --glass-shadow: 0 12px 32px -8px rgba(65, 73, 66, 0.12), 0 2px 8px rgba(65, 73, 66, 0.05);
+  --glass-blur: blur(20px);
 
-  --text-primary: #f0f6fc;
-  --text-secondary: #8b949e;
-  /* Human Editorial Slate */
-  --text-muted: #6e7681;
+  --text-primary: #414942;
+  --text-secondary: #515952;
+  --text-muted: #68716A;
 
-  --primary-color: #f59e0b;
-  /* Warm Champagne Amber */
-  --primary-hover: #d97706;
-  --accent-color: #fbbf24;
-  /* Radiant Warm Gold */
-  --accent-hover: #fef08a;
+  --primary-color: #936142;
+  --primary-hover: #835336;
+  --accent-color: #C58970;
+  --accent-hover: #B37860;
+  --secondary-color: #AC8A69;
 
-  --contrast-cyan: #38bdf8;
-  /* High Contrast Sky Blue */
-  --contrast-green: #10b981;
-  /* High Contrast Emerald Green */
+  --contrast-cyan: #936142;
+  --contrast-green: #5A7A5C;
 
-  --card-bg: rgba(22, 27, 34, 0.7);
-  --card-border: rgba(255, 255, 255, 0.1);
+  --card-bg: #E5D9CD;
+  --card-border: rgba(172, 138, 105, 0.35);
   --border-radius: 18px;
 
   --font-serif: 'Playfair Display', Georgia, serif;
@@ -44,46 +39,86 @@
   --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 12px 30px -6px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.7);
-  --card-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), inset 0 -1px 1px rgba(0, 0, 0, 0.2), 0 20px 42px -10px rgba(0, 0, 0, 0.6);
-  --card-shadow-hover: inset 0 1px 2px rgba(255, 255, 255, 0.5), 0 28px 56px -12px rgba(0, 0, 0, 0.75), 0 0 24px rgba(245, 158, 11, 0.28);
+  /* Natural architectural drop shadows tinted by slate charcoal #414942 */
+  --shadow-sm: 0 2px 8px rgba(65, 73, 66, 0.07);
+  --shadow-md: 0 10px 24px -5px rgba(65, 73, 66, 0.10);
+  --shadow-lg: 0 20px 42px -10px rgba(65, 73, 66, 0.14);
+  --card-shadow: 0 12px 28px -6px rgba(65, 73, 66, 0.09), 0 2px 8px rgba(65, 73, 66, 0.04);
+  --card-shadow-hover: 0 20px 42px -8px rgba(65, 73, 66, 0.16), 0 4px 12px rgba(65, 73, 66, 0.06);
 
   --transition-fast: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-normal: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-slow: 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Light Mode Overrides - Warm Pearl Linen & Deep Amber */
+/* Light Mode Overrides - Warm Linen Sand & Terracotta Chestnut */
 [data-theme="light"] {
-  --bg-color: #fafaf9;
-  --bg-grid-color: rgba(217, 119, 6, 0.10);
+  --bg-color: #CCBBA9;
+  --bg-grid-color: rgba(172, 138, 105, 0.22);
 
-  --surface-color: rgba(255, 255, 255, 0.88);
-  --surface-hover: rgba(255, 255, 255, 0.98);
-  --border-color: rgba(0, 0, 0, 0.08);
-  --border-hover: rgba(217, 119, 6, 0.4);
+  --surface-color: #E5D9CD;
+  --surface-hover: #EFE6DC;
+  --border-color: rgba(172, 138, 105, 0.35);
+  --border-hover: #936142;
 
-  --glass-bg: rgba(255, 255, 255, 0.92);
-  --glass-border: rgba(255, 255, 255, 0.98);
-  --glass-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 1), inset 0 -1px 1px rgba(0, 0, 0, 0.04), 0 16px 36px -8px rgba(0, 0, 0, 0.10), 0 4px 12px -4px rgba(217, 119, 6, 0.08);
+  --glass-bg: rgba(238, 230, 222, 0.94);
+  --glass-border: rgba(172, 138, 105, 0.35);
+  --glass-shadow: 0 12px 32px -8px rgba(65, 73, 66, 0.12), 0 2px 8px rgba(65, 73, 66, 0.05);
 
-  --text-primary: #1c1917;
-  --text-secondary: #57534e;
-  --text-muted: #78716c;
+  --text-primary: #414942;
+  --text-secondary: #515952;
+  --text-muted: #68716A;
 
-  --primary-color: #d97706;
-  /* Deep Warm Bronze Amber */
-  --primary-hover: #b45309;
-  --accent-color: #b45309;
-  --accent-hover: #92400e;
+  --primary-color: #936142;
+  --primary-hover: #835336;
+  --accent-color: #C58970;
+  --accent-hover: #B37860;
+  --secondary-color: #AC8A69;
 
-  --card-bg: rgba(255, 255, 255, 0.88);
-  --card-border: rgba(0, 0, 0, 0.08);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 10px 28px -6px rgba(0, 0, 0, 0.10);
-  --shadow-lg: 0 20px 44px -10px rgba(0, 0, 0, 0.14);
-  --card-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 1), 0 16px 36px -8px rgba(0, 0, 0, 0.10), 0 4px 12px -4px rgba(217, 119, 6, 0.06);
-  --card-shadow-hover: inset 0 1px 2px rgba(255, 255, 255, 1), 0 24px 48px -10px rgba(0, 0, 0, 0.15), 0 0 18px rgba(217, 119, 6, 0.18);
+  --contrast-cyan: #936142;
+  --contrast-green: #5A7A5C;
+
+  --card-bg: #E5D9CD;
+  --card-border: rgba(172, 138, 105, 0.35);
+  --shadow-sm: 0 2px 8px rgba(65, 73, 66, 0.07);
+  --shadow-md: 0 10px 24px -5px rgba(65, 73, 66, 0.10);
+  --shadow-lg: 0 20px 42px -10px rgba(65, 73, 66, 0.14);
+  --card-shadow: 0 12px 28px -6px rgba(65, 73, 66, 0.09), 0 2px 8px rgba(65, 73, 66, 0.04);
+  --card-shadow-hover: 0 20px 42px -8px rgba(65, 73, 66, 0.16), 0 4px 12px rgba(65, 73, 66, 0.06);
+}
+
+/* Dark Mode Overrides - Deep Slate Charcoal & Terracotta */
+[data-theme="dark"] {
+  --bg-color: #2b302c;
+  --bg-grid-color: rgba(172, 138, 105, 0.14);
+
+  --surface-color: #353b36;
+  --surface-hover: #3f4540;
+  --border-color: rgba(172, 138, 105, 0.28);
+  --border-hover: #C58970;
+
+  --glass-bg: rgba(35, 39, 36, 0.94);
+  --glass-border: rgba(172, 138, 105, 0.30);
+  --glass-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.45);
+
+  --text-primary: #EDE3D8;
+  --text-secondary: #CCBBA9;
+  --text-muted: #AC8A69;
+
+  --primary-color: #936142;
+  --primary-hover: #A87050;
+  --accent-color: #C58970;
+  --accent-hover: #D69980;
+  --secondary-color: #AC8A69;
+
+  --contrast-cyan: #C58970;
+  --contrast-green: #6C826D;
+
+  --card-bg: #353b36;
+  --card-border: rgba(172, 138, 105, 0.28);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 12px 30px -6px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.65);
+  --card-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.45);
+  --card-shadow-hover: 0 24px 50px -10px rgba(0, 0, 0, 0.65);
 }

@@ -1,4 +1,4 @@
-/* Preloader.css - Minimal & Professional Multilingual Intro with Light & Dark Theme Support */
+/* Preloader.css - Warm Linen Sand & Terracotta Minimal Intro */
 
 .preloader-overlay {
   position: fixed;
@@ -6,8 +6,8 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: var(--bg-color, #0d1117);
-  color: var(--text-primary, #f0f6fc);
+  background-color: var(--bg-color, #CCBBA9);
+  color: var(--text-primary, #414942);
   z-index: 9999999;
   display: flex;
   flex-direction: column;
@@ -22,16 +22,16 @@
 [data-theme="light"] .preloader-overlay,
 .preloader-overlay.light,
 .preloader-overlay[data-theme="light"] {
-  background-color: #fafaf9;
-  color: #1c1917;
+  background-color: #CCBBA9;
+  color: #414942;
 }
 
 /* Dark Theme Styling */
 [data-theme="dark"] .preloader-overlay,
 .preloader-overlay.dark,
 .preloader-overlay[data-theme="dark"] {
-  background-color: #0d1117;
-  color: #f0f6fc;
+  background-color: #2b302c;
+  color: #EDE3D8;
 }
 
 .preloader-overlay.slide-up {
@@ -76,7 +76,7 @@
   font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
   font-size: clamp(3.2rem, 8vw, 6rem);
   font-weight: 600;
-  color: var(--text-primary, #f0f6fc);
+  color: var(--text-primary, #414942);
   letter-spacing: -0.02em;
   text-align: center;
   user-select: none;
@@ -86,13 +86,13 @@
 [data-theme="light"] .preloader-greeting-text,
 .preloader-overlay.light .preloader-greeting-text,
 .preloader-overlay[data-theme="light"] .preloader-greeting-text {
-  color: #1c1917;
+  color: #414942;
 }
 
 [data-theme="dark"] .preloader-greeting-text,
 .preloader-overlay.dark .preloader-greeting-text,
 .preloader-overlay[data-theme="dark"] .preloader-greeting-text {
-  color: #f0f6fc;
+  color: #EDE3D8;
 }
 
 /* Footer & Hairline Progress Bar */
@@ -105,7 +105,7 @@
 .preloader-line-container {
   width: 100%;
   height: 2px;
-  background: var(--border-color, rgba(255, 255, 255, 0.1));
+  background: var(--border-color, rgba(172, 138, 105, 0.35));
   border-radius: 2px;
   overflow: hidden;
   margin-bottom: 0.75rem;
@@ -115,18 +115,18 @@
 [data-theme="light"] .preloader-line-container,
 .preloader-overlay.light .preloader-line-container,
 .preloader-overlay[data-theme="light"] .preloader-line-container {
-  background: rgba(0, 0, 0, 0.08);
+  background: rgba(172, 138, 105, 0.35);
 }
 
 [data-theme="dark"] .preloader-line-container,
 .preloader-overlay.dark .preloader-line-container,
 .preloader-overlay[data-theme="dark"] .preloader-line-container {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(172, 138, 105, 0.28);
 }
 
 .preloader-line-fill {
   height: 100%;
-  background: var(--primary-color, #f59e0b);
+  background: var(--primary-color, #936142);
   border-radius: 2px;
   transition: width 0.15s ease-out;
 }
@@ -137,7 +137,7 @@
   align-items: center;
   font-family: var(--font-mono, 'JetBrains Mono', monospace);
   font-size: 0.78rem;
-  color: var(--text-muted, #6e7681);
+  color: var(--text-muted, #68716A);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   transition: color 0.3s ease;
@@ -146,17 +146,17 @@
 [data-theme="light"] .preloader-meta,
 .preloader-overlay.light .preloader-meta,
 .preloader-overlay[data-theme="light"] .preloader-meta {
-  color: #78716c;
+  color: #68716A;
 }
 
 [data-theme="dark"] .preloader-meta,
 .preloader-overlay.dark .preloader-meta,
 .preloader-overlay[data-theme="dark"] .preloader-meta {
-  color: #6e7681;
+  color: #AC8A69;
 }
 
 .preloader-author {
-  color: var(--text-secondary, #8b949e);
+  color: var(--text-secondary, #515952);
   font-weight: 500;
   transition: color 0.3s ease;
 }
@@ -164,17 +164,16 @@
 [data-theme="light"] .preloader-author,
 .preloader-overlay.light .preloader-author,
 .preloader-overlay[data-theme="light"] .preloader-author {
-  color: #57534e;
+  color: #515952;
 }
 
 [data-theme="dark"] .preloader-author,
 .preloader-overlay.dark .preloader-author,
 .preloader-overlay[data-theme="dark"] .preloader-author {
-  color: #8b949e;
+  color: #CCBBA9;
 }
 
 .preloader-counter {
-  color: var(--primary-color, #f59e0b);
+  color: var(--primary-color, #936142);
   font-weight: 600;
 }
-

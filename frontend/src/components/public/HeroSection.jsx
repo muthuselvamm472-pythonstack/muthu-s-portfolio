@@ -40,17 +40,17 @@ export const HeroSection = () => {
             <div
               className="status-pill"
               style={{
-                color: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.14)',
-                borderColor: 'rgba(16, 185, 129, 0.4)'
+                color: 'var(--text-primary)',
+                backgroundColor: '#EDE3D8',
+                borderColor: 'var(--secondary-color, #AC8A69)'
               }}
             >
-              <Sparkles size={14} style={{ color: '#10b981' }} /> {statusBadgeText}
+              <Sparkles size={14} style={{ color: '#6C826D' }} /> {statusBadgeText}
             </div>
           )}
 
           {/* Typewriter Identity Line (e.g. REACT |) */}
-          <div className="hero-identity" style={{ color: '#06b6d4', fontWeight: 600 }}>
+          <div className="hero-identity" style={{ color: 'var(--primary-color)', fontWeight: 600 }}>
             <Typewriter words={typewriterRoles} speed={80} deleteSpeed={40} delay={2200} />
           </div>
 

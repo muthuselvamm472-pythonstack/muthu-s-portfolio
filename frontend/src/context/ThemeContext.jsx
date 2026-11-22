@@ -7,7 +7,7 @@ export const ThemeProvider = ({ children }) => {
   const [themeMode, setThemeModeState] = useState(() => {
     const savedUserTheme = localStorage.getItem('muthu_portfolio_theme_mode');
     const savedAdminDefault = localStorage.getItem('muthu_portfolio_default_theme');
-    return savedUserTheme || savedAdminDefault || mockPortfolioData.themeSettings?.themeMode || 'dark';
+    return savedUserTheme || savedAdminDefault || mockPortfolioData.themeSettings?.themeMode || 'light';
   });
 
   const setThemeMode = (mode) => {

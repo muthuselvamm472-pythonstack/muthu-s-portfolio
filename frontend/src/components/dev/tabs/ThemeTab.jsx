@@ -75,19 +75,19 @@ export const ThemeTab = ({ data, updateThemeSettings, showToast }) => {
                 gap: '0.75rem',
                 padding: '1.25rem',
                 borderRadius: '16px',
-                border: form.themeMode === 'dark' ? '2px solid #ef4444' : '1px solid var(--admin-border)',
-                background: form.themeMode === 'dark' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(255, 255, 255, 0.03)',
+                border: form.themeMode === 'dark' ? '2px solid var(--admin-accent)' : '1px solid var(--admin-border)',
+                background: form.themeMode === 'dark' ? 'rgba(147, 97, 66, 0.14)' : 'rgba(255, 255, 255, 0.03)',
                 color: 'var(--admin-text-main)',
                 cursor: 'pointer',
                 textAlign: 'left'
               }}
             >
-              <Moon size={26} style={{ color: form.themeMode === 'dark' ? '#ef4444' : 'inherit' }} />
+              <Moon size={26} style={{ color: form.themeMode === 'dark' ? 'var(--admin-accent)' : 'inherit' }} />
               <div>
                 <strong style={{ display: 'block', fontSize: '1rem' }}>Dark Mode</strong>
-                <span style={{ fontSize: '0.78rem', color: 'var(--admin-text-sub)' }}>Sleek, high-contrast dark theme</span>
+                <span style={{ fontSize: '0.78rem', color: 'var(--admin-text-sub)' }}>Sleek, deep slate charcoal theme</span>
               </div>
-              {form.themeMode === 'dark' && <CheckCircle2 size={18} style={{ marginLeft: 'auto', color: '#ef4444' }} />}
+              {form.themeMode === 'dark' && <CheckCircle2 size={18} style={{ marginLeft: 'auto', color: 'var(--admin-accent)' }} />}
             </button>
 
             <button
@@ -100,19 +100,19 @@ export const ThemeTab = ({ data, updateThemeSettings, showToast }) => {
                 gap: '0.75rem',
                 padding: '1.25rem',
                 borderRadius: '16px',
-                border: form.themeMode === 'light' ? '2px solid #3b82f6' : '1px solid var(--admin-border)',
-                background: form.themeMode === 'light' ? 'rgba(59, 130, 246, 0.12)' : 'rgba(255, 255, 255, 0.03)',
+                border: form.themeMode === 'light' ? '2px solid var(--admin-accent)' : '1px solid var(--admin-border)',
+                background: form.themeMode === 'light' ? 'rgba(147, 97, 66, 0.14)' : 'rgba(255, 255, 255, 0.03)',
                 color: 'var(--admin-text-main)',
                 cursor: 'pointer',
                 textAlign: 'left'
               }}
             >
-              <Sun size={26} style={{ color: form.themeMode === 'light' ? '#3b82f6' : 'inherit' }} />
+              <Sun size={26} style={{ color: form.themeMode === 'light' ? 'var(--admin-accent)' : 'inherit' }} />
               <div>
                 <strong style={{ display: 'block', fontSize: '1rem' }}>Light Mode</strong>
-                <span style={{ fontSize: '0.78rem', color: 'var(--admin-text-sub)' }}>Clean, bright light theme</span>
+                <span style={{ fontSize: '0.78rem', color: 'var(--admin-text-sub)' }}>Warm linen sand editorial theme</span>
               </div>
-              {form.themeMode === 'light' && <CheckCircle2 size={18} style={{ marginLeft: 'auto', color: '#3b82f6' }} />}
+              {form.themeMode === 'light' && <CheckCircle2 size={18} style={{ marginLeft: 'auto', color: 'var(--admin-accent)' }} />}
             </button>
           </div>
         </div>

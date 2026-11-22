@@ -18,7 +18,7 @@ export const Footer = () => {
     return parts.map((part, i) => {
       if (part.toUpperCase() === 'SELVAM') {
         return (
-          <span key={i} style={{ color: 'var(--accent-color)', fontWeight: 800 }}>
+          <span key={i} style={{ color: 'var(--primary-color)', fontWeight: 800 }}>
             {part.toUpperCase()}
           </span>
         );
