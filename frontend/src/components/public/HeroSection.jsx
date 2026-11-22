@@ -37,15 +37,8 @@ export const HeroSection = () => {
         <ScrollReveal delay={100} className="hero-content">
           {/* Status Pill */}
           {showStatusBadge && (
-            <div
-              className="status-pill"
-              style={{
-                color: 'var(--text-primary)',
-                backgroundColor: '#EDE3D8',
-                borderColor: 'var(--secondary-color, #AC8A69)'
-              }}
-            >
-              <Sparkles size={14} style={{ color: '#6C826D' }} /> {statusBadgeText}
+            <div className="status-pill">
+              <Sparkles size={14} /> {statusBadgeText}
             </div>
           )}
 
@@ -103,7 +96,6 @@ export const HeroSection = () => {
                 target="_blank"
                 rel="noreferrer"
                 className="social-link-item"
-                style={{ color: 'var(--text-secondary)' }}
               >
                 <SocialIcon platform={link.platform} size={18} />
                 <span>{link.platform}</span>

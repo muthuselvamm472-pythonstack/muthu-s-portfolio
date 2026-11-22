@@ -65,11 +65,11 @@ export const Tech3DCarousel = () => {
       id: 'sql',
       name: 'SQL Database',
       subtitle: 'Relational Data Storage',
-      color: '#38bdf8',
-      glow: 'rgba(56, 189, 248, 0.65)',
+      color: '#936142',
+      glow: 'rgba(147, 97, 66, 0.30)',
       svg: (
-        <svg viewBox="0 0 24 24" width="72" height="72" fill="none" stroke="#38bdf8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          <ellipse cx="12" cy="5" rx="9" ry="3" fill="rgba(56, 189, 248, 0.2)" />
+        <svg viewBox="0 0 24 24" width="72" height="72" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--primary-color)' }}>
+          <ellipse cx="12" cy="5" rx="9" ry="3" fill="rgba(147, 97, 66, 0.18)" />
           <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
           <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
           <path d="M12 8v8" strokeDasharray="2 2" opacity="0.6" />
@@ -185,13 +185,13 @@ export const Tech3DCarousel = () => {
               <div
                 className="tech-3d-icon-wrap"
                 style={{
-                  filter: isFront ? `drop-shadow(0 0 25px ${tech.glow})` : 'none'
+                  filter: isFront ? 'drop-shadow(0 10px 22px rgba(147, 97, 66, 0.32))' : 'none'
                 }}
               >
                 <TechIcon tech={tech} />
               </div>
               <div className="tech-3d-info">
-                <span className="tech-3d-title" style={{ color: isFront ? tech.color : 'var(--text-primary)' }}>
+                <span className="tech-3d-title">
                   {tech.name}
                 </span>
                 <span className="tech-3d-subtitle">{tech.subtitle}</span>

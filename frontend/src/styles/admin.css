@@ -18,7 +18,7 @@
   --admin-card-bg: #353b36;
   --admin-border: rgba(172, 138, 105, 0.28);
   --admin-text-main: #EDE3D8;
-  --admin-text-muted: #AC8A69;
+  --admin-text-muted: #CCBBA9;
   --admin-accent: #936142;
   --admin-accent-hover: #A87050;
   --admin-input-bg: #3E4540;
@@ -69,12 +69,25 @@
 .btn-secondary {
   background: var(--admin-card-bg);
   border-color: var(--admin-border);
-  color: var(--admin-text-main);
+  color: var(--admin-text-main) !important;
 }
 
 .btn-secondary:hover {
   background: var(--admin-bg);
   border-color: var(--admin-accent);
+  color: var(--admin-accent) !important;
+}
+
+[data-theme="dark"] .btn-secondary {
+  background: rgba(237, 227, 216, 0.10) !important;
+  color: #EDE3D8 !important;
+  border-color: rgba(172, 138, 105, 0.45) !important;
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+  background: rgba(147, 97, 66, 0.25) !important;
+  border-color: var(--admin-accent) !important;
+  color: #EDE3D8 !important;
 }
 
 .btn-danger {
