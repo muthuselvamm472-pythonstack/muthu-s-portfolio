@@ -2,6 +2,8 @@
 
 <div align="center">
 
+[![Live Portfolio](https://img.shields.io/badge/Live%20Demo-muthu--s--portfolio.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://muthu-s-portfolio.vercel.app/)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/muthuselvamm472-pythonstack/muthu-s-portfolio)
 [![React](https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Django](https://img.shields.io/badge/Django-5.2-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
 [![Django REST Framework](https://img.shields.io/badge/DRF-3.17-red?style=for-the-badge&logo=django&logoColor=white)](https://www.django-rest-framework.org/)
@@ -9,90 +11,137 @@
 [![Vite](https://img.shields.io/badge/Vite-5.1-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![JWT](https://img.shields.io/badge/JWT-SimpleJWT-black?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://jwt.io/)
 [![Database](https://img.shields.io/badge/Database-SQLite%20%7C%20Oracle%20SQL-F80000?style=for-the-badge&logo=oracle&logoColor=white)](https://www.oracle.com/database/)
-[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
-[![Render](https://img.shields.io/badge/Backend%20on-Render-46E3B7?style=for-the-badge&logo=render&logoColor=black)](https://render.com/)
 
-**A high-performance, dynamic developer portfolio and full-featured Content Management System (CMS) designed for modern web engineers.**
+**An enterprise-grade, high-performance developer portfolio and full Content Management System (CMS) built with React 18, Vite, Django REST Framework, and an Apple-inspired Liquid Glass design language.**
 
-[Live Public Portfolio](https://muthu-s-portfolio.vercel.app/) • [Admin Control Center](https://muthu-s-portfolio.vercel.app/#/admin) • [Report Bug](https://github.com/muthuselvamm472-pythonstack/muthu-s-portfolio/issues)
+[🌐 Live Portfolio](https://muthu-s-portfolio.vercel.app/) • [⚡ Admin Control Center](https://muthu-s-portfolio.vercel.app/#/admin) • [📁 GitHub Repository](https://github.com/muthuselvamm472-pythonstack/muthu-s-portfolio) • [🐛 Report Bug](https://github.com/muthuselvamm472-pythonstack/muthu-s-portfolio/issues)
 
 </div>
 
 ---
 
 ## 📖 Table of Contents
-- [Overview](#overview)
-- [Key Features](#key-features)
-  - [Public Portfolio Showcase](#1-public-portfolio-showcase)
-  - [Admin CMS & Control Center](#2-admin-cms--control-center)
-  - [Intelligent Data & State Management](#3-intelligent-data--state-management)
-- [Architecture & Tech Stack](#architecture--tech-stack)
-- [Directory Structure](#directory-structure)
-- [Database Schema & Design](#database-schema--design)
-- [API Endpoints Reference](#api-endpoints-reference)
-- [Getting Started](#getting-started)
+- [Overview](#-overview)
+- [Design System & UI Architecture](#-design-system--ui-architecture)
+- [Key Features](#-key-features)
+  - [1. Public Portfolio Showcase](#1-public-portfolio-showcase)
+  - [2. Apple Liquid Glass Interface & Buttons](#2-apple-liquid-glass-interface--buttons)
+  - [3. Interactive 3D Tech Carousel](#3-interactive-3d-tech-carousel)
+  - [4. Dynamic Typography & Typewriter Engine](#4-dynamic-typography--typewriter-engine)
+  - [5. Admin CMS & Control Center](#5-admin-cms--control-center)
+  - [6. Dynamic Resume Management](#6-dynamic-resume-management)
+  - [7. Intelligent Data & State Management](#7-intelligent-data--state-management)
+- [Architecture & Tech Stack](#-architecture--tech-stack)
+- [Directory Structure](#-directory-structure)
+- [Database Schema & Design](#-database-schema--design)
+- [API Endpoints Reference](#-api-endpoints-reference)
+- [Getting Started](#-getting-started)
   - [Prerequisites](#prerequisites)
   - [Local Development Setup](#local-development-setup)
   - [Running Both Servers Concurrently](#running-both-servers-concurrently)
-- [Environment Configuration](#environment-configuration)
-- [Admin Credentials & Management](#admin-credentials--management)
-- [Deployment Guide](#deployment-guide)
+- [Environment Configuration](#-environment-configuration)
+- [Admin Credentials & Security](#-admin-credentials--security)
+- [Deployment Guide](#-deployment-guide)
   - [Frontend Deployment (Vercel)](#frontend-deployment-vercel)
   - [Backend Deployment (Render)](#backend-deployment-render)
-- [Author & Contact](#author--contact)
+- [Author & Contact](#-author--contact)
 
 ---
 
 ## 🌟 Overview
 
-This project is an **enterprise-grade, full-stack personal portfolio and live CMS** built by **Muthu Selvam M** (Python Full Stack Developer). 
+This project is a **production-ready, full-stack personal portfolio and live CMS** designed and developed by **Muthu Selvam M** (Python Full Stack Developer).
 
-Unlike static portfolio templates where code edits are required to update text, skills, or projects, this platform features an **integrated administration portal** powered by **Django REST Framework** and **React 18**. Any update made in the Admin Dashboard is instantly reflected on the public portfolio in real-time, backed by SQLite / Oracle SQL database persistence, silent JWT token rotation, and robust offline-first fallback capabilities.
+Unlike traditional static developer templates that require code edits and redeployments to update content, this platform combines a **modern client SPA (React 18 + Vite)** with a **decoupled Django REST API** and an **integrated Content Management System (CMS)**. 
+
+Every single element on the website—from the headline typography and typewriter keywords, to projects, certifications, experiences, skill matrices, social links, and uploaded resumes—can be dynamically edited in real-time from the Admin Control Center without touching the codebase.
+
+---
+
+## 🎨 Design System & UI Architecture
+
+The platform features an editorial **Quiet Luxury** color palette combined with **Apple Liquid Glass (Frosted Glassmorphism)**:
+
+| Color Token | Hex Code | Role | Description |
+| :--- | :--- | :--- | :--- |
+| `--primary-color` | `#936142` | Primary Accent / Terracotta Chestnut | Used for active links, primary CTA buttons, badges, and brand highlights |
+| `--secondary-color` | `#AC8A69` | Secondary Accent / Caramel Ochre | Used for borders, subtle icons, and secondary card rims |
+| `--accent-color` | `#C58970` | Warm Ochre / Muted Clay | Used for interactive states, hover transitions, and glow highlights |
+| `--bg-color` (Light) | `#CCBBA9` / `#EDE3D8` | Background / Warm Linen Sand | Soft, non-glare, architectural background for reading comfort |
+| `--text-primary` | `#414942` | Slate Pine Charcoal | High-contrast editorial typography for maximum legibility (4.5+:1 ratio) |
+
+### Apple Liquid Glass Details:
+- **Optical Depth**: Utilizes high-saturation backdrop blurs (`backdrop-filter: blur(24px) saturate(180%)`) allowing grid lines and ambient page gradients to softly diffuse through.
+- **Specular Top Rims**: Subtle glass reflections created with inset box shadows (`box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.85)`).
+- **Architectural Drop Shadows**: Custom non-blurry drop shadows replacing shiny gradients for an elegant, minimal, and high-end feel.
+- **Dark Mode Ergonomics**: Seamlessly converts to a deep slate glass (`#232724` / `#2b302c`) with bright linen text (`#EDE3D8`) ensuring complete readability without eye fatigue.
 
 ---
 
 ## ✨ Key Features
 
 ### 1. Public Portfolio Showcase
+- **Architectural Fixed Navbar**:
+  - Features dedicated **Home** button navigation with smooth scroll-to-top behavior.
+  - Section links (`About`, `Skills`, `Experience`, `Certifications`, `Work`, `Contact`).
+  - Active section indicator with pill highlights and no-overlap button gaps.
+  - Floating Liquid Glass **Resume** action button and one-click **Dark/Light Mode** toggle.
 - **Hero & Headline Engine**:
-  - Configurable 3-line editorial hero headline with custom font pairings and golden radiance styling.
+  - Configurable 3-line editorial hero greeting with warm terracotta radiance.
   - Interactive status pill (`Available for Full Stack Opportunities`) with real-time toggle.
   - Dynamic Typewriter component cycling through customizable role titles.
-  - Direct resume download & external preview integration.
-- **Interactive 3D Tech Carousel (`Tech3DCarousel`)**:
-  - Custom 3D perspective stage showcasing 7 core technologies (*Python, Django, JavaScript, React.js, SQL Database, HTML5, CSS3*).
-  - Smooth auto-rotation with depth scaling, blur defocus, and color-matched drop shadows.
-  - Hover-to-pause and click-to-focus interactive physics.
-- **About Section**:
+  - Dual CTA buttons: **"View My Work"** and **"View Resume"**.
+  - Social pill list (*Email, GitHub, LinkedIn, Instagram*) with high-contrast icons.
+- **About Section & Core Competencies**:
   - Academic background (*BCA, CGPA: 7.8, Agurchand Manmull Jain College*).
-  - Core competencies tag cloud and expandable bio descriptions.
+  - High-contrast **Core Technologies** pills (*Python3, SQL, HTML5, CSS3, React.js, Manual Testing, Microsoft Office*) visible in both light and dark modes.
 - **Skills Matrix**:
   - Filterable categorized skills: *Programming, Frontend, Backend, Database, Tools, Soft Skills, QA*.
-  - Custom visual ordering, visibility switches, and SVG icons.
+  - Custom display order, proficiency bars, and visibility toggles.
 - **Experience Timeline**:
-  - Chronological career & internship entries with company details, date tags, and bulleted contributions.
+  - Chronological career & internship entries with company details, date tags, and contribution bullet points.
 - **Interactive Certifications**:
   - Credential cards with issuer badges (*Qspiders, Infosys Springboard, TCS iON, HP LIFE, NPTEL*).
   - Integrated image modal and high-resolution lightbox for proof-of-completion verification.
 - **Projects Showcase**:
   - Rich project cards with short/detailed descriptions, tech badges, live demo links, and GitHub repository links.
-  - Special `⭐ Featured` project highlighting.
+  - Special `⭐ Featured` project highlighting with responsive grid.
 - **Direct Contact System**:
   - Client-side validated contact form (*Name, Email, Subject, Message*).
   - Instant dispatch to the Django REST backend and logged into the Admin Inbox.
-- **Theming & Global UI Polish**:
-  - Seamless Light / Dark mode toggle with persistent local storage and root attribute binding.
-  - Top scroll progress bar indicator, customized preloader animation, and scroll reveal transitions.
 
 ---
 
-### 2. Admin CMS & Control Center
-Accessible via `/#/admin` with secure JWT authorization:
+### 2. Apple Liquid Glass Interface & Buttons
+All interactive controls are designed with frosted translucent glass physics:
+- **Primary Buttons (`.btn-primary`)**: Translucent terracotta gradient (`#936142` to `#835336`) with top specular highlight and smooth tactile lift.
+- **Secondary Buttons (`.btn-secondary`)**: Translucent warm sand glass in light mode and translucent dark slate glass in dark mode, maintaining 100% text contrast.
+- **Navbar (`.navbar`)**: Floats dynamically with scroll-direction detection (shrinks slightly on scroll down, elevates with smooth transitions on scroll up).
+
+---
+
+### 3. Interactive 3D Tech Carousel
+- Custom CSS 3D perspective stage showcasing 7 core technologies (*Python, Django, JavaScript, React.js, SQL Database, HTML5, CSS3*).
+- 3D circular rotation with depth-scaling, z-index calculation, and color-matched ambient drop shadows.
+- Interactive physics: hover to pause rotation, click any node to bring it to center focus.
+- 100% unified with the quiet luxury palette.
+
+---
+
+### 4. Dynamic Typography & Typewriter Engine
+- Live headline rotator cycling through customizable role keywords (e.g., `DJANGO REST API SPECIALIST`, `REACT.JS & ORACLE SQL DEVELOPER`).
+- Admin-controlled **Drag-and-Drop Chip Reordering** with character limits, live count badges, and uppercase normalization.
+- High-contrast visual styling in both light and dark themes.
+
+---
+
+### 5. Admin CMS & Control Center
+Accessible securely via `/#/admin`:
 - **Dashboard Overview**:
-  - Live metric counters for received inquiries, active experiences, certifications, and projects.
-  - Unread message indicators with instant preview.
-- **Profile & Hero Manager**:
-  - Real-time editing of personal details, contact data, tagline, typewriter list, and hero button targets.
+  - Real-time KPI stat cards: *Total Projects, Skills, Experiences, Certifications, Unread Messages*.
+  - Quick Action shortcuts to jump directly to any content editor.
+- **Hero & Profile Manager**:
+  - Real-time updates for greeting lines, professional titles, bio, and typewriter words.
 - **Content CRUD Modules**:
   - **Skills Tab**: Add, edit, reorder, toggle visibility, and delete technical skills.
   - **Experience Tab**: Manage work experiences, training periods, and responsibilities.
@@ -100,15 +149,23 @@ Accessible via `/#/admin` with secure JWT authorization:
   - **Projects Tab**: Create/edit showcase projects with featured flags, repository URLs, and live links.
   - **Social Links Tab**: Manage social profiles (*GitHub, LinkedIn, Email, LeetCode, HackerRank, etc.*).
 - **Messages Inbox**:
-  - View all visitor inquiries with timestamp, author email, and subject.
+  - View visitor inquiries with timestamp, author email, subject, and message body.
   - Mark messages as read/unread or delete processed inquiries.
 - **Theme & Section Settings**:
-  - Customize site theme mode (*Light / Dark*), primary brand colors, and border radiuses.
-  - Section visibility toggles: turn on/off *Hero, About, Skills, Experience, Certifications, Projects, Contact, Footer* with a single click.
+  - Toggle section visibility (*Hero, About, Skills, Experience, Certifications, Projects, Contact, Footer*) on/off with a single click.
 
 ---
 
-### 3. Intelligent Data & State Management
+### 6. Dynamic Resume Management
+- Upload new resume files directly from the Admin CMS (stored securely in database / Base64 format).
+- Intelligent fallback hierarchy:
+  1. Custom uploaded resume from Admin panel.
+  2. Local static PDF (`/Muthu_Selvam_Resume.pdf`).
+- Works seamlessly on both local development and static cloud hosting (Vercel).
+
+---
+
+### 7. Intelligent Data & State Management
 - **Persistent State Merging (`PortfolioContext`)**:
   - Database-first architecture where Django API data takes authoritative precedence.
   - Preserves offline/unsynced temporary additions seamlessly in browser `localStorage`.
@@ -158,6 +215,7 @@ flowchart TD
 muthu's portfolio/
 ├── start_servers.bat           # 1-Click script to start both dev servers
 ├── vercel.json                 # Vercel deployment & API rewrite configuration
+├── README.md                   # Comprehensive project documentation
 ├── backend/
 │   ├── manage.py               # Django management script
 │   ├── requirements.txt        # Python backend dependencies
@@ -192,12 +250,12 @@ muthu's portfolio/
         │   ├── ThemeContext.jsx      # Light/Dark mode state
         │   └── SectionContext.jsx    # Section visibility state
         ├── components/
-        │   ├── common/         # Preloader, ScrollProgress, Buttons, Modals
-        │   ├── public/         # Hero, Tech3DCarousel, About, Skills, Projects, Contact
+        │   ├── common/         # Preloader, ScrollProgress, Buttons, Modals, Typewriter
+        │   ├── public/         # Navbar, Hero, Tech3DCarousel, About, Skills, Projects, Contact
         │   └── dev/            # Admin Layout, CMS Tabs, and Control Panels
         └── styles/
             ├── global.css      # Base resets & typography
-            ├── variables.css   # Color palette tokens
+            ├── variables.css   # Color palette tokens & themes
             ├── public.css      # Portfolio layout & 3D carousel styles
             └── admin.css       # Admin dashboard & modal styles
 ```
@@ -275,7 +333,7 @@ All entities utilize explicit database table mappings to support both **SQLite**
 #### 1. Clone the Repository
 ```bash
 git clone https://github.com/muthuselvamm472-pythonstack/muthu-s-portfolio.git
-cd "muthu's portfolio"
+cd "muthu-s-portfolio"
 ```
 
 #### 2. Backend Setup (Django REST Framework)
@@ -327,11 +385,11 @@ npm run dev
 ---
 
 ### Running Both Servers Concurrently
-On Windows, you can simply double-click the included automation batch file:
+On Windows, you can double-click the included automation batch file:
 ```cmd
 start_servers.bat
 ```
-This will launch:
+This automatically launches:
 1. **Django REST API**: `http://127.0.0.1:8000/`
 2. **Vite React Frontend**: `http://127.0.0.1:3000/`
 
@@ -369,7 +427,7 @@ CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,https://muthu-s
 
 ---
 
-## 🔐 Admin Credentials & Management
+## 🔐 Admin Credentials & Security
 
 - **Default Admin Route**: `http://localhost:3000/#/admin`
 - **Default Username**: `muthu` *(or configured in `.env`)*
@@ -379,7 +437,7 @@ To change the admin password at any time via CLI:
 ```bash
 python manage.py set_admin_credentials --username your_username --password your_new_password
 ```
-Alternatively, log in to `/#/admin` and navigate to the top-right user menu to change credentials directly from the browser.
+Or log in to `/#/admin` and navigate to the top-right user menu to change credentials directly from the browser.
 
 ---
 
@@ -421,11 +479,11 @@ The repository includes a root `vercel.json` with API rewrite routing.
 *Python Full Stack Developer*  
 📍 Chennai, Tamil Nadu, India  
 
-- **Portfolio**: [muthu-s-portfolio.vercel.app](https://muthu-s-portfolio.vercel.app/)
-- **GitHub**: [@muthuselvamm472-pythonstack](https://github.com/muthuselvamm472-pythonstack)
-- **LinkedIn**: [linkedin.com/in/muthuselvamm472](https://www.linkedin.com/in/muthuselvamm472)
-- **Email**: [muthuselvamm472@gmail.com](mailto:muthuselvamm472@gmail.com)
-- **Phone**: +91 86789 22362
+- **🌐 Live Portfolio**: [muthu-s-portfolio.vercel.app](https://muthu-s-portfolio.vercel.app/)
+- **📁 GitHub**: [@muthuselvamm472-pythonstack](https://github.com/muthuselvamm472-pythonstack)
+- **💼 LinkedIn**: [linkedin.com/in/muthuselvamm472](https://www.linkedin.com/in/muthuselvamm472)
+- **📧 Email**: [muthuselvamm472@gmail.com](mailto:muthuselvamm472@gmail.com)
+- **📱 Phone**: +91 86789 22362
 
 ---
 
