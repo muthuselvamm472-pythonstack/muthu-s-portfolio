@@ -3,6 +3,7 @@ import { Button } from '../common/Button';
 import { ScrollReveal } from '../common/ScrollReveal';
 import { FormattedText } from '../common/FormattedText';
 import { usePortfolio } from '../../context/PortfolioContext';
+import { resolveResumeUrl } from '../../apiConfig';
 import { FileText, ArrowUpRight, Compass, Code2 } from 'lucide-react';
 
 export const AboutSection = () => {
@@ -21,7 +22,7 @@ export const AboutSection = () => {
 
   const focusItems = parseItems(about.currentFocus);
   const techItems = parseItems(about.coreTechnologies);
-  const resumeLink = profile?.resumeUrl || about.resumeUrl || '/Muthu_Selvam_Resume.pdf';
+  const resumeLink = resolveResumeUrl(profile?.resumeUrl || about.resumeUrl);
 
   return (
     <section id="about" className="portfolio-section">

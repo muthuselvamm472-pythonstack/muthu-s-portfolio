@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { Button } from '../common/Button';
+import { resolveResumeUrl } from '../../apiConfig';
 import { Sun, Moon, Menu, X, FileText } from 'lucide-react';
 
 export const Navbar = () => {
   const { themeMode, toggleTheme } = useTheme();
   const { data } = usePortfolio();
   const profile = data?.profile || {};
+  const resumeLink = resolveResumeUrl(data?.profile?.resumeUrl || data?.about?.resumeUrl);
   const sections = data?.sectionVisibility || {};
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState('hero');
@@ -118,7 +120,7 @@ export const Navbar = () => {
             {/* Mobile-only actions inside the dropdown */}
             <div className="mobile-drawer-actions">
               <Button
-                href={data.profile?.resumeUrl || data.about?.resumeUrl || '/Muthu_Selvam_Resume.pdf'}
+                href={resumeLink}
                 variant="secondary"
                 className="mobile-resume-btn"
                 target="_blank"
@@ -142,7 +144,7 @@ export const Navbar = () => {
           {/* Desktop-only action buttons */}
           <div className="nav-actions">
             <Button
-              href={data.profile?.resumeUrl || data.about?.resumeUrl || '/Muthu_Selvam_Resume.pdf'}
+              href={resumeLink}
               variant="secondary"
               className="nav-resume-btn"
               target="_blank"

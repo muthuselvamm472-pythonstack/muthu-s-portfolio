@@ -365,6 +365,7 @@ export const PortfolioProvider = ({ children }) => {
       phone: fields.phone,
       location: fields.location,
       resume_url: fields.resumeUrl,
+      resume_filename: fields.resumeFilename,
       button2_url: fields.resumeUrl,
       status_badge_text: fields.statusBadgeText,
       show_status_badge: fields.showStatusBadge,
@@ -382,6 +383,7 @@ export const PortfolioProvider = ({ children }) => {
             ...prev.profile,
             resumeUrl: updated.resume_url,
             button2Url: updated.resume_url,
+            resumeFilename: updated.resume_filename || prev.profile.resumeFilename,
           },
           about: {
             ...prev.about,

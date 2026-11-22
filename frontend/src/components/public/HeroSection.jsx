@@ -4,6 +4,7 @@ import { ScrollReveal } from '../common/ScrollReveal';
 import { Typewriter } from '../common/Typewriter';
 import { Tech3DCarousel } from './Tech3DCarousel';
 import { usePortfolio } from '../../context/PortfolioContext';
+import { resolveResumeUrl } from '../../apiConfig';
 import { SocialIcon } from '../common/SocialIcon';
 import { Sparkles, FileText, ChevronDown } from 'lucide-react';
 
@@ -88,7 +89,7 @@ export const HeroSection = () => {
               <Button href={profile.button1Url || '#projects'} variant="primary">
                 {profile.button1Text || 'View My Work'}
               </Button>
-              <Button href={profile.resumeUrl || profile.button2Url || '/Muthu_Selvam_Resume.pdf'} variant="secondary" target="_blank" rel="noreferrer">
+              <Button href={resolveResumeUrl(profile.resumeUrl || profile.button2Url)} variant="secondary" target="_blank" rel="noreferrer">
                 <FileText size={16} /> View Resume
               </Button>
             </div>

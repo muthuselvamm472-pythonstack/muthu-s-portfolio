@@ -20,6 +20,8 @@ class Profile(models.Model):
     location = models.CharField(max_length=200, blank=True, default='Chennai, Tamil Nadu, India')
     resume_file = models.FileField(upload_to='resume/', blank=True, null=True)
     resume_url = models.TextField(blank=True, default='/Muthu_Selvam_Resume.pdf')
+    resume_filename = models.CharField(max_length=255, blank=True, default='Muthu_Selvam_Resume.pdf')
+    resume_data = models.TextField(blank=True, default='')  # Base64 persistence for Render restart resilience
     # Hero headline & typography animation controls
     hero_line1 = models.CharField(max_length=200, blank=True, default="I'm Muthu Selvam,")
     hero_line2 = models.CharField(max_length=200, blank=True, default="A Python Full Stack")

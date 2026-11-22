@@ -7,6 +7,7 @@ import os
 import re
 import base64
 from django.conf import settings
+from django.http import HttpResponse, FileResponse, HttpResponseNotFound
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
@@ -194,6 +195,54 @@ def public_portfolio(request):
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def public_resume(request):
+    """
+    GET /api/resume/
+    Public stream of the current active resume.
+    1. Returns decoded PDF from database base64 (always persistent on Render).
+    2. Fallback to resume_file on disk.
+    3. Fallback to bundled PDF file in frontend/public.
+    """
+    profile = get_profile()
+    filename = getattr(profile, 'resume_filename', '') or 'Muthu_Selvam_Resume.pdf'
+
+    # 1. From database base64 (most resilient, works on Render even after restart)
+    if profile.resume_data:
+        try:
+            pdf_bytes = base64.b64decode(profile.resume_data)
+            response = HttpResponse(pdf_bytes, content_type='application/pdf')
+            response['Content-Disposition'] = f'inline; filename="{filename}"'
+            return response
+        except Exception as e:
+            print('Error streaming resume from DB:', e)
+
+    # 2. From file storage
+    if profile.resume_file:
+        try:
+            if profile.resume_file.storage.exists(profile.resume_file.name):
+                response = FileResponse(profile.resume_file.open('rb'), content_type='application/pdf')
+                response['Content-Disposition'] = f'inline; filename="{filename}"'
+                return response
+        except Exception as e:
+            print('Error streaming resume file:', e)
+
+    # 3. Fallback to bundled resume file in frontend/public or backend static
+    fallback_paths = [
+        settings.BASE_DIR / 'media' / 'resume' / 'Muthu_Selvam_Resume.pdf',
+        settings.BASE_DIR.parent / 'frontend' / 'public' / 'Muthu_Selvam_Resume.pdf',
+        settings.BASE_DIR.parent / 'frontend' / 'public' / 'Muthu Selvam(RESUME).pdf',
+    ]
+    for p in fallback_paths:
+        if p.exists():
+            response = FileResponse(open(p, 'rb'), content_type='application/pdf')
+            response['Content-Disposition'] = f'inline; filename="{filename}"'
+            return response
+
+    return HttpResponseNotFound("Resume not found.")
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 @throttle_classes([AnonRateThrottle])
@@ -237,6 +286,8 @@ class AdminProfileView(APIView):
 
         # Check if resume_url is a base64 encoded PDF document
         raw_resume = data.get('resume_url', '')
+        resume_filename = data.get('resume_filename', '') or 'Muthu_Selvam_Resume.pdf'
+
         if isinstance(raw_resume, str) and raw_resume.startswith('data:'):
             try:
                 header, base64_str = raw_resume.split(';base64,', 1)
@@ -250,10 +301,16 @@ class AdminProfileView(APIView):
                         profile.resume_file.delete(save=False)
                     except Exception:
                         pass
-                profile.resume_file.save(file_name, ContentFile(decoded_file), save=False)
-                resume_media_url = profile.resume_file.url  # e.g. '/media/resume/Muthu_Selvam_Resume.pdf'
-                data['resume_url'] = resume_media_url
-                data['button2_url'] = resume_media_url
+                
+                profile.resume_data = base64_str
+                profile.resume_filename = resume_filename
+                profile.resume_file.save(file_name, ContentFile(decoded_file), save=True)
+                profile.resume_url = '/api/resume/'
+                profile.button2_url = '/api/resume/'
+                profile.save()
+
+                data['resume_url'] = '/api/resume/'
+                data['button2_url'] = '/api/resume/'
 
                 # Also copy to frontend/public for fallback offline access
                 try:
@@ -269,7 +326,16 @@ class AdminProfileView(APIView):
                 print('Error decoding resume base64:', e)
         elif raw_resume == '':
             profile.resume_file = None
+            profile.resume_data = ''
+            profile.resume_url = ''
+            profile.button2_url = ''
+            profile.save()
             data['resume_url'] = ''
+            data['button2_url'] = ''
+        elif isinstance(raw_resume, str) and (raw_resume.startswith('http://') or raw_resume.startswith('https://')):
+            profile.resume_url = raw_resume
+            profile.button2_url = raw_resume
+            profile.save()
 
         # Check if profile_image is cleared
         if data.get('profile_image') == '':
@@ -284,8 +350,14 @@ class AdminProfileView(APIView):
                 profile.profile_image = request.FILES['profile_image_file']
             # Handle resume file upload
             if 'resume_file_upload' in request.FILES:
-                profile.resume_file = request.FILES['resume_file_upload']
-                profile.resume_url = profile.resume_file.url
+                f = request.FILES['resume_file_upload']
+                file_bytes = f.read()
+                profile.resume_data = base64.b64encode(file_bytes).decode('utf-8')
+                profile.resume_filename = f.name
+                profile.resume_file.save(f.name, ContentFile(file_bytes), save=True)
+                profile.resume_url = '/api/resume/'
+                profile.button2_url = '/api/resume/'
+                profile.save()
             serializer.save()
             return Response(ProfileSerializer(profile, context={'request': request}).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

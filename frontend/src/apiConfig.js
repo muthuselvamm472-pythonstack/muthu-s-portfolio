@@ -31,3 +31,25 @@ export const getApiUrl = (path) => {
   }
   return cleanPath;
 };
+
+/**
+ * Intelligently resolves the Resume URL:
+ * - If backend path (/api/resume/ or /media/...), prepends backend origin in production.
+ * - If external (http:// or https://), returns directly.
+ * - If empty or static, falls back to local static bundled file /Muthu_Selvam_Resume.pdf.
+ */
+export const resolveResumeUrl = (rawUrl) => {
+  if (!rawUrl || rawUrl === '/Muthu_Selvam_Resume.pdf' || rawUrl === '/Muthu%20Selvam(RESUME).pdf') {
+    return '/Muthu_Selvam_Resume.pdf';
+  }
+  if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
+    return rawUrl;
+  }
+  if (rawUrl.startsWith('data:')) {
+    return rawUrl;
+  }
+  if (rawUrl.startsWith('/api/') || rawUrl.startsWith('/media/')) {
+    return getApiUrl(rawUrl);
+  }
+  return rawUrl;
+};

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Save, ShieldCheck, Lock, User, KeyRound, FileText, Upload, ExternalLink, Trash2, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
-import { getApiUrl } from '../../../apiConfig';
+import { getApiUrl, resolveResumeUrl } from '../../../apiConfig';
 
 export const ProfileTab = ({ data, updateProfile, showToast }) => {
   const { user, changeCredentials } = useAuth();
@@ -59,16 +59,16 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
 
     if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
       showToast('Please upload a valid PDF document file (.pdf)', 'warning');
+      return;
     }
 
     setPendingResumeFile(file);
-    // Keep the input text clean and readable with filename
-    setForm(prev => ({ ...prev, resumeUrl: `/media/resume/${file.name}` }));
+    setForm(prev => ({ ...prev, resumeUrl: `/api/resume/` }));
 
     const reader = new FileReader();
     reader.onloadend = () => {
       setPendingResumeBase64(reader.result);
-      showToast(`📄 Selected "${file.name}"! Click "Save Profile & Resume Changes" to activate.`, 'info');
+      showToast(`📄 Selected "${file.name}"! Click "Save Profile & Resume Changes" below to activate.`, 'info');
     };
     reader.readAsDataURL(file);
   };
@@ -80,29 +80,15 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
       window.open(blobUrl, '_blank');
       return;
     }
-    if (form.resumeUrl && form.resumeUrl.startsWith('data:')) {
-      fetch(form.resumeUrl)
-        .then(res => res.blob())
-        .then(blob => {
-          const blobUrl = URL.createObjectURL(blob);
-          window.open(blobUrl, '_blank');
-        })
-        .catch(() => window.open(form.resumeUrl, '_blank'));
-      return;
-    }
-    if (form.resumeUrl) {
-      const targetUrl = form.resumeUrl.startsWith('http')
-        ? form.resumeUrl
-        : getApiUrl(form.resumeUrl);
-      window.open(targetUrl, '_blank');
-    }
+    const targetUrl = resolveResumeUrl(form.resumeUrl || '/api/resume/');
+    window.open(targetUrl, '_blank');
   };
 
   const handleClearResume = () => {
     setPendingResumeFile(null);
     setPendingResumeBase64(null);
-    setForm(prev => ({ ...prev, resumeUrl: '' }));
-    showToast('Resume cleared. Click "Save Profile Changes" to activate.', 'info');
+    setForm(prev => ({ ...prev, resumeUrl: '/Muthu_Selvam_Resume.pdf' }));
+    showToast('Reset to default resume. Click "Save Profile & Resume Changes" to activate.', 'info');
   };
 
   const handleSubmit = (e) => {
@@ -110,6 +96,7 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
     const payload = {
       ...form,
       resumeUrl: pendingResumeBase64 || form.resumeUrl,
+      resumeFilename: pendingResumeFile?.name || 'Muthu_Selvam_Resume.pdf',
     };
     updateProfile(payload);
     setPendingResumeBase64(null);
@@ -192,7 +179,7 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
                   name="resumeUrl"
                   value={form.resumeUrl}
                   onChange={handleChange}
-                  placeholder="/media/resume/Muthu_Selvam_Resume.pdf or URL link"
+                  placeholder="/api/resume/ or https://drive.google.com/..."
                   style={{ flex: '1 1 240px' }}
                 />
                 <label className="btn btn-secondary flex-center gap-2" style={{ cursor: 'pointer', margin: 0, padding: '0.6rem 1rem' }}>

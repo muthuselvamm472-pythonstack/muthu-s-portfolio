@@ -8,6 +8,7 @@ from . import views
 urlpatterns = [
     # ── Public (no auth required) ──────────────────────────────────────────────
     path('portfolio/', views.public_portfolio, name='public_portfolio'),
+    path('resume/', views.public_resume, name='public_resume'),
     path('contact/', views.submit_message, name='submit_message'),
 
     # ── Auth ───────────────────────────────────────────────────────────────────
