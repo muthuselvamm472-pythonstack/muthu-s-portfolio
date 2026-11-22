@@ -4,6 +4,7 @@ Protected endpoints require JWT Bearer token.
 Public endpoints return portfolio data without auth.
 """
 import os
+import re
 import base64
 from django.conf import settings
 from django.contrib.auth import authenticate
@@ -11,8 +12,10 @@ from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db.models import Q
+from django.utils.html import strip_tags
 from rest_framework import status, generics
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
+from rest_framework.throttling import AnonRateThrottle
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -55,8 +58,9 @@ class LoginView(APIView):
         if not serializer.is_valid():
             return Response({'error': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
 
-        username = serializer.validated_data['username']
-        password = serializer.validated_data['password']
+        data = getattr(serializer, 'validated_data', None)
+        username = data.get('username') if isinstance(data, dict) else None
+        password = data.get('password') if isinstance(data, dict) else None
         user = authenticate(username=username, password=password)
 
         if user is None:
@@ -192,9 +196,23 @@ def public_portfolio(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AnonRateThrottle])
 def submit_message(request):
-    """POST /api/contact/ — Submit a contact form message. Public endpoint."""
-    serializer = MessageSerializer(data=request.data)
+    """POST /api/contact/ — Submit a contact form message with XSS sanitization and rate limiting."""
+    data = dict(request.data) if hasattr(request.data, 'items') else {}
+    cleaned = {}
+    for k, v in data.items():
+        if isinstance(v, list) and len(v) == 1:
+            v = v[0]
+        if isinstance(v, str):
+            # Strip entire script tags and their content
+            clean_str = re.sub(r'<script.*?>.*?</script>', '', v, flags=re.IGNORECASE | re.DOTALL)
+            clean_str = strip_tags(clean_str).strip()
+            cleaned[k] = clean_str
+        else:
+            cleaned[k] = v
+
+    serializer = MessageSerializer(data=cleaned)
     if serializer.is_valid():
         serializer.save()
         return Response({'message': 'Message sent successfully!'}, status=status.HTTP_201_CREATED)

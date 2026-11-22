@@ -115,6 +115,15 @@ export const AdminLayout = () => {
       </header>
 
       <div className="admin-body-layout">
+        {/* Mobile Backdrop */}
+        {mobileDrawerOpen && (
+          <div
+            className="admin-drawer-backdrop"
+            onClick={() => setMobileDrawerOpen(false)}
+            aria-label="Close menu drawer"
+          />
+        )}
+
         {/* Sidebar */}
         <aside className={`admin-sidebar ${mobileDrawerOpen ? 'drawer-open' : ''}`}>
           <div className="sidebar-menu">

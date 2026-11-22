@@ -95,6 +95,11 @@ export const ProjectsSection = () => {
                     <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>
                       {project.shortDescription}
                     </p>
+                    {project.image && (
+                      <div className="secondary-project-img-wrap" style={{ borderRadius: '10px', overflow: 'hidden', marginBottom: '1.25rem', maxHeight: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.25)', border: '1px solid var(--glass-border)', padding: '0.5rem' }}>
+                        <img src={project.image} alt={project.title} style={{ maxWidth: '100%', maxHeight: '160px', width: 'auto', height: 'auto', objectFit: 'contain' }} />
+                      </div>
+                    )}
                   </div>
 
                   {project.technologies && project.technologies.length > 0 && (

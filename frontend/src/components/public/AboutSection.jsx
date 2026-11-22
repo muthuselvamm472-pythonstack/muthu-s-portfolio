@@ -1,13 +1,26 @@
 import React from 'react';
-import { Card } from '../common/Card';
 import { Button } from '../common/Button';
 import { ScrollReveal } from '../common/ScrollReveal';
 import { usePortfolio } from '../../context/PortfolioContext';
-import { FileText, Target, Cpu } from 'lucide-react';
+import { FileText, ArrowUpRight, Compass, Code2 } from 'lucide-react';
 
 export const AboutSection = () => {
   const { data } = usePortfolio();
   const about = data?.about || {};
+  const profile = data?.profile || {};
+
+  // Clean bullet parsing
+  const parseItems = (rawString) => {
+    if (!rawString) return [];
+    return rawString
+      .split(/[•\n]/)
+      .map(s => s.trim())
+      .filter(Boolean);
+  };
+
+  const focusItems = parseItems(about.currentFocus);
+  const techItems = parseItems(about.coreTechnologies);
+  const resumeLink = profile?.resumeUrl || about.resumeUrl || '/Muthu_Selvam_Resume.pdf';
 
   return (
     <section id="about" className="portfolio-section">
@@ -16,45 +29,92 @@ export const AboutSection = () => {
           <h2 className="section-title">ABOUT ME</h2>
         </ScrollReveal>
 
-        <div className="about-grid">
-          <ScrollReveal variant="fade-right" delay={120} duration={750} className="about-narrative">
-            <h3 style={{ fontSize: '1.4rem', color: 'var(--text-primary)' }}>
-              {about.heading}
+        <div className="about-editorial-grid">
+          {/* Left Column: Narrative Story */}
+          <ScrollReveal variant="fade-right" delay={120} duration={700} className="about-story-col">
+            <h3 className="about-story-heading">
+              {about.heading || "Who Am I?"}
             </h3>
-            <p>{about.shortDescription}</p>
-            <p>{about.detailedDescription}</p>
-            <div style={{ marginTop: '1rem' }}>
-              <Button href={data?.profile?.resumeUrl || about.resumeUrl || '/Muthu_Selvam_Resume.pdf'} variant="primary" target="_blank" rel="noreferrer">
+
+            <div className="about-story-text">
+              {about.shortDescription && (
+                <p className="about-paragraph lead">{about.shortDescription}</p>
+              )}
+              {about.detailedDescription && (
+                <p className="about-paragraph">{about.detailedDescription}</p>
+              )}
+            </div>
+
+            {/* Subtle contextual details: human, simple, understated */}
+            <div className="about-meta-strip">
+              <span className="about-meta-item">
+                <span className="meta-dot"></span>
+                <span className="meta-label">Education:</span>
+                <span className="meta-val">BCA Graduate</span>
+              </span>
+              <span className="about-meta-item">
+                <span className="meta-dot"></span>
+                <span className="meta-label">Location:</span>
+                <span className="meta-val">Chennai, Tamil Nadu</span>
+              </span>
+            </div>
+
+            <div className="about-actions">
+              <Button href={resumeLink} variant="primary" target="_blank" rel="noreferrer">
                 <FileText size={16} /> View Resume
               </Button>
+              <a href="#contact" className="about-contact-text-btn">
+                <span>Get in touch</span>
+                <ArrowUpRight size={15} />
+              </a>
             </div>
           </ScrollReveal>
 
-          <div className="about-cards-col">
-            <ScrollReveal variant="fade-left" delay={220} duration={750}>
-              <Card>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                  <Target size={18} color="var(--accent-color)" />
-                  <span className="focus-card-title">CURRENT FOCUS</span>
+          {/* Right Column: Clean, calm highlights card */}
+          <ScrollReveal variant="fade-left" delay={200} duration={700} className="about-aside-col">
+            <div className="about-aside-card">
+              {/* Current Focus Panel */}
+              <div className="about-aside-block">
+                <div className="aside-block-header">
+                  <Compass size={16} className="aside-icon" />
+                  <h4>Current Focus</h4>
                 </div>
-                <div className="focus-card-content">{about.currentFocus}</div>
-              </Card>
-            </ScrollReveal>
+                {focusItems.length > 0 ? (
+                  <ul className="aside-focus-list">
+                    {focusItems.map((item, idx) => (
+                      <li key={idx} className="aside-focus-item">
+                        <span className="aside-bullet">&mdash;</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="aside-plain-text">{about.currentFocus}</p>
+                )}
+              </div>
 
-            <ScrollReveal variant="fade-left" delay={340} duration={750}>
-              <Card>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                  <Cpu size={18} color="var(--primary-color)" />
-                  <span className="focus-card-title" style={{ color: 'var(--primary-color)' }}>
-                    CORE TECHNOLOGIES
-                  </span>
+              <div className="aside-divider"></div>
+
+              {/* Core Technologies Panel */}
+              <div className="about-aside-block">
+                <div className="aside-block-header">
+                  <Code2 size={16} className="aside-icon" />
+                  <h4>Core Technologies</h4>
                 </div>
-                <div className="focus-card-content" style={{ fontSize: '1rem', fontWeight: '500' }}>
-                  {about.coreTechnologies}
-                </div>
-              </Card>
-            </ScrollReveal>
-          </div>
+                {techItems.length > 0 ? (
+                  <div className="aside-tech-pills">
+                    {techItems.map((tech, idx) => (
+                      <span key={idx} className="aside-tech-pill">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="aside-plain-text">{about.coreTechnologies}</p>
+                )}
+              </div>
+            </div>
+          </ScrollReveal>
         </div>
       </div>
     </section>

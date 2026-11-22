@@ -183,7 +183,7 @@ export const mockPortfolioData = {
     footer: true
   },
   themeSettings: {
-    themeMode: "light",
+    themeMode: "dark",
     primaryColor: "#f59e0b",
     accentColor: "#fbbf24",
     backgroundColor: "#ffffff",

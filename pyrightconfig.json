@@ -1,0 +1,21 @@
+{
+  "include": [
+    "backend"
+  ],
+  "extraPaths": [
+    "backend",
+    "C:/Users/Muthu selvam.M/AppData/Local/Python/pythoncore-3.14-64/Lib/site-packages"
+  ],
+  "typeCheckingMode": "basic",
+  "reportMissingImports": "none",
+  "reportAttributeAccessIssue": "none",
+  "reportArgumentType": "none",
+  "reportAssignmentType": "none",
+  "reportCallIssue": "none",
+  "reportIncompatibleMethodOverride": "none",
+  "reportGeneralTypeIssues": "none",
+  "reportIndexIssue": "none",
+  "reportOptionalSubscript": "none",
+  "pythonVersion": "3.14",
+  "pythonPlatform": "Windows"
+}

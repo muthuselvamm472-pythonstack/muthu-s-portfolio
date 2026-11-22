@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 
 class Profile(models.Model):
     """Portfolio owner's personal information and hero section content."""
+    objects = models.Manager()
     full_name = models.CharField(max_length=100, default='MUTHU SELVAM.M')
     professional_title = models.CharField(max_length=200, default='PYTHON FULL STACK DEVELOPER')
     tagline = models.CharField(max_length=500, blank=True, default='')
@@ -40,11 +41,12 @@ class Profile(models.Model):
         db_table = 'PORTFOLIO_PROFILE'
 
     def __str__(self):
-        return self.full_name
+        return str(self.full_name)
 
 
 class About(models.Model):
     """About section content."""
+    objects = models.Manager()
     heading = models.TextField(default='Driven BCA graduate with a strong academic foundation.')
     short_description = models.TextField(blank=True, default='')
     detailed_description = models.TextField(blank=True, default='')
@@ -62,6 +64,7 @@ class About(models.Model):
 
 class Skill(models.Model):
     """Individual skills displayed in the Skills section."""
+    objects = models.Manager()
     CATEGORIES = [
         ('Programming', 'Programming'),
         ('Frontend', 'Frontend'),
@@ -87,6 +90,7 @@ class Skill(models.Model):
 
 class Experience(models.Model):
     """Work/internship experience entries."""
+    objects = models.Manager()
     role = models.CharField(max_length=200)
     company = models.CharField(max_length=200)
     location = models.CharField(max_length=200, blank=True, default='')
@@ -109,6 +113,7 @@ class Experience(models.Model):
 
 class Certification(models.Model):
     """Certifications and achievements."""
+    objects = models.Manager()
     name = models.CharField(max_length=200)
     organization = models.CharField(max_length=200)
     issue_date = models.CharField(max_length=50, blank=True, default='')
@@ -129,6 +134,7 @@ class Certification(models.Model):
 
 class Project(models.Model):
     """Portfolio projects."""
+    objects = models.Manager()
     title = models.CharField(max_length=200)
     short_description = models.TextField(blank=True, default='')
     detailed_description = models.TextField(blank=True, default='')
@@ -149,11 +155,12 @@ class Project(models.Model):
         ordering = ['display_order', '-created_at']
 
     def __str__(self):
-        return self.title
+        return str(self.title)
 
 
 class Message(models.Model):
     """Contact form messages from visitors."""
+    objects = models.Manager()
     name = models.CharField(max_length=100)
     email = models.EmailField()
     subject = models.CharField(max_length=200, blank=True, default='')
@@ -172,6 +179,7 @@ class Message(models.Model):
 
 class SocialLink(models.Model):
     """Social media and professional profile links."""
+    objects = models.Manager()
     PLATFORMS = [
         ('GitHub', 'GitHub'),
         ('LinkedIn', 'LinkedIn'),
@@ -199,6 +207,7 @@ class SocialLink(models.Model):
 
 class SiteSettings(models.Model):
     """Site-wide settings: theme, section visibility."""
+    objects = models.Manager()
     # Theme
     theme_mode = models.CharField(max_length=10, default='light', choices=[('light', 'Light'), ('dark', 'Dark')])
     primary_color = models.CharField(max_length=20, default='#f59e0b')

@@ -1107,6 +1107,15 @@ input:checked + .toggle-slider:before {
     transform: translateX(0);
   }
 
+  .admin-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    top: 64px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 998;
+  }
+
   .admin-main-content {
     padding: 1.25rem 0.85rem;
   }

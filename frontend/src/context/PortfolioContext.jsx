@@ -211,14 +211,14 @@ const formatAndMerge = (apiData, prev) => {
     projects:       mergeList(apiProj, prev?.projects || []),
     socialLinks:    mergeList(apiSocial, prev?.socialLinks || []),
     sectionVisibility: {
-      hero:           s.show_hero           !== false,
-      about:          s.show_about          !== false,
-      skills:         s.show_skills         !== false,
-      experience:     s.show_experience     !== false,
-      certifications: s.show_certifications !== false,
-      projects:       s.show_projects       !== false,
-      contact:        s.show_contact        !== false,
-      footer:         s.show_footer         !== false,
+      hero:           prev?.sectionVisibility?.hero !== undefined ? prev.sectionVisibility.hero : (s.show_hero !== false),
+      about:          prev?.sectionVisibility?.about !== undefined ? prev.sectionVisibility.about : (s.show_about !== false),
+      skills:         prev?.sectionVisibility?.skills !== undefined ? prev.sectionVisibility.skills : (s.show_skills !== false),
+      experience:     prev?.sectionVisibility?.experience !== undefined ? prev.sectionVisibility.experience : (s.show_experience !== false),
+      certifications: prev?.sectionVisibility?.certifications !== undefined ? prev.sectionVisibility.certifications : (s.show_certifications !== false),
+      projects:       prev?.sectionVisibility?.projects !== undefined ? prev.sectionVisibility.projects : (s.show_projects !== false),
+      contact:        prev?.sectionVisibility?.contact !== undefined ? prev.sectionVisibility.contact : (s.show_contact !== false),
+      footer:         prev?.sectionVisibility?.footer !== undefined ? prev.sectionVisibility.footer : (s.show_footer !== false),
     },
     themeSettings: {
       ...(prev?.themeSettings || mockPortfolioData.themeSettings),
@@ -246,16 +246,29 @@ const saveCache = (data) => {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (_) {}
 };
 
+// Cross-tab / Cross-window zero-latency sync via BroadcastChannel
+let syncChannel = null;
+try {
+  if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+    syncChannel = new BroadcastChannel('muthu_portfolio_sync');
+  }
+} catch (_) {}
+
 export const PortfolioProvider = ({ children }) => {
   const [data, setDataRaw] = useState(() => loadCache() || mockPortfolioData);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Persistence wrapper for setData
+  // Persistence wrapper for setData with instant broadcast
   const setData = useCallback((updater) => {
     setDataRaw(prev => {
       const next = typeof updater === 'function' ? updater(prev) : updater;
       saveCache(next);
+      if (syncChannel) {
+        try {
+          syncChannel.postMessage({ type: 'SYNC_PORTFOLIO', payload: next });
+        } catch (_) {}
+      }
       return next;
     });
   }, []);
@@ -292,15 +305,30 @@ export const PortfolioProvider = ({ children }) => {
     refreshPortfolioData();
   }, []);
 
-  // Cross-tab sync
+  // Cross-tab / Cross-window Instant Sync
   useEffect(() => {
+    const handleBroadcast = (e) => {
+      if (e?.data?.type === 'SYNC_PORTFOLIO' && e.data.payload) {
+        setDataRaw(e.data.payload);
+      }
+    };
+    if (syncChannel) {
+      syncChannel.addEventListener('message', handleBroadcast);
+    }
+
     const handleStorage = (e) => {
       if (e.key === STORAGE_KEY && e.newValue) {
         try { setDataRaw(JSON.parse(e.newValue)); } catch (_) {}
       }
     };
     window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+
+    return () => {
+      if (syncChannel) {
+        syncChannel.removeEventListener('message', handleBroadcast);
+      }
+      window.removeEventListener('storage', handleStorage);
+    };
   }, []);
 
   // Admin Messages
