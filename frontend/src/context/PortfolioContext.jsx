@@ -144,6 +144,10 @@ const formatAndMerge = (apiData, prev) => {
   const a = apiData.about || {};
   const s = apiData.settings || {};
 
+  // Protect fields that were explicitly customized by user in Admin CMS
+  const profileUserEdited = prev?.profile?._userEdited || {};
+  const aboutUserEdited = prev?.about?._userEdited || {};
+
   const apiSkills = (apiData.skills || []).map((sk, i) => ({
     id: sk.id || i + 1, name: sk.name, category: sk.category, icon: sk.icon || 'Code',
     order: sk.display_order ?? (i + 1), isVisible: sk.is_visible !== false,
@@ -175,35 +179,39 @@ const formatAndMerge = (apiData, prev) => {
 
   return {
     profile: {
-      fullName:       p.full_name             || prev?.profile?.fullName        || mockPortfolioData.profile.fullName,
-      title:          p.professional_title     || prev?.profile?.title           || mockPortfolioData.profile.title,
-      tagline:        p.tagline                || prev?.profile?.tagline         || mockPortfolioData.profile.tagline,
-      heroDescription:p.hero_description       || prev?.profile?.heroDescription || mockPortfolioData.profile.heroDescription,
-      profileImage:   p.profile_image          || prev?.profile?.profileImage    || mockPortfolioData.profile.profileImage,
-      statusBadgeText: p.status_badge_text !== undefined ? p.status_badge_text : (prev?.profile?.statusBadgeText ?? mockPortfolioData.profile.statusBadgeText),
-      showStatusBadge: p.show_status_badge !== undefined ? p.show_status_badge : (prev?.profile?.showStatusBadge ?? true),
-      typewriterRoles: (Array.isArray(p.typewriter_roles) && p.typewriter_roles.length > 0) ? p.typewriter_roles : (prev?.profile?.typewriterRoles || mockPortfolioData.profile.typewriterRoles),
-      heroLine1:       p.hero_line1 !== undefined ? p.hero_line1 : (prev?.profile?.heroLine1 ?? mockPortfolioData.profile.heroLine1),
-      heroLine2:       p.hero_line2 !== undefined ? p.hero_line2 : (prev?.profile?.heroLine2 ?? mockPortfolioData.profile.heroLine2),
-      heroLine3:       p.hero_line3 !== undefined ? p.hero_line3 : (prev?.profile?.heroLine3 ?? mockPortfolioData.profile.heroLine3),
-      email:          p.email                  || prev?.profile?.email           || mockPortfolioData.profile.email,
-      phone:          p.phone                  || prev?.profile?.phone           || mockPortfolioData.profile.phone,
-      location:       p.location               || prev?.profile?.location        || mockPortfolioData.profile.location,
-      resumeUrl:      p.resume_url             || prev?.profile?.resumeUrl       || '/Muthu_Selvam_Resume.pdf',
+      fullName:       profileUserEdited.fullName       ? prev.profile.fullName       : (p.full_name             || prev?.profile?.fullName        || mockPortfolioData.profile.fullName),
+      title:          profileUserEdited.title          ? prev.profile.title          : (p.professional_title     || prev?.profile?.title           || mockPortfolioData.profile.title),
+      tagline:        profileUserEdited.tagline        ? prev.profile.tagline        : (p.tagline                || prev?.profile?.tagline         || mockPortfolioData.profile.tagline),
+      heroDescription:profileUserEdited.heroDescription? prev.profile.heroDescription: (p.hero_description       || prev?.profile?.heroDescription || mockPortfolioData.profile.heroDescription),
+      profileImage:   profileUserEdited.profileImage   ? prev.profile.profileImage   : (p.profile_image          || prev?.profile?.profileImage    || mockPortfolioData.profile.profileImage),
+      statusBadgeText:profileUserEdited.statusBadgeText? prev.profile.statusBadgeText: (p.status_badge_text !== undefined ? p.status_badge_text : (prev?.profile?.statusBadgeText ?? mockPortfolioData.profile.statusBadgeText)),
+      showStatusBadge:profileUserEdited.showStatusBadge? prev.profile.showStatusBadge: (p.show_status_badge !== undefined ? p.show_status_badge : (prev?.profile?.showStatusBadge ?? true)),
+      typewriterRoles:profileUserEdited.typewriterRoles? prev.profile.typewriterRoles: ((Array.isArray(p.typewriter_roles) && p.typewriter_roles.length > 0) ? p.typewriter_roles : (prev?.profile?.typewriterRoles || mockPortfolioData.profile.typewriterRoles)),
+      heroLine1:      profileUserEdited.heroLine1      ? prev.profile.heroLine1      : (p.hero_line1 !== undefined ? p.hero_line1 : (prev?.profile?.heroLine1 ?? mockPortfolioData.profile.heroLine1)),
+      heroLine2:      profileUserEdited.heroLine2      ? prev.profile.heroLine2      : (p.hero_line2 !== undefined ? p.hero_line2 : (prev?.profile?.heroLine2 ?? mockPortfolioData.profile.heroLine2)),
+      heroLine3:      profileUserEdited.heroLine3      ? prev.profile.heroLine3      : (p.hero_line3 !== undefined ? p.hero_line3 : (prev?.profile?.heroLine3 ?? mockPortfolioData.profile.heroLine3)),
+      email:          profileUserEdited.email          ? prev.profile.email          : (p.email                  || prev?.profile?.email           || mockPortfolioData.profile.email),
+      phone:          profileUserEdited.phone          ? prev.profile.phone          : (p.phone                  || prev?.profile?.phone           || mockPortfolioData.profile.phone),
+      location:       profileUserEdited.location       ? prev.profile.location       : (p.location               || prev?.profile?.location        || mockPortfolioData.profile.location),
+      resumeUrl:      profileUserEdited.resumeUrl      ? prev.profile.resumeUrl      : (p.resume_url             || prev?.profile?.resumeUrl       || '/Muthu_Selvam_Resume.pdf'),
       showHeroButtons: p.show_hero_buttons !== false,
-      button1Text:    p.button1_text           || prev?.profile?.button1Text     || 'View My Work',
-      button1Url:     p.button1_url            || prev?.profile?.button1Url      || '#projects',
-      button2Text:    p.button2_text           || prev?.profile?.button2Text     || 'Download Resume',
-      button2Url:     p.button2_url            || prev?.profile?.button2Url      || '/Muthu_Selvam_Resume.pdf',
+      button1Text:    profileUserEdited.button1Text    ? prev.profile.button1Text    : (p.button1_text           || prev?.profile?.button1Text     || 'View My Work'),
+      button1Url:     profileUserEdited.button1Url     ? prev.profile.button1Url     : (p.button1_url            || prev?.profile?.button1Url      || '#projects'),
+      button2Text:    profileUserEdited.button2Text    ? prev.profile.button2Text    : (p.button2_text           || prev?.profile?.button2Text     || 'Download Resume'),
+      button2Url:     profileUserEdited.button2Url     ? prev.profile.button2Url     : (p.button2_url            || prev?.profile?.button2Url      || '/Muthu_Selvam_Resume.pdf'),
+      _userEdited:    profileUserEdited,
+      _clientUpdatedAt: prev?.profile?._clientUpdatedAt,
     },
     about: {
-      heading:            a.heading              || prev?.about?.heading            || mockPortfolioData.about.heading,
-      shortDescription:   a.short_description   || prev?.about?.shortDescription   || mockPortfolioData.about.shortDescription,
-      detailedDescription:a.detailed_description || prev?.about?.detailedDescription|| mockPortfolioData.about.detailedDescription,
-      currentFocus:       a.current_focus        || prev?.about?.currentFocus       || mockPortfolioData.about.currentFocus,
-      coreTechnologies:   a.core_technologies    || prev?.about?.coreTechnologies    || mockPortfolioData.about.coreTechnologies,
+      heading:            aboutUserEdited.heading            ? prev.about.heading            : (a.heading              || prev?.about?.heading            || mockPortfolioData.about.heading),
+      shortDescription:   aboutUserEdited.shortDescription   ? prev.about.shortDescription   : (a.short_description   || prev?.about?.shortDescription   || mockPortfolioData.about.shortDescription),
+      detailedDescription:aboutUserEdited.detailedDescription? prev.about.detailedDescription: (a.detailed_description || prev?.about?.detailedDescription|| mockPortfolioData.about.detailedDescription),
+      currentFocus:       aboutUserEdited.currentFocus       ? prev.about.currentFocus       : (a.current_focus        || prev?.about?.currentFocus       || mockPortfolioData.about.currentFocus),
+      coreTechnologies:   aboutUserEdited.coreTechnologies   ? prev.about.coreTechnologies   : (a.core_technologies    || prev?.about?.coreTechnologies    || mockPortfolioData.about.coreTechnologies),
       showResumeButton:   a.show_resume_button !== false,
-      resumeUrl:          p.resume_url           || prev?.about?.resumeUrl          || '/Muthu_Selvam_Resume.pdf',
+      resumeUrl:          aboutUserEdited.resumeUrl          ? prev.about.resumeUrl          : (p.resume_url           || prev?.about?.resumeUrl          || '/Muthu_Selvam_Resume.pdf'),
+      _userEdited:        aboutUserEdited,
+      _clientUpdatedAt:   prev?.about?._clientUpdatedAt,
     },
     skills:         mergeList(apiSkills, prev?.skills || []),
     experiences:    mergeList(apiExp, prev?.experiences || []),
@@ -342,20 +350,28 @@ export const PortfolioProvider = ({ children }) => {
 
   // ─── PROFILE ───────────────────────────────────────────────────────────────
   const updateProfile = useCallback(async (fields) => {
-    setData(prev => ({
-      ...prev,
-      profile: {
-        ...prev.profile,
-        ...fields,
-        button2Url: fields.resumeUrl || fields.button2Url || prev.profile.button2Url
-      },
-      about: {
-        ...prev.about,
-        resumeUrl: fields.resumeUrl || prev.about?.resumeUrl || prev.profile.resumeUrl
-      },
-      // Keep contact in sync with profile
-      contact: { ...prev.contact, email: fields.email || prev.profile.email, phone: fields.phone || prev.profile.phone, location: fields.location || prev.profile.location }
-    }));
+    setData(prev => {
+      const userEdited = { ...(prev?.profile?._userEdited || {}) };
+      Object.keys(fields).forEach(k => {
+        if (fields[k] !== undefined) userEdited[k] = true;
+      });
+      return {
+        ...prev,
+        profile: {
+          ...prev.profile,
+          ...fields,
+          _userEdited: userEdited,
+          _clientUpdatedAt: Date.now(),
+          button2Url: fields.resumeUrl || fields.button2Url || prev.profile.button2Url
+        },
+        about: {
+          ...prev.about,
+          resumeUrl: fields.resumeUrl || prev.about?.resumeUrl || prev.profile.resumeUrl
+        },
+        // Keep contact in sync with profile
+        contact: { ...prev.contact, email: fields.email || prev.profile.email, phone: fields.phone || prev.profile.phone, location: fields.location || prev.profile.location }
+      };
+    });
     const res = await api('/api/admin/profile/', 'PUT', {
       full_name: fields.fullName,
       professional_title: fields.title,
@@ -392,12 +408,27 @@ export const PortfolioProvider = ({ children }) => {
         }));
       }
     }
+    return res;
   }, [setData]);
 
   // ─── ABOUT ─────────────────────────────────────────────────────────────────
   const updateAbout = useCallback(async (fields) => {
-    setData(prev => ({ ...prev, about: { ...prev.about, ...fields } }));
-    await api('/api/admin/about/', 'PUT', {
+    setData(prev => {
+      const userEdited = { ...(prev?.about?._userEdited || {}) };
+      Object.keys(fields).forEach(k => {
+        if (fields[k] !== undefined) userEdited[k] = true;
+      });
+      return {
+        ...prev,
+        about: {
+          ...prev.about,
+          ...fields,
+          _userEdited: userEdited,
+          _clientUpdatedAt: Date.now(),
+        }
+      };
+    });
+    const res = await api('/api/admin/about/', 'PUT', {
       heading: fields.heading,
       short_description: fields.shortDescription,
       detailed_description: fields.detailedDescription,
@@ -405,6 +436,7 @@ export const PortfolioProvider = ({ children }) => {
       core_technologies: fields.coreTechnologies,
       show_resume_button: fields.showResumeButton,
     });
+    return res;
   }, [setData]);
 
   // ─── SKILLS ────────────────────────────────────────────────────────────────

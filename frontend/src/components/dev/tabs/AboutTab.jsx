@@ -33,10 +33,23 @@ export const AboutTab = ({ data, updateAbout, showToast }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    updateAbout(form);
-    showToast('About section updated successfully!', 'success');
+    setIsSaving(true);
+    try {
+      const res = await updateAbout(form);
+      if (res && res.ok) {
+        showToast('🎉 About section saved & synced to live server!', 'success');
+      } else {
+        showToast('💾 About section saved in local browser storage.', 'success');
+      }
+    } catch (_) {
+      showToast('💾 Saved in browser storage.', 'info');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -89,8 +102,8 @@ export const AboutTab = ({ data, updateAbout, showToast }) => {
         </div>
 
         <div className="form-actions">
-          <button type="submit" className="btn btn-primary flex-center gap-2">
-            <Save size={18} /> Save Changes
+          <button type="submit" className="btn btn-primary flex-center gap-2" disabled={isSaving}>
+            <Save size={18} /> {isSaving ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </form>

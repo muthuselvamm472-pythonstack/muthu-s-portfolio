@@ -72,10 +72,26 @@ TEMPLATES = [
 WSGI_APPLICATION = 'portfolio_backend.wsgi.application'
 
 # ─── Database Configuration ────────────────────────────────────────────────────
-# DB_BACKEND options: 'sqlite' (default, no setup needed) | 'oracle'
+# Supports: DATABASE_URL (PostgreSQL for persistent cloud storage) | Oracle | SQLite (default)
+DATABASE_URL = config('DATABASE_URL', default=None)
 DB_BACKEND = config('DB_BACKEND', default='sqlite')
 
-if DB_BACKEND == 'oracle':
+if DATABASE_URL:
+    import urllib.parse
+    # Render, Neon, Supabase provide postgresql:// or postgres://
+    url = urllib.parse.urlparse(DATABASE_URL)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': url.path.lstrip('/'),
+            'USER': url.username,
+            'PASSWORD': url.password,
+            'HOST': url.hostname,
+            'PORT': url.port or 5432,
+            'CONN_MAX_AGE': 600,
+        }
+    }
+elif DB_BACKEND == 'oracle':
     # Oracle requires 64-bit Oracle Instant Client 21c+
     # Download from: https://www.oracle.com/database/technologies/instant-client/winx64-64-downloads.html
     DATABASES = {

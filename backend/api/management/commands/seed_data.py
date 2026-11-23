@@ -29,8 +29,8 @@ class Command(BaseCommand):
             muthu_user.save()
             self.stdout.write(self.style.SUCCESS('Created superuser "muthu" with password "muthu2026"'))
 
-        # 2. Profile
-        Profile.objects.update_or_create(
+        # 2. Profile — use get_or_create to protect user admin edits from being overwritten on deploy
+        Profile.objects.get_or_create(
             id=1,
             defaults={
                 'full_name': 'MUTHU SELVAM.M',
@@ -49,8 +49,8 @@ class Command(BaseCommand):
             }
         )
 
-        # 3. About
-        About.objects.update_or_create(
+        # 3. About — use get_or_create to protect user admin edits from being overwritten on deploy
+        About.objects.get_or_create(
             id=1,
             defaults={
                 'heading': 'Driven BCA graduate with a strong academic foundation in Python, SQL, and Web Technologies.',

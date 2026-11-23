@@ -560,7 +560,7 @@
 }
 
 .hero-line-lower {
-  text-transform: lowercase;
+  text-transform: none;
   font-weight: 700;
 }
 

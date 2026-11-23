@@ -97,10 +97,23 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
   };
   const handleDragEnd = () => { dragSrcIdx.current = null; setDragOverIdx(null); };
 
-  const handleSubmit = (e) => {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    updateProfile(form);
-    showToast('🎉 Hero section and typography animation updated successfully!', 'success');
+    setIsSaving(true);
+    try {
+      const res = await updateProfile(form);
+      if (res && res.ok) {
+        showToast('🎉 Hero section saved & synced to live server!', 'success');
+      } else {
+        showToast('💾 Hero section saved in local browser storage.', 'success');
+      }
+    } catch (_) {
+      showToast('💾 Saved in browser storage.', 'info');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const MAX_CHARS = 60;
@@ -462,8 +475,8 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
         </div>
 
         <div className="form-actions">
-          <button type="submit" className="btn btn-primary flex-center gap-2">
-            <Save size={18} /> Save Hero Changes
+          <button type="submit" className="btn btn-primary flex-center gap-2" disabled={isSaving}>
+            <Save size={18} /> {isSaving ? 'Saving...' : 'Save Hero Changes'}
           </button>
         </div>
       </form>

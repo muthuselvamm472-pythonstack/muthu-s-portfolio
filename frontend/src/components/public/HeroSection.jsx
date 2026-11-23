@@ -67,7 +67,7 @@ export const HeroSection = () => {
             )}
             {line2 && line3 && <br />}
             {line3 && (
-              <span className="hero-line-white hero-line-lower">
+              <span className="hero-line-white">
                 {line3}
               </span>
             )}
