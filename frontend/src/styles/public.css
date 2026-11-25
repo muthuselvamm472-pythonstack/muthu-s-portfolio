@@ -451,9 +451,9 @@
   font-size: 0.8rem;
   font-weight: 600;
   font-family: var(--font-mono);
-  background: rgba(147, 97, 66, 0.12);
-  color: var(--accent-color) !important;
-  border: 1px solid transparent;
+  background: rgba(147, 97, 66, 0.14);
+  color: #6B3B1F;
+  border: 1px solid rgba(147, 97, 66, 0.30);
   box-shadow: var(--btn-secondary-shadow);
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
     background 0.35s ease,
@@ -461,8 +461,14 @@
     box-shadow 0.35s ease;
 }
 
+[data-theme="dark"] .badge {
+  background: rgba(197, 137, 112, 0.15);
+  color: #E2A68C;
+  border: 1px solid rgba(197, 137, 112, 0.30);
+}
+
 .badge:hover {
-  background: rgba(147, 97, 66, 0.22);
+  background: var(--primary-color);
   border-color: var(--primary-color);
   color: #ffffff !important;
   box-shadow: var(--btn-secondary-shadow-hover);
