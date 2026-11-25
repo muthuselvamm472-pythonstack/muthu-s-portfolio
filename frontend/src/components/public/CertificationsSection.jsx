@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card } from '../common/Card';
+import { Button } from '../common/Button';
 import { ScrollReveal } from '../common/ScrollReveal';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { Award, Image, X } from 'lucide-react';
@@ -65,13 +66,13 @@ export const CertificationsSection = () => {
                   {/* View Certificate button — only appears when image is uploaded in admin */}
                   {hasCertImage && (
                     <div style={{ marginTop: '1rem' }}>
-                      <button
+                      <Button
+                        variant="primary"
                         onClick={() => openCertImage(cert)}
-                        className="btn btn-primary"
-                        style={{ padding: '0.4rem 0.85rem', fontSize: '0.85rem', width: '100%', justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '0.4rem', border: 'none', cursor: 'pointer' }}
+                        style={{ padding: '0.45rem 0.9rem', fontSize: '0.85rem', width: '100%' }}
                       >
                         <Image size={14} /> View Certificate
-                      </button>
+                      </Button>
                     </div>
                   )}
                 </Card>

@@ -202,3 +202,110 @@ h6 {
     display: none !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   APPLE LIQUID GLASS OPTICAL ARCHITECTURE
+   4-Layer Refraction Stack: .glass-filter -> .glass-overlay -> .glass-specular -> content (z-index: 3)
+   Works cleanly across both Light & Dark themes while preserving layout flow.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.glass-container {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.42s cubic-bezier(0.175, 0.885, 0.32, 2.2),
+    box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.35s ease,
+    background 0.35s ease;
+}
+
+.glass-shell {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glass-filter {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  backdrop-filter: blur(12px) saturate(185%);
+  -webkit-backdrop-filter: blur(12px) saturate(185%);
+  filter: url(#lg-dist);
+  isolation: isolate;
+  pointer-events: none;
+}
+
+.glass-container--btn .glass-filter {
+  backdrop-filter: blur(14px) saturate(185%);
+  -webkit-backdrop-filter: blur(14px) saturate(185%);
+  filter: url(#lg-dist-btn);
+}
+
+.glass-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--lg-bg-color);
+  pointer-events: none;
+  transition: background 0.35s ease;
+}
+
+.glass-overlay--btn-primary {
+  background: var(--lg-bg-primary);
+}
+
+.btn-primary:hover .glass-overlay--btn-primary {
+  background: var(--lg-bg-primary-hover);
+}
+
+.glass-overlay--btn-secondary {
+  background: var(--lg-bg-color);
+}
+
+.glass-overlay--nav {
+  background: var(--lg-bg-nav);
+}
+
+.glass-overlay--card {
+  background: var(--glass-bg);
+}
+
+.glass-specular {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  overflow: hidden;
+  box-shadow: inset 1px 1px 0 var(--lg-highlight),
+    inset 0 0 6px var(--lg-highlight);
+  pointer-events: none;
+}
+
+.glass-content {
+  position: relative;
+  z-index: 3;
+}
+
+.glass-content--inline {
+  position: relative;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: inherit;
+  width: 100%;
+}
+
+/* Keep direct non-shell children crisp above optical glass layers without breaking flex/grid layout */
+.glass-container > *:not(.glass-shell) {
+  position: relative;
+  z-index: 3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-filter {
+    filter: none !important;
+  }
+}

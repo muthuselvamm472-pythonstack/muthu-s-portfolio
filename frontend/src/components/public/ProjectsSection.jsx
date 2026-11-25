@@ -60,7 +60,13 @@ export const ProjectsSection = () => {
 
               {project.image && (
                 <div className="project-image-box">
-                  <img src={project.image} alt={project.title} />
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
                 </div>
               )}
             </Card>
@@ -94,7 +100,14 @@ export const ProjectsSection = () => {
                     <FormattedText text={project.shortDescription} className="secondary-project-desc" />
                     {project.image && (
                       <div className="secondary-project-img-wrap" style={{ borderRadius: '10px', overflow: 'hidden', marginBottom: '1.25rem', maxHeight: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.25)', border: '1px solid var(--glass-border)', padding: '0.5rem' }}>
-                        <img src={project.image} alt={project.title} style={{ maxWidth: '100%', maxHeight: '160px', width: 'auto', height: 'auto', objectFit: 'contain' }} />
+                        <img
+                          src={project.image}
+                          alt={project.title}
+                          loading="lazy"
+                          decoding="async"
+                          onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+                          style={{ maxWidth: '100%', maxHeight: '160px', width: 'auto', height: 'auto', objectFit: 'contain' }}
+                        />
                       </div>
                     )}
                   </div>

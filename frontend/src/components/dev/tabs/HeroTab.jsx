@@ -12,7 +12,7 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
     showStatusBadge: profile.showStatusBadge !== false,
     heroLine1: profile.heroLine1 !== undefined ? profile.heroLine1 : "I'm Muthu Selvam,",
     heroLine2: profile.heroLine2 !== undefined ? profile.heroLine2 : "A Python Full Stack",
-    heroLine3: profile.heroLine3 !== undefined ? profile.heroLine3 : "developer",
+    heroLine3: profile.heroLine3 !== undefined ? profile.heroLine3 : "DEVELOPER",
     typewriterRoles: Array.isArray(profile.typewriterRoles) && profile.typewriterRoles.length > 0
       ? profile.typewriterRoles
       : [
@@ -444,7 +444,7 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
                 name="heroLine3"
                 value={form.heroLine3}
                 onChange={handleChange}
-                placeholder="e.g. developer"
+                placeholder="e.g. DEVELOPER"
               />
             </div>
 

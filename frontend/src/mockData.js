@@ -15,12 +15,12 @@ export const mockPortfolioData = {
     ],
     heroLine1: "I'm Muthu Selvam,",
     heroLine2: "A Python Full Stack",
-    heroLine3: "developer",
+    heroLine3: "DEVELOPER",
     button1Text: "View My Work",
     button1Url: "#projects",
     button2Text: "Download Resume",
-    button2Url: "/Muthu_Selvam_Resume.pdf",
-    resumeUrl: "/Muthu_Selvam_Resume.pdf",
+    button2Url: "/api/resume/",
+    resumeUrl: "/api/resume/",
     showHeroButtons: true,
     email: "muthuselvamm472@gmail.com",
     phone: "+91 8678922362",
@@ -165,7 +165,8 @@ export const mockPortfolioData = {
   socialLinks: [
     { id: 1, platform: "GitHub", url: "https://github.com/muthuselvamm472-pythonstack", icon: "Github", order: 1, isVisible: true },
     { id: 2, platform: "LinkedIn", url: "https://www.linkedin.com/in/muthuselvamm472", icon: "Linkedin", order: 2, isVisible: true },
-    { id: 3, platform: "Email", url: "mailto:muthuselvamm472@gmail.com", icon: "Mail", order: 3, isVisible: true }
+    { id: 3, platform: "Email", url: "mailto:muthuselvamm472@gmail.com", icon: "Mail", order: 3, isVisible: true },
+    { id: 4, platform: "Instagram", url: "https://www.instagram.com/_.selva_edr._/", icon: "Instagram", order: 4, isVisible: true }
   ],
   contact: {
     email: "muthuselvamm472@gmail.com",

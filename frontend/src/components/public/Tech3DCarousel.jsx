@@ -8,6 +8,8 @@ const TechIcon = ({ tech }) => {
       <img
         src={tech.imgSrc}
         alt={tech.name}
+        loading="lazy"
+        decoding="async"
         style={{ width: '72px', height: '72px', objectFit: 'contain' }}
         onError={() => setImgFailed(true)}
       />
@@ -94,13 +96,33 @@ export const Tech3DCarousel = () => {
     }
   ];
 
-  // Auto-rotate right to left every 2 seconds (2000ms)
+  // Auto-rotate right to left every 2s, pausing cleanly when browser tab is hidden
   useEffect(() => {
     if (isPaused) return;
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % techStack.length);
-    }, 2000);
-    return () => clearInterval(interval);
+    let interval = null;
+
+    const startRotation = () => {
+      if (document.hidden || interval) return;
+      interval = setInterval(() => {
+        setActiveIndex((prev) => (prev + 1) % techStack.length);
+      }, 2000);
+    };
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        clearInterval(interval);
+        interval = null;
+      } else {
+        startRotation();
+      }
+    };
+
+    startRotation();
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, [isPaused, techStack.length]);
 
   // Responsive offset calculations for mobile vs tablet vs desktop

@@ -22,6 +22,7 @@ export const ContactSection = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -37,7 +38,7 @@ export const ContactSection = () => {
     return errs;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
@@ -46,15 +47,17 @@ export const ContactSection = () => {
     }
 
     setErrors({});
+    setSubmitError('');
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      // Add message to Admin Inbox
-      addMessage(formData);
-      setIsSubmitting(false);
+    const res = await addMessage(formData);
+    setIsSubmitting(false);
+    if (res && res.ok) {
       setSubmitted(true);
       setFormData({ name: '', email: '', subject: '', message: '' });
-    }, 400);
+    } else {
+      setSubmitError(res?.error || 'Unable to send message right now. Please try email or try again shortly.');
+    }
   };
 
   const handleChange = (e) => {
@@ -183,6 +186,12 @@ export const ContactSection = () => {
                     />
                     {errors.message && <span className="form-error">{errors.message}</span>}
                   </div>
+
+                  {submitError && (
+                    <div className="form-error" style={{ padding: '0.65rem 0.85rem', borderRadius: '10px', background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.35)' }}>
+                      {submitError}
+                    </div>
+                  )}
 
                   <Button type="submit" variant="primary" disabled={isSubmitting}>
                     <Send size={16} /> {isSubmitting ? 'Sending...' : 'Send Message'}

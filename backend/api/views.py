@@ -284,9 +284,12 @@ class AdminProfileView(APIView):
         profile = get_profile()
         data = request.data.copy() if hasattr(request.data, 'copy') else dict(request.data)
 
-        # Check if resume_url is a base64 encoded PDF document
-        raw_resume = data.get('resume_url', '')
-        resume_filename = data.get('resume_filename', '') or 'Muthu_Selvam_Resume.pdf'
+        # Only modify resume fields when explicitly included in the request payload
+        # (prevents partial updates from HeroTab from wiping uploaded resumes!)
+        has_resume_key = 'resume_url' in data
+        clear_resume = bool(data.pop('clear_resume', False))
+        raw_resume = data.get('resume_url') if has_resume_key else None
+        resume_filename = data.get('resume_filename') or getattr(profile, 'resume_filename', '') or 'Muthu_Selvam_Resume.pdf'
 
         if isinstance(raw_resume, str) and raw_resume.startswith('data:'):
             try:
@@ -301,7 +304,7 @@ class AdminProfileView(APIView):
                         profile.resume_file.delete(save=False)
                     except Exception:
                         pass
-                
+
                 profile.resume_data = base64_str
                 profile.resume_filename = resume_filename
                 profile.resume_file.save(file_name, ContentFile(decoded_file), save=True)
@@ -324,7 +327,7 @@ class AdminProfileView(APIView):
                     print('Note: Could not copy to frontend/public:', ex)
             except Exception as e:
                 print('Error decoding resume base64:', e)
-        elif raw_resume == '':
+        elif clear_resume or (has_resume_key and raw_resume == ''):
             profile.resume_file = None
             profile.resume_data = ''
             profile.resume_url = ''
@@ -332,15 +335,29 @@ class AdminProfileView(APIView):
             profile.save()
             data['resume_url'] = ''
             data['button2_url'] = ''
-        elif isinstance(raw_resume, str) and (raw_resume.startswith('http://') or raw_resume.startswith('https://')):
+        elif isinstance(raw_resume, str) and (
+            raw_resume.startswith('http://') or raw_resume.startswith('https://') or raw_resume == '/api/resume/'
+        ):
             profile.resume_url = raw_resume
-            profile.button2_url = raw_resume
+            if 'button2_url' not in data or not data.get('button2_url'):
+                profile.button2_url = raw_resume
             profile.save()
+        elif not has_resume_key:
+            # Preserve existing button2_url if omitted during HeroTab update
+            if 'button2_url' in data and not data.get('button2_url'):
+                data.pop('button2_url', None)
 
-        # Check if profile_image is cleared
-        if data.get('profile_image') == '':
-            profile.profile_image = None
-            data['profile_image_url'] = ''
+        # Handle profile_image cleanly whether passed as URL string, data URL, or cleared
+        if 'profile_image' in data:
+            img_val = data.get('profile_image')
+            if img_val == '':
+                profile.profile_image = None
+                data['profile_image_url'] = ''
+                data.pop('profile_image', None)
+            elif isinstance(img_val, str):
+                # Store external URL or data URL in profile_image_url so ImageField validation doesn't fail
+                data['profile_image_url'] = img_val
+                data.pop('profile_image', None)
 
         serializer = ProfileSerializer(profile, data=data, partial=True,
                                        context={'request': request})
@@ -495,6 +512,16 @@ class AdminExperienceDetailView(APIView):
 # ADMIN — CERTIFICATIONS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+def _clean_optional_urls(request_data, url_fields):
+    """Normalize placeholder '#' or whitespace URL values to '' so URLField validation passes."""
+    cleaned = request_data.copy() if hasattr(request_data, 'copy') else dict(request_data)
+    for field in url_fields:
+        if field in cleaned and isinstance(cleaned[field], str):
+            val = cleaned[field].strip()
+            cleaned[field] = '' if val in ('#', '') else val
+    return cleaned
+
+
 class AdminCertListView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -503,7 +530,8 @@ class AdminCertListView(APIView):
         return Response(CertificationSerializer(certs, many=True, context={'request': request}).data)
 
     def post(self, request):
-        serializer = CertificationSerializer(data=request.data, context={'request': request})
+        data = _clean_optional_urls(request.data, ['credential_url'])
+        serializer = CertificationSerializer(data=data, context={'request': request})
         if serializer.is_valid():
             cert = serializer.save()
             if 'certificate_image' in request.FILES:
@@ -534,7 +562,8 @@ class AdminCertDetailView(APIView):
             cert.certificate_image_data = ''
             cert.save()
 
-        serializer = CertificationSerializer(cert, data=request.data, partial=True,
+        data = _clean_optional_urls(request.data, ['credential_url'])
+        serializer = CertificationSerializer(cert, data=data, partial=True,
                                               context={'request': request})
         if serializer.is_valid():
             cert = serializer.save()
@@ -564,7 +593,8 @@ class AdminProjectListView(APIView):
         return Response(ProjectSerializer(projects, many=True, context={'request': request}).data)
 
     def post(self, request):
-        serializer = ProjectSerializer(data=request.data, context={'request': request})
+        data = _clean_optional_urls(request.data, ['github_url', 'live_demo_url'])
+        serializer = ProjectSerializer(data=data, context={'request': request})
         if serializer.is_valid():
             proj = serializer.save()
             if 'project_image' in request.FILES:
@@ -595,7 +625,8 @@ class AdminProjectDetailView(APIView):
             proj.project_image_url = ''
             proj.save()
 
-        serializer = ProjectSerializer(proj, data=request.data, partial=True,
+        data = _clean_optional_urls(request.data, ['github_url', 'live_demo_url'])
+        serializer = ProjectSerializer(proj, data=data, partial=True,
                                         context={'request': request})
         if serializer.is_valid():
             proj = serializer.save()

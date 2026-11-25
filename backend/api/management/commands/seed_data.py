@@ -38,13 +38,25 @@ class Command(BaseCommand):
                 'tagline': 'Motivated software development professional with a strong foundation in Python, SQL, HTML5, CSS3, React.js, and Manual Testing.',
                 'hero_description': 'Motivated software development professional with a strong foundation in Python, SQL, HTML5, CSS3, and Manual Testing. Eager to contribute to the development and testing of efficient, responsive, and reliable applications while applying analytical thinking, problem-solving skills, attention to detail, and a commitment to continuous learning to support organizational success.',
                 'profile_image_url': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+                'hero_line1': "I'm Muthu Selvam,",
+                'hero_line2': 'A Python Full Stack',
+                'hero_line3': 'DEVELOPER',
+                'status_badge_text': 'Available for Full Stack Opportunities',
+                'show_status_badge': True,
+                'typewriter_roles': [
+                    'REACT',
+                    'PYTHON FULL STACK DEVELOPER',
+                    'DJANGO REST API SPECIALIST',
+                    'REACT.JS & ORACLE SQL DEVELOPER',
+                ],
                 'email': 'muthuselvamm472@gmail.com',
                 'phone': '+91 8678922362',
                 'location': 'Chennai, Tamil Nadu, India',
                 'button1_text': 'View My Work',
                 'button1_url': '#projects',
                 'button2_text': 'Download Resume',
-                'button2_url': '/Muthu_Selvam_Resume.pdf',
+                'button2_url': '/api/resume/',
+                'resume_url': '/api/resume/',
                 'show_hero_buttons': True
             }
         )
@@ -151,6 +163,7 @@ class Command(BaseCommand):
             {'platform': 'GitHub', 'url': 'https://github.com/muthuselvamm472-pythonstack', 'icon': 'Github', 'display_order': 1},
             {'platform': 'LinkedIn', 'url': 'https://www.linkedin.com/in/muthuselvamm472', 'icon': 'Linkedin', 'display_order': 2},
             {'platform': 'Email', 'url': 'mailto:muthuselvamm472@gmail.com', 'icon': 'Mail', 'display_order': 3},
+            {'platform': 'Instagram', 'url': 'https://www.instagram.com/_.selva_edr._/', 'icon': 'Instagram', 'display_order': 4},
         ]
         for s in initial_socials:
             SocialLink.objects.get_or_create(platform=s['platform'], defaults=s)
@@ -160,11 +173,11 @@ class Command(BaseCommand):
             id=1,
             defaults={
                 'theme_mode': 'light',
-                'primary_color': '#f59e0b',
-                'accent_color': '#fbbf24',
-                'background_color': '#ffffff',
-                'text_color': '#0f172a',
-                'card_color': '#ffffff',
+                'primary_color': '#936142',
+                'accent_color': '#C58970',
+                'background_color': '#CCBBA9',
+                'text_color': '#414942',
+                'card_color': '#EAE0D5',
                 'border_radius': '18px',
                 'show_hero': True,
                 'show_about': True,

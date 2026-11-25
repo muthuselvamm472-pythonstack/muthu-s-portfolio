@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { Button } from '../common/Button';
+import { GlassBackdrop } from '../common/GlassLayers';
 import { resolveResumeUrl } from '../../apiConfig';
 import { Sun, Moon, Menu, X, FileText } from 'lucide-react';
 
@@ -16,20 +17,34 @@ export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [scrollDir, setScrollDir] = useState('up');
 
-  const navItems = [
-    { id: 'hero', label: 'Home', show: sections.hero !== false },
-    { id: 'about', label: 'About', show: sections.about !== false },
-    { id: 'skills', label: 'Skills', show: sections.skills !== false },
-    { id: 'experience', label: 'Experience', show: sections.experience !== false },
-    { id: 'certifications', label: 'Certifications', show: sections.certifications !== false },
-    { id: 'projects', label: 'Work', show: sections.projects !== false },
-    { id: 'contact', label: 'Contact', show: sections.contact !== false }
-  ];
+  const navItems = useMemo(
+    () => [
+      { id: 'hero', label: 'Home', show: sections.hero !== false },
+      { id: 'about', label: 'About', show: sections.about !== false },
+      { id: 'skills', label: 'Skills', show: sections.skills !== false },
+      { id: 'experience', label: 'Experience', show: sections.experience !== false },
+      { id: 'certifications', label: 'Certifications', show: sections.certifications !== false },
+      { id: 'projects', label: 'Work', show: sections.projects !== false },
+      { id: 'contact', label: 'Contact', show: sections.contact !== false },
+    ],
+    [
+      sections.hero,
+      sections.about,
+      sections.skills,
+      sections.experience,
+      sections.certifications,
+      sections.projects,
+      sections.contact,
+    ]
+  );
 
   useEffect(() => {
     let lastY = window.scrollY;
+    let ticking = false;
+    const visibleIds = navItems.filter((item) => item.show).map((item) => item.id);
 
-    const handleScroll = () => {
+    const updateOnScroll = () => {
+      ticking = false;
       const currentY = window.scrollY;
 
       setIsScrolled(currentY > 20);
@@ -40,34 +55,35 @@ export const Navbar = () => {
       }
       lastY = currentY;
 
-      const sectionElements = navItems
-        .filter(item => item.show)
-        .map(item => document.getElementById(item.id))
-        .filter(Boolean);
+      if (currentY < 120) {
+        setActiveNav('hero');
+        return;
+      }
 
       const scrollPosition = currentY + 160;
-
-      for (let i = sectionElements.length - 1; i >= 0; i--) {
-        const section = sectionElements[i];
-        if (section.offsetTop <= scrollPosition) {
-          setActiveNav(section.id);
+      for (let i = visibleIds.length - 1; i >= 0; i--) {
+        const el = document.getElementById(visibleIds[i]);
+        if (el && el.offsetTop <= scrollPosition) {
+          setActiveNav(visibleIds[i]);
           break;
         }
       }
-      if (currentY < 120) {
-        setActiveNav('hero');
+    };
+
+    const handleScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(updateOnScroll);
       }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [sections]);
+  }, [navItems]);
 
-  /** Navigate to a section and close the mobile menu */
   const handleNavClick = (e, itemId) => {
     e.preventDefault();
     setMobileMenuOpen(false);
-    // Small delay so menu close animation completes before scroll
     setTimeout(() => {
       if (itemId === 'hero') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -95,8 +111,10 @@ export const Navbar = () => {
 
   return (
     <header className={`navbar-wrapper ${isScrolled ? 'is-scrolled' : ''} scroll-dir-${scrollDir}`}>
-      <nav className="navbar container">
-        <div className="navbar-container">
+      <nav className="navbar glass-container container" style={{ overflow: 'visible' }}>
+        <GlassBackdrop overlayClassName="glass-overlay--nav" />
+
+        <div className="navbar-container glass-content">
           <a href="#hero" className="nav-brand" onClick={(e) => handleNavClick(e, 'hero')}>
             {renderBrand()}
           </a>
@@ -130,14 +148,15 @@ export const Navbar = () => {
                 <FileText size={15} /> Resume
               </Button>
 
-              <button
+              <Button
+                variant="secondary"
                 onClick={toggleTheme}
-                className="btn btn-secondary mobile-theme-btn"
+                className="mobile-theme-btn"
                 aria-label="Toggle Theme"
               >
                 {themeMode === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
                 <span>{themeMode === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}</span>
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -154,25 +173,29 @@ export const Navbar = () => {
               <FileText size={14} /> Resume
             </Button>
 
-            <button
+            <Button
+              variant="secondary"
               onClick={toggleTheme}
-              className="btn btn-secondary theme-toggle-btn"
+              className="theme-toggle-btn"
               aria-label="Toggle Theme"
               style={{ padding: '0.45rem 1rem', fontSize: '0.85rem' }}
             >
               {themeMode === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
               <span>{themeMode === 'dark' ? 'Light' : 'Dark'}</span>
-            </button>
+            </Button>
           </div>
 
           {/* Hamburger button */}
           <button
-            className="mobile-menu-btn"
-            onClick={() => setMobileMenuOpen(prev => !prev)}
+            className="mobile-menu-btn glass-container glass-container--btn"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
             aria-label="Toggle Menu"
             aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            <GlassBackdrop />
+            <span className="glass-content glass-content--inline">
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </span>
           </button>
         </div>
       </nav>

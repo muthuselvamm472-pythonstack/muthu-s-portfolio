@@ -7,7 +7,9 @@ import { usePortfolio } from '../../context/PortfolioContext';
 
 export const ExperienceSection = () => {
   const { data } = usePortfolio();
-  const experiences = (data?.experiences || []).filter(e => e.isVisible !== false);
+  const experiences = [...(data?.experiences || [])]
+    .filter(e => e.isVisible !== false)
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
 
   return (
     <section id="experience" className="portfolio-section">

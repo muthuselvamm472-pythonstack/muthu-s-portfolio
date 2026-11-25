@@ -16,10 +16,14 @@ export const SectionSettingsTab = ({ data, toggleSection, showToast }) => {
     { key: 'footer',         name: 'Footer',                  desc: 'Bottom copyright bar and social links' },
   ];
 
-  const handleToggle = (key, name) => {
+  const handleToggle = async (key, name) => {
     const currentlyVisible = isOn(key);
-    toggleSection(key);
-    showToast(`${name} turned ${currentlyVisible ? 'OFF' : 'ON'}`, 'info');
+    const res = await toggleSection(key);
+    if (res && res.ok) {
+      showToast(`${name} turned ${currentlyVisible ? 'OFF' : 'ON'} & synced to Cloud`, 'info');
+    } else {
+      showToast(`${name} turned ${currentlyVisible ? 'OFF' : 'ON'} locally`, 'warning');
+    }
   };
 
   return (

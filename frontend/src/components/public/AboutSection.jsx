@@ -62,9 +62,11 @@ export const AboutSection = () => {
             </div>
 
             <div className="about-actions">
-              <Button href={resumeLink} variant="primary" target="_blank" rel="noreferrer">
-                <FileText size={16} /> View Resume
-              </Button>
+              {about.showResumeButton !== false && (
+                <Button href={resumeLink} variant="primary" target="_blank" rel="noreferrer">
+                  <FileText size={16} /> View Resume
+                </Button>
+              )}
               <a href="#contact" className="about-contact-text-btn">
                 <span>Get in touch</span>
                 <ArrowUpRight size={15} />

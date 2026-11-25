@@ -1,14 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  FolderGit2, Code, Briefcase, Award, Mail, Plus, User, ExternalLink, Layers
+  FolderGit2, Code, Briefcase, Award, Mail, Plus, User, ExternalLink, Layers,
+  RefreshCw, Cloud, CheckCircle2, AlertTriangle
 } from 'lucide-react';
 
-export const OverviewTab = ({ data, messages, setActiveTab }) => {
+export const OverviewTab = ({ data, messages, setActiveTab, syncStatus, syncAllToCloud, showToast }) => {
+  const [isSyncing, setIsSyncing] = useState(false);
+
   const projectsCount = data.projects?.length || 0;
   const skillsCount = data.skills?.length || 0;
   const expCount = data.experiences?.length || 0;
   const certsCount = data.certifications?.length || 0;
-  const unreadMessagesCount = (messages || []).filter(m => !m.is_read && !m.read).length;
+  const unreadMessagesCount = (messages || []).filter((m) => !m.is_read && !m.read).length;
+  const pendingCount = syncStatus?.pendingCount || 0;
+  const isConnected = syncStatus?.state === 'connected';
+
+  const handleManualSync = async () => {
+    if (!syncAllToCloud) return;
+    setIsSyncing(true);
+    try {
+      const res = await syncAllToCloud();
+      if (res?.ok) {
+        showToast?.('☁️ All 11 sections successfully synced & verified with Cloud Database!', 'success');
+      } else {
+        showToast?.(`⚠️ Sync incomplete: ${res?.error || 'Check connection or try again.'}`, 'warning');
+      }
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   return (
     <div className="tab-pane">
@@ -17,9 +37,51 @@ export const OverviewTab = ({ data, messages, setActiveTab }) => {
           <h2>Dashboard Overview</h2>
           <p className="tab-subtitle">Welcome back, {data.profile?.fullName || 'Muthu Selvam'}</p>
         </div>
-        <a href="/#/" target="_blank" rel="noreferrer" className="btn btn-secondary flex-center gap-2">
-          <ExternalLink size={16} /> View Public Website
-        </a>
+        <div className="flex-center gap-2" style={{ flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={handleManualSync}
+            disabled={isSyncing}
+            className="btn btn-primary flex-center gap-2"
+          >
+            <RefreshCw size={16} className={isSyncing ? 'spin-icon' : ''} />
+            {isSyncing ? 'Syncing All Sections...' : 'Sync All Sections to Cloud'}
+          </button>
+          <a href="/#/" target="_blank" rel="noreferrer" className="btn btn-secondary flex-center gap-2">
+            <ExternalLink size={16} /> View Public Website
+          </a>
+        </div>
+      </div>
+
+      {/* Live Website <-> Cloud Connection Monitor */}
+      <div className="admin-section-box margin-bottom" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+        <div className="flex-center gap-3">
+          <div className="stat-icon" style={{
+            background: pendingCount > 0 ? 'rgba(245, 158, 11, 0.16)' : isConnected ? 'rgba(16, 185, 129, 0.16)' : 'rgba(147, 97, 66, 0.16)',
+            color: pendingCount > 0 ? '#f59e0b' : isConnected ? '#10b981' : 'var(--admin-accent)',
+          }}>
+            {pendingCount > 0 ? <AlertTriangle size={22} /> : isConnected ? <CheckCircle2 size={22} /> : <Cloud size={22} />}
+          </div>
+          <div>
+            <h3 style={{ marginBottom: '0.2rem' }}>
+              {pendingCount > 0
+                ? `${pendingCount} Local Item(s) Pending Cloud Sync`
+                : isConnected
+                ? 'Website & Admin Connected (All 11 Sections Synced)'
+                : 'Cloud Sync Status'}
+            </h3>
+            <p className="field-hint">
+              {syncStatus?.error
+                ? syncStatus.error
+                : syncStatus?.lastSyncedAt
+                ? `Last verified with backend: ${new Date(syncStatus.lastSyncedAt).toLocaleTimeString()}`
+                : 'Edits sync automatically across tabs and push to your cloud backend.'}
+            </p>
+          </div>
+        </div>
+        <span className={`badge ${pendingCount > 0 ? 'badge-warning' : 'badge-success'}`}>
+          {pendingCount > 0 ? 'SYNC NEEDED' : isConnected ? 'CONNECTED' : 'READY'}
+        </span>
       </div>
 
       {/* Summary Cards Grid */}
@@ -85,8 +147,11 @@ export const OverviewTab = ({ data, messages, setActiveTab }) => {
           <button onClick={() => setActiveTab('skills')} className="btn btn-secondary quick-btn">
             <Plus size={18} /> Add Skill
           </button>
+          <button onClick={() => setActiveTab('social')} className="btn btn-secondary quick-btn">
+            <Plus size={18} /> Manage Social Links
+          </button>
           <button onClick={() => setActiveTab('profile')} className="btn btn-secondary quick-btn">
-            <User size={18} /> Edit Profile
+            <User size={18} /> Edit Profile & Resume
           </button>
           <button onClick={() => setActiveTab('sections')} className="btn btn-secondary quick-btn">
             <Layers size={18} /> Section Settings

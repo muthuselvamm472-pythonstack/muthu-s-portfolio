@@ -6,7 +6,8 @@ import { Tech3DCarousel } from './Tech3DCarousel';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { resolveResumeUrl } from '../../apiConfig';
 import { SocialIcon } from '../common/SocialIcon';
-import { Sparkles, FileText, ChevronDown } from 'lucide-react';
+import { GlassBackdrop } from '../common/GlassLayers';
+import { Sparkles, FileText } from 'lucide-react';
 
 export const HeroSection = () => {
   const { data } = usePortfolio();
@@ -29,7 +30,7 @@ export const HeroSection = () => {
   const showStatusBadge = profile.showStatusBadge !== false;
   const line1 = profile.heroLine1 !== undefined ? profile.heroLine1 : "I'm Muthu Selvam,";
   const line2 = profile.heroLine2 !== undefined ? profile.heroLine2 : "A Python Full Stack";
-  const line3 = profile.heroLine3 !== undefined ? profile.heroLine3 : "developer";
+  const line3 = profile.heroLine3 !== undefined ? profile.heroLine3 : "DEVELOPER";
 
   return (
     <section id="hero" className="portfolio-section" style={{ position: 'relative' }}>
@@ -37,8 +38,11 @@ export const HeroSection = () => {
         <ScrollReveal delay={100} className="hero-content">
           {/* Status Pill */}
           {showStatusBadge && (
-            <div className="status-pill">
-              <Sparkles size={14} /> {statusBadgeText}
+            <div className="status-pill glass-container glass-container--btn">
+              <GlassBackdrop />
+              <span className="glass-content glass-content--inline">
+                <Sparkles size={14} /> {statusBadgeText}
+              </span>
             </div>
           )}
 
@@ -95,10 +99,13 @@ export const HeroSection = () => {
                 href={link.url}
                 target="_blank"
                 rel="noreferrer"
-                className="social-link-item"
+                className="social-link-item glass-container glass-container--btn"
               >
-                <SocialIcon platform={link.platform} size={18} />
-                <span>{link.platform}</span>
+                <GlassBackdrop />
+                <span className="glass-content glass-content--inline">
+                  <SocialIcon platform={link.platform} size={18} />
+                  <span>{link.platform}</span>
+                </span>
               </a>
             ))}
           </div>

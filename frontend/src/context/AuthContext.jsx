@@ -1,16 +1,34 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { getApiUrl } from '../apiConfig';
 
 const AuthContext = createContext();
+
+const parseJwtPayload = (jwt) => {
+  try {
+    const part = jwt.split('.')[1];
+    if (!part) return null;
+    const base64 = part.replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(base64));
+  } catch (_) {
+    return null;
+  }
+};
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem('muthu_admin_jwt'));
   const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('muthu_admin_jwt_refresh'));
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const skipNextVerifyRef = useRef(false);
 
-  // Check auth state on mount
+  // Check auth state on mount or external token change
   useEffect(() => {
+    if (skipNextVerifyRef.current) {
+      skipNextVerifyRef.current = false;
+      setLoading(false);
+      return;
+    }
+
     const verifyAuth = async () => {
       let currentToken = token || localStorage.getItem('muthu_admin_jwt');
       const currentRefresh = refreshToken || localStorage.getItem('muthu_admin_jwt_refresh');
@@ -20,7 +38,6 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      // Helper to refresh token
       const doRefresh = async () => {
         if (!currentRefresh) return null;
         try {
@@ -33,6 +50,7 @@ export const AuthProvider = ({ children }) => {
             const data = await rfRes.json();
             if (data.access) {
               localStorage.setItem('muthu_admin_jwt', data.access);
+              skipNextVerifyRef.current = true;
               setToken(data.access);
               return data.access;
             }
@@ -68,21 +86,39 @@ export const AuthProvider = ({ children }) => {
             const userData = await res.json();
             setUser(userData);
           } else {
-            logout();
+            // Unexpected HTML (e.g. Render cold start splash) — keep local session intact if token unexpired
+            const payload = currentToken ? parseJwtPayload(currentToken) : null;
+            if (payload && (!payload.exp || payload.exp * 1000 > Date.now())) {
+              setUser({ username: payload.username || 'admin', offlineFallback: true });
+            }
           }
+        } else if (res && (res.status === 401 || res.status === 403)) {
+          // Explicit auth rejection after refresh attempt — sign out
+          localStorage.removeItem('muthu_admin_jwt');
+          localStorage.removeItem('muthu_admin_jwt_refresh');
+          setToken(null);
+          setRefreshToken(null);
+          setUser(null);
         } else {
-          // Both token and refresh failed
-          logout();
+          // Network or 5xx while backend sleeps — preserve valid unexpired session
+          const payload = currentToken ? parseJwtPayload(currentToken) : null;
+          if (payload && (!payload.exp || payload.exp * 1000 > Date.now())) {
+            setUser({ username: payload.username || 'admin', offlineFallback: true });
+          }
         }
       } catch (err) {
-        console.error('Auth verification failed:', err);
+        console.warn('Auth verification deferred (backend waking up/offline):', err);
+        const payload = currentToken ? parseJwtPayload(currentToken) : null;
+        if (payload && (!payload.exp || payload.exp * 1000 > Date.now())) {
+          setUser({ username: payload.username || 'admin', offlineFallback: true });
+        }
       } finally {
         setLoading(false);
       }
     };
 
     verifyAuth();
-  }, [token]);
+  }, [token, refreshToken]);
 
   const login = async (username, password) => {
     try {
@@ -116,6 +152,7 @@ export const AuthProvider = ({ children }) => {
       // Save tokens
       localStorage.setItem('muthu_admin_jwt', data.access);
       localStorage.setItem('muthu_admin_jwt_refresh', data.refresh);
+      skipNextVerifyRef.current = true;
       setToken(data.access);
       setRefreshToken(data.refresh);
       setUser(data.user);

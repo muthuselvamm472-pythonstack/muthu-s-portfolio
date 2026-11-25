@@ -40,33 +40,38 @@ export const SkillsTab = ({ data, addSkill, updateSkill, deleteSkill, showToast 
     setModalOpen(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingItem) {
-      updateSkill(editingItem.id, form);
-      showToast('Skill updated successfully!', 'success');
-    } else {
-      addSkill(form);
-      showToast('New skill added!', 'success');
-    }
+    const res = editingItem
+      ? await updateSkill(editingItem.id, form)
+      : await addSkill(form);
     setModalOpen(false);
+    if (res && res.ok) {
+      showToast(editingItem ? 'Skill updated & synced to Cloud!' : 'New skill added & synced to Cloud!', 'success');
+    } else {
+      showToast(`Saved locally — pending Cloud Sync (${res?.error || 'Offline'})`, 'warning');
+    }
   };
 
   const promptDelete = (id, name) => {
     setDeleteTarget({ id, name });
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteTarget) {
-      deleteSkill(deleteTarget.id);
+      await deleteSkill(deleteTarget.id);
       showToast(`Skill "${deleteTarget.name || 'Item'}" deleted`, 'info');
       setDeleteTarget(null);
     }
   };
 
-  const toggleVisibility = (item) => {
-    updateSkill(item.id, { isVisible: !item.isVisible });
-    showToast(`Skill ${!item.isVisible ? 'shown' : 'hidden'} on website`, 'info');
+  const toggleVisibility = async (item) => {
+    const res = await updateSkill(item.id, { isVisible: !item.isVisible });
+    if (res && res.ok) {
+      showToast(`Skill ${!item.isVisible ? 'shown' : 'hidden'} on website & synced`, 'info');
+    } else {
+      showToast(`Updated locally — queued for Cloud Sync`, 'warning');
+    }
   };
 
   const sortedSkills = [...skills].sort((a, b) => (a.order || 0) - (b.order || 0));

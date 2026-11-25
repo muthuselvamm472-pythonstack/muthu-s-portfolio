@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { useTheme } from '../../context/ThemeContext';
 import { Toast } from '../common/Toast';
+import { GlassBackdrop } from '../common/GlassLayers';
 import {
   LayoutDashboard, User, Sliders, Info, Code, Briefcase, Award,
   FolderGit2, Mail, Share2, Palette, Layers, LogOut, Menu, X, ShieldCheck, ExternalLink, Sun, Moon
@@ -25,7 +26,8 @@ export const AdminLayout = () => {
   const { logout, user } = useAuth();
   const { themeMode, toggleTheme } = useTheme();
   const {
-    data, messages, updateProfile, updateAbout,
+    data, messages, syncStatus, syncAllToCloud,
+    updateProfile, updateAbout,
     addSkill, updateSkill, deleteSkill,
     addExperience, updateExperience, deleteExperience,
     addCertification, updateCertification, deleteCertification,
@@ -38,17 +40,30 @@ export const AdminLayout = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [toast, setToast] = useState({ message: '', type: 'success' });
+  const autoSyncedRef = React.useRef(false);
 
-  const showToast = (message, type = 'success') => {
+  const showToast = React.useCallback((message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => {
       setToast({ message: '', type: 'success' });
-    }, 4000);
-  };
+    }, 4500);
+  }, []);
 
   React.useEffect(() => {
     fetchMessages();
   }, [fetchMessages]);
+
+  // Automatically reconcile any offline/unsynced items when admin opens dashboard
+  React.useEffect(() => {
+    if (!autoSyncedRef.current && syncStatus?.pendingCount > 0) {
+      autoSyncedRef.current = true;
+      syncAllToCloud().then((res) => {
+        if (res?.ok && res.syncedCount > 0) {
+          showToast(`☁️ Auto-synced ${res.syncedCount} local item(s) to Cloud Database!`, 'success');
+        }
+      });
+    }
+  }, [syncStatus?.pendingCount, syncAllToCloud, showToast]);
 
   const navItems = [
     { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
@@ -76,7 +91,8 @@ export const AdminLayout = () => {
       <Toast message={toast.message} type={toast.type} onClose={() => setToast({ message: '', type: 'success' })} />
 
       {/* Top Navbar */}
-      <header className="admin-topbar">
+      <header className="admin-topbar glass-container" style={{ overflow: 'visible' }}>
+        <GlassBackdrop overlayClassName="glass-overlay--nav" />
         <div className="topbar-left">
           <button className="mobile-drawer-toggle" onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}>
             {mobileDrawerOpen ? <X size={22} /> : <Menu size={22} />}
@@ -156,7 +172,14 @@ export const AdminLayout = () => {
         {/* Content Area */}
         <main className="admin-main-content">
           {activeTab === 'overview' && (
-            <OverviewTab data={data} setActiveTab={setActiveTab} />
+            <OverviewTab
+              data={data}
+              messages={messages}
+              setActiveTab={setActiveTab}
+              syncStatus={syncStatus}
+              syncAllToCloud={syncAllToCloud}
+              showToast={showToast}
+            />
           )}
 
           {activeTab === 'profile' && (

@@ -54,7 +54,7 @@ export const ExperienceTab = ({ data, toggleSection, addExperience, updateExperi
     setModalOpen(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
       ...form,
@@ -63,32 +63,37 @@ export const ExperienceTab = ({ data, toggleSection, addExperience, updateExperi
         : form.technologies
     };
 
-    if (editingItem) {
-      updateExperience(editingItem.id, payload);
-      showToast('Experience entry updated!', 'success');
-    } else {
-      addExperience(payload);
-      showToast('New experience entry added!', 'success');
-    }
+    const res = editingItem
+      ? await updateExperience(editingItem.id, payload)
+      : await addExperience(payload);
     setModalOpen(false);
+    if (res && res.ok) {
+      showToast(editingItem ? 'Experience updated & synced to Cloud!' : 'New experience added & synced to Cloud!', 'success');
+    } else {
+      showToast(`Saved locally — pending Cloud Sync (${res?.error || 'Offline'})`, 'warning');
+    }
   };
 
   const promptDelete = (id, role) => {
     setDeleteTarget({ id, role });
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteTarget) {
-      deleteExperience(deleteTarget.id);
+      await deleteExperience(deleteTarget.id);
       showToast(`Experience "${deleteTarget.role || 'Item'}" deleted`, 'info');
       setDeleteTarget(null);
     }
   };
 
-  const toggleVisibility = (item) => {
+  const toggleVisibility = async (item) => {
     const nextVal = item.isVisible === false;
-    updateExperience(item.id, { isVisible: nextVal });
-    showToast(`Experience entry ${nextVal ? 'shown' : 'hidden'} on website`, 'info');
+    const res = await updateExperience(item.id, { isVisible: nextVal });
+    if (res && res.ok) {
+      showToast(`Experience entry ${nextVal ? 'shown' : 'hidden'} on website & synced`, 'info');
+    } else {
+      showToast(`Updated locally — queued for Cloud Sync`, 'warning');
+    }
   };
 
   const sortedExperiences = [...experiences].sort((a, b) => (a.order || 0) - (b.order || 0));

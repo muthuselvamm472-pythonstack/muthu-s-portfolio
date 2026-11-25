@@ -17,6 +17,8 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
 
   const [pendingResumeFile, setPendingResumeFile] = useState(null);
   const [pendingResumeBase64, setPendingResumeBase64] = useState(null);
+  const [resumeCleared, setResumeCleared] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   // Admin Account Credentials form state
   const [credForm, setCredForm] = useState({
@@ -62,6 +64,12 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
       return;
     }
 
+    if (file.size > 3.5 * 1024 * 1024) {
+      showToast('PDF must be under 3.5 MB so browser offline storage & fast streaming stay reliable.', 'warning');
+      return;
+    }
+
+    setResumeCleared(false);
     setPendingResumeFile(file);
     setForm(prev => ({ ...prev, resumeUrl: `/api/resume/` }));
 
@@ -87,21 +95,33 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
   const handleClearResume = () => {
     setPendingResumeFile(null);
     setPendingResumeBase64(null);
+    setResumeCleared(true);
     setForm(prev => ({ ...prev, resumeUrl: '/Muthu_Selvam_Resume.pdf' }));
     showToast('Reset to default resume. Click "Save Profile & Resume Changes" to activate.', 'info');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = {
-      ...form,
-      resumeUrl: pendingResumeBase64 || form.resumeUrl,
-      resumeFilename: pendingResumeFile?.name || 'Muthu_Selvam_Resume.pdf',
-    };
-    updateProfile(payload);
-    setPendingResumeBase64(null);
-    setPendingResumeFile(null);
-    showToast('✅ Profile & Resume settings updated! Changes are live on the website.', 'success');
+    setIsSavingProfile(true);
+    try {
+      const payload = {
+        ...form,
+        resumeUrl: pendingResumeBase64 || form.resumeUrl,
+        resumeFilename: pendingResumeFile?.name || data.profile?.resumeFilename || 'Muthu_Selvam_Resume.pdf',
+        clearResume: resumeCleared && !pendingResumeBase64,
+      };
+      const res = await updateProfile(payload);
+      setPendingResumeBase64(null);
+      setPendingResumeFile(null);
+      setResumeCleared(false);
+      if (res && res.ok) {
+        showToast('✅ Profile & Resume saved & synced to Cloud Database!', 'success');
+      } else {
+        showToast(`⚠️ Saved locally — queued for Cloud Sync (${res?.error || 'Backend unreachable'}).`, 'warning');
+      }
+    } finally {
+      setIsSavingProfile(false);
+    }
   };
 
   const handleCredsSubmit = async (e) => {
@@ -220,8 +240,8 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
           </div>
 
           <div className="form-actions margin-top">
-            <button type="submit" className="btn btn-primary flex-center gap-2">
-              <Save size={18} /> Save Profile & Resume Changes
+            <button type="submit" className="btn btn-primary flex-center gap-2" disabled={isSavingProfile}>
+              <Save size={18} /> {isSavingProfile ? 'Saving & Syncing...' : 'Save Profile & Resume Changes'}
             </button>
           </div>
         </div>

@@ -53,37 +53,42 @@ export const SocialLinksTab = ({ data, addSocialLink, updateSocialLink, deleteSo
     setModalOpen(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const finalPlatform = form.platform === 'Other' && customPlatform.trim() ? customPlatform.trim() : form.platform;
     const payload = { ...form, platform: finalPlatform };
 
-    if (editingItem) {
-      updateSocialLink(editingItem.id, payload);
-      showToast('Social link updated!', 'success');
-    } else {
-      addSocialLink(payload);
-      showToast('New social link added!', 'success');
-    }
+    const res = editingItem
+      ? await updateSocialLink(editingItem.id, payload)
+      : await addSocialLink(payload);
     setModalOpen(false);
+    if (res && res.ok) {
+      showToast(editingItem ? 'Social link updated & synced to Cloud!' : 'New social link added & synced to Cloud!', 'success');
+    } else {
+      showToast(`Saved locally — pending Cloud Sync (${res?.error || 'Offline'})`, 'warning');
+    }
   };
 
   const promptDelete = (id, platform) => {
     setDeleteTarget({ id, platform });
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteTarget) {
-      deleteSocialLink(deleteTarget.id);
+      await deleteSocialLink(deleteTarget.id);
       showToast(`Social link "${deleteTarget.platform || 'Item'}" deleted`, 'info');
       setDeleteTarget(null);
     }
   };
 
-  const toggleVisibility = (item) => {
+  const toggleVisibility = async (item) => {
     const nextVal = item.isVisible === false;
-    updateSocialLink(item.id, { isVisible: nextVal });
-    showToast(`Social link ${nextVal ? 'shown' : 'hidden'} on website`, 'info');
+    const res = await updateSocialLink(item.id, { isVisible: nextVal });
+    if (res && res.ok) {
+      showToast(`Social link ${nextVal ? 'shown' : 'hidden'} on website & synced`, 'info');
+    } else {
+      showToast(`Updated locally — queued for Cloud Sync`, 'warning');
+    }
   };
 
   const sortedLinks = [...links].sort((a, b) => (a.order || 0) - (b.order || 0));

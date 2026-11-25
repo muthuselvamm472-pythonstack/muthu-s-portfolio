@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { SocialIcon } from '../common/SocialIcon';
+import { GlassBackdrop } from '../common/GlassLayers';
 
 export const Footer = () => {
   const { data } = usePortfolio();
@@ -37,9 +38,12 @@ export const Footer = () => {
 
         <div className="footer-links">
           {socialLinks.map((link, i) => (
-            <a key={link.id || i} href={link.url} target="_blank" rel="noreferrer" className="social-link-item">
-              <SocialIcon platform={link.platform} size={16} />
-              <span>{link.platform}</span>
+            <a key={link.id || i} href={link.url} target="_blank" rel="noreferrer" className="social-link-item glass-container glass-container--btn">
+              <GlassBackdrop />
+              <span className="glass-content glass-content--inline">
+                <SocialIcon platform={link.platform} size={16} />
+                <span>{link.platform}</span>
+              </span>
             </a>
           ))}
         </div>

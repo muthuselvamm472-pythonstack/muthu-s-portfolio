@@ -52,6 +52,11 @@ export const CertificationsTab = ({ data, toggleSection, addCertification, updat
     const file = e.target.files[0];
     if (!file) return;
 
+    if (file.size > 2.5 * 1024 * 1024) {
+      showToast('Certificate image must be under 2.5 MB for reliable cloud & offline sync.', 'warning');
+      return;
+    }
+
     const reader = new FileReader();
     reader.onloadend = () => {
       setForm(prev => ({ ...prev, certificateImg: reader.result }));
@@ -60,34 +65,39 @@ export const CertificationsTab = ({ data, toggleSection, addCertification, updat
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingItem) {
-      updateCertification(editingItem.id, form);
-      showToast('Certification updated successfully!', 'success');
-    } else {
-      addCertification(form);
-      showToast('New certification added!', 'success');
-    }
+    const res = editingItem
+      ? await updateCertification(editingItem.id, form)
+      : await addCertification(form);
     setModalOpen(false);
+    if (res && res.ok) {
+      showToast(editingItem ? 'Certification updated & synced to Cloud!' : 'New certification added & synced to Cloud!', 'success');
+    } else {
+      showToast(`Saved locally — pending Cloud Sync (${res?.error || 'Offline'})`, 'warning');
+    }
   };
 
   const promptDelete = (id, name) => {
     setDeleteTarget({ id, name });
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteTarget) {
-      deleteCertification(deleteTarget.id);
+      await deleteCertification(deleteTarget.id);
       showToast(`Certification "${deleteTarget.name || 'Item'}" deleted`, 'info');
       setDeleteTarget(null);
     }
   };
 
-  const toggleVisibility = (item) => {
+  const toggleVisibility = async (item) => {
     const nextVal = item.isVisible === false;
-    updateCertification(item.id, { isVisible: nextVal });
-    showToast(`Certification ${nextVal ? 'shown' : 'hidden'} on website`, 'info');
+    const res = await updateCertification(item.id, { isVisible: nextVal });
+    if (res && res.ok) {
+      showToast(`Certification ${nextVal ? 'shown' : 'hidden'} on website & synced`, 'info');
+    } else {
+      showToast(`Updated locally — queued for Cloud Sync`, 'warning');
+    }
   };
 
   const sortedCerts = [...certs].sort((a, b) => (a.order || 0) - (b.order || 0));

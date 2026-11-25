@@ -7,12 +7,12 @@ export const ThemeTab = ({ data, updateThemeSettings, showToast }) => {
   const theme = data.themeSettings || {};
 
   const [form, setForm] = useState({
-    themeMode: theme.themeMode || localStorage.getItem('muthu_portfolio_default_theme') || 'dark',
-    primaryColor: theme.primaryColor || '#f59e0b',
-    accentColor: theme.accentColor || '#fbbf24',
-    backgroundColor: theme.backgroundColor || '#ffffff',
-    textColor: theme.textColor || '#0f172a',
-    cardColor: theme.cardColor || '#ffffff',
+    themeMode: theme.themeMode || localStorage.getItem('muthu_portfolio_default_theme') || 'light',
+    primaryColor: theme.primaryColor || '#936142',
+    accentColor: theme.accentColor || '#C58970',
+    backgroundColor: theme.backgroundColor || '#CCBBA9',
+    textColor: theme.textColor || '#414942',
+    cardColor: theme.cardColor || '#EAE0D5',
     borderRadius: theme.borderRadius || '18px'
   });
 
@@ -43,9 +43,13 @@ export const ThemeTab = ({ data, updateThemeSettings, showToast }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await updateThemeSettings(form);
+    const res = await updateThemeSettings(form);
     setAdminDefaultTheme(form.themeMode);
-    showToast(`✅ Default website theme saved to database as ${form.themeMode.toUpperCase()} mode!`, 'success');
+    if (res && res.ok) {
+      showToast(`✅ Default website theme saved to Cloud Database as ${form.themeMode.toUpperCase()} mode!`, 'success');
+    } else {
+      showToast(`💾 Theme applied locally (${form.themeMode.toUpperCase()}). ${res?.error || 'Sync when online.'}`, 'warning');
+    }
   };
 
   return (

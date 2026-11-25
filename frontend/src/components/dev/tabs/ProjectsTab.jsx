@@ -31,7 +31,7 @@ export const ProjectsTab = ({ data, addProject, updateProject, deleteProject, sh
       image: '',
       technologies: '',
       githubUrl: 'https://github.com/muthuselvamm472-pythonstack',
-      liveDemoUrl: '#',
+      liveDemoUrl: '',
       order: projects.length + 1,
       isFeatured: false,
       isVisible: true
@@ -60,6 +60,11 @@ export const ProjectsTab = ({ data, addProject, updateProject, deleteProject, sh
     const file = e.target.files[0];
     if (!file) return;
 
+    if (file.size > 2.5 * 1024 * 1024) {
+      showToast('Project image must be under 2.5 MB for reliable cloud & offline sync.', 'warning');
+      return;
+    }
+
     const reader = new FileReader();
     reader.onloadend = () => {
       setForm(prev => ({ ...prev, image: reader.result }));
@@ -68,7 +73,7 @@ export const ProjectsTab = ({ data, addProject, updateProject, deleteProject, sh
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
       ...form,
@@ -77,37 +82,46 @@ export const ProjectsTab = ({ data, addProject, updateProject, deleteProject, sh
         : form.technologies
     };
 
-    if (editingItem) {
-      updateProject(editingItem.id, payload);
-      showToast('Project updated successfully!', 'success');
-    } else {
-      addProject(payload);
-      showToast('New project added!', 'success');
-    }
+    const res = editingItem
+      ? await updateProject(editingItem.id, payload)
+      : await addProject(payload);
     setModalOpen(false);
+    if (res && res.ok) {
+      showToast(editingItem ? 'Project updated & synced to Cloud!' : 'New project added & synced to Cloud!', 'success');
+    } else {
+      showToast(`Saved locally — pending Cloud Sync (${res?.error || 'Offline'})`, 'warning');
+    }
   };
 
   const promptDelete = (id, title) => {
     setDeleteTarget({ id, title });
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteTarget) {
-      deleteProject(deleteTarget.id);
+      await deleteProject(deleteTarget.id);
       showToast(`Project "${deleteTarget.title || 'Item'}" deleted`, 'info');
       setDeleteTarget(null);
     }
   };
 
-  const toggleFeatured = (item) => {
-    updateProject(item.id, { isFeatured: !item.isFeatured });
-    showToast(`Project ${!item.isFeatured ? 'featured' : 'unfeatured'}`, 'info');
+  const toggleFeatured = async (item) => {
+    const res = await updateProject(item.id, { isFeatured: !item.isFeatured });
+    if (res && res.ok) {
+      showToast(`Project ${!item.isFeatured ? 'featured' : 'unfeatured'} & synced`, 'info');
+    } else {
+      showToast(`Updated locally — queued for Cloud Sync`, 'warning');
+    }
   };
 
-  const toggleVisibility = (item) => {
+  const toggleVisibility = async (item) => {
     const nextVal = item.isVisible === false;
-    updateProject(item.id, { isVisible: nextVal });
-    showToast(`Project ${nextVal ? 'shown' : 'hidden'} on website`, 'info');
+    const res = await updateProject(item.id, { isVisible: nextVal });
+    if (res && res.ok) {
+      showToast(`Project ${nextVal ? 'shown' : 'hidden'} on website & synced`, 'info');
+    } else {
+      showToast(`Updated locally — queued for Cloud Sync`, 'warning');
+    }
   };
 
   const sortedProjects = [...projects].sort((a, b) => (a.order || 0) - (b.order || 0));
