@@ -99,7 +99,7 @@ export const HeroSection = () => {
                 href={link.url}
                 target="_blank"
                 rel="noreferrer"
-                className="social-link-item glass-container glass-container--btn"
+                className="social-link-item glass-container glass-container--btn glassBtn"
               >
                 <GlassBackdrop />
                 <span className="glass-content glass-content--inline">

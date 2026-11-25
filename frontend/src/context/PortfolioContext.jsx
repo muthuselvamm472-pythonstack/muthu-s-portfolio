@@ -184,13 +184,29 @@ const mergeList = (apiItems = [], cachedItems = [], semanticKeyFn = null) => {
   const deletedSet = getDeletedIds();
   const resultMap = new Map();
   const seenSemanticKeys = new Set();
+  const cachedMap = new Map();
+
+  (cachedItems || []).forEach((c) => {
+    if (c && c.id !== undefined && c.id !== null) {
+      cachedMap.set(String(c.id), c);
+    }
+  });
 
   apiItems.forEach((item, idx) => {
     const itemId = item.id || `api_${idx + 1}`;
-    if (deletedSet.has(String(itemId))) return;
-    resultMap.set(String(itemId), { ...item, id: itemId, _needsSync: false });
+    const key = String(itemId);
+    if (deletedSet.has(key)) return;
+
+    // Check if user locally edited this item with pending sync
+    const cached = cachedMap.get(key);
+    if (cached && (cached._needsSync || cached._userEdited)) {
+      resultMap.set(key, { ...item, ...cached, id: itemId });
+    } else {
+      resultMap.set(key, { ...item, id: itemId, _needsSync: false });
+    }
+
     if (semanticKeyFn) {
-      const sk = semanticKeyFn(item);
+      const sk = semanticKeyFn(resultMap.get(key));
       if (sk) seenSemanticKeys.add(sk);
     }
   });
@@ -379,24 +395,56 @@ const formatAndMerge = (apiData, prev) => {
     projects: mergeList(apiProj, prev?.projects || [], semanticKeys.projects),
     socialLinks: mergeList(apiSocial, prev?.socialLinks || [], semanticKeys.socialLinks),
     sectionVisibility: {
-      hero: s.show_hero !== undefined ? s.show_hero : prev?.sectionVisibility?.hero ?? true,
-      about: s.show_about !== undefined ? s.show_about : prev?.sectionVisibility?.about ?? true,
-      skills: s.show_skills !== undefined ? s.show_skills : prev?.sectionVisibility?.skills ?? true,
-      experience: s.show_experience !== undefined ? s.show_experience : prev?.sectionVisibility?.experience ?? true,
-      certifications: s.show_certifications !== undefined ? s.show_certifications : prev?.sectionVisibility?.certifications ?? true,
-      projects: s.show_projects !== undefined ? s.show_projects : prev?.sectionVisibility?.projects ?? true,
-      contact: s.show_contact !== undefined ? s.show_contact : prev?.sectionVisibility?.contact ?? true,
-      footer: s.show_footer !== undefined ? s.show_footer : prev?.sectionVisibility?.footer ?? true,
+      hero: prev?.sectionVisibility?._userEdited?.hero !== undefined
+        ? prev.sectionVisibility.hero
+        : (s.show_hero !== undefined ? s.show_hero : prev?.sectionVisibility?.hero ?? true),
+      about: prev?.sectionVisibility?._userEdited?.about !== undefined
+        ? prev.sectionVisibility.about
+        : (s.show_about !== undefined ? s.show_about : prev?.sectionVisibility?.about ?? true),
+      skills: prev?.sectionVisibility?._userEdited?.skills !== undefined
+        ? prev.sectionVisibility.skills
+        : (s.show_skills !== undefined ? s.show_skills : prev?.sectionVisibility?.skills ?? true),
+      experience: prev?.sectionVisibility?._userEdited?.experience !== undefined
+        ? prev.sectionVisibility.experience
+        : (s.show_experience !== undefined ? s.show_experience : prev?.sectionVisibility?.experience ?? true),
+      certifications: prev?.sectionVisibility?._userEdited?.certifications !== undefined
+        ? prev.sectionVisibility.certifications
+        : (s.show_certifications !== undefined ? s.show_certifications : prev?.sectionVisibility?.certifications ?? true),
+      projects: prev?.sectionVisibility?._userEdited?.projects !== undefined
+        ? prev.sectionVisibility.projects
+        : (s.show_projects !== undefined ? s.show_projects : prev?.sectionVisibility?.projects ?? true),
+      contact: prev?.sectionVisibility?._userEdited?.contact !== undefined
+        ? prev.sectionVisibility.contact
+        : (s.show_contact !== undefined ? s.show_contact : prev?.sectionVisibility?.contact ?? true),
+      footer: prev?.sectionVisibility?._userEdited?.footer !== undefined
+        ? prev.sectionVisibility.footer
+        : (s.show_footer !== undefined ? s.show_footer : prev?.sectionVisibility?.footer ?? true),
+      _userEdited: prev?.sectionVisibility?._userEdited || {},
     },
     themeSettings: {
       ...(prev?.themeSettings || mockPortfolioData.themeSettings),
-      themeMode: s.theme_mode || prev?.themeSettings?.themeMode || mockPortfolioData.themeSettings.themeMode,
-      primaryColor: s.primary_color || prev?.themeSettings?.primaryColor || mockPortfolioData.themeSettings.primaryColor,
-      accentColor: s.accent_color || prev?.themeSettings?.accentColor || mockPortfolioData.themeSettings.accentColor,
-      backgroundColor: s.background_color || prev?.themeSettings?.backgroundColor || mockPortfolioData.themeSettings.backgroundColor,
-      textColor: s.text_color || prev?.themeSettings?.textColor || mockPortfolioData.themeSettings.textColor,
-      cardColor: s.card_color || prev?.themeSettings?.cardColor || mockPortfolioData.themeSettings.cardColor,
-      borderRadius: s.border_radius || prev?.themeSettings?.borderRadius || mockPortfolioData.themeSettings.borderRadius,
+      themeMode: prev?.themeSettings?._userEdited
+        ? prev.themeSettings.themeMode
+        : (s.theme_mode || prev?.themeSettings?.themeMode || mockPortfolioData.themeSettings.themeMode),
+      primaryColor: prev?.themeSettings?._userEdited
+        ? prev.themeSettings.primaryColor
+        : (s.primary_color || prev?.themeSettings?.primaryColor || mockPortfolioData.themeSettings.primaryColor),
+      accentColor: prev?.themeSettings?._userEdited
+        ? prev.themeSettings.accentColor
+        : (s.accent_color || prev?.themeSettings?.accentColor || mockPortfolioData.themeSettings.accentColor),
+      backgroundColor: prev?.themeSettings?._userEdited
+        ? prev.themeSettings.backgroundColor
+        : (s.background_color || prev?.themeSettings?.backgroundColor || mockPortfolioData.themeSettings.backgroundColor),
+      textColor: prev?.themeSettings?._userEdited
+        ? prev.themeSettings.textColor
+        : (s.text_color || prev?.themeSettings?.textColor || mockPortfolioData.themeSettings.textColor),
+      cardColor: prev?.themeSettings?._userEdited
+        ? prev.themeSettings.cardColor
+        : (s.card_color || prev?.themeSettings?.cardColor || mockPortfolioData.themeSettings.cardColor),
+      borderRadius: prev?.themeSettings?._userEdited
+        ? prev.themeSettings.borderRadius
+        : (s.border_radius || prev?.themeSettings?.borderRadius || mockPortfolioData.themeSettings.borderRadius),
+      _userEdited: prev?.themeSettings?._userEdited || false,
     },
     contact: {
       email: pickEditedOrServer(profileEdited.email, prev?.profile?.email, p.email, mockPortfolioData.contact.email),
@@ -774,6 +822,8 @@ export const PortfolioProvider = ({ children }) => {
         isVisible: item.isVisible !== false,
         order: Number(item.order) || 1,
         _needsSync: true,
+        _userEdited: true,
+        _clientUpdatedAt: Date.now(),
       };
 
       setData((prev) => {
@@ -808,7 +858,13 @@ export const PortfolioProvider = ({ children }) => {
       setData((prev) => {
         const list = (prev[collectionKey] || []).map((entry) => {
           if (String(entry.id) === String(id)) {
-            updatedItem = { ...entry, ...fields, _needsSync: true };
+            updatedItem = {
+              ...entry,
+              ...fields,
+              _needsSync: true,
+              _userEdited: true,
+              _clientUpdatedAt: Date.now(),
+            };
             return updatedItem;
           }
           return entry;
@@ -893,9 +949,10 @@ export const PortfolioProvider = ({ children }) => {
       setData((prev) => {
         const currentValue = prev.sectionVisibility?.[key] !== false;
         nextValue = !currentValue;
+        const userEdited = { ...(prev.sectionVisibility?._userEdited || {}), [key]: true };
         return {
           ...prev,
-          sectionVisibility: { ...(prev.sectionVisibility || {}), [key]: nextValue },
+          sectionVisibility: { ...(prev.sectionVisibility || {}), [key]: nextValue, _userEdited: userEdited },
         };
       });
 
@@ -922,7 +979,7 @@ export const PortfolioProvider = ({ children }) => {
     async (newSettings) => {
       setData((prev) => ({
         ...prev,
-        themeSettings: { ...(prev.themeSettings || {}), ...newSettings },
+        themeSettings: { ...(prev.themeSettings || {}), ...newSettings, _userEdited: true },
       }));
 
       if (newSettings.themeMode) {

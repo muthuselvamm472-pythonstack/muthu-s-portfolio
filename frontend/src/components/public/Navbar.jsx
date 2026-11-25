@@ -111,7 +111,7 @@ export const Navbar = () => {
 
   return (
     <header className={`navbar-wrapper ${isScrolled ? 'is-scrolled' : ''} scroll-dir-${scrollDir}`}>
-      <nav className="navbar glass-container container" style={{ overflow: 'visible' }}>
+      <nav className="navbar glass-container glassContainer container" style={{ overflow: 'visible' }}>
         <GlassBackdrop overlayClassName="glass-overlay--nav" />
 
         <div className="navbar-container glass-content">

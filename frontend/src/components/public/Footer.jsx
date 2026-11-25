@@ -38,7 +38,7 @@ export const Footer = () => {
 
         <div className="footer-links">
           {socialLinks.map((link, i) => (
-            <a key={link.id || i} href={link.url} target="_blank" rel="noreferrer" className="social-link-item glass-container glass-container--btn">
+            <a key={link.id || i} href={link.url} target="_blank" rel="noreferrer" className="social-link-item glass-container glass-container--btn glassBtn">
               <GlassBackdrop />
               <span className="glass-content glass-content--inline">
                 <SocialIcon platform={link.platform} size={16} />

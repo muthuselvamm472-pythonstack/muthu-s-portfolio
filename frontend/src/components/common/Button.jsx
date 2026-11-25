@@ -3,7 +3,7 @@ import { getApiUrl } from '../../apiConfig';
 import { GlassBackdrop } from './GlassLayers';
 
 export const Button = ({ children, variant = 'primary', href, onClick, className = '', type = 'button', ...props }) => {
-  const baseClass = `btn btn-${variant} glass-container glass-container--btn ${className}`;
+  const baseClass = `btn btn-${variant} glass-container glass-container--btn glassBtn ${className}`;
 
   const innerLayers = (
     <>

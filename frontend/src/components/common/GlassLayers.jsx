@@ -1,8 +1,15 @@
 import React from 'react';
+import { LIQUID_GLASS_NORMAL_MAP } from './liquidGlassMap';
 
 /**
  * Global Apple Liquid Glass SVG Displacement Filters.
- * Mounted once offscreen (using 0x0 sizing instead of display:none so Chromium & Firefox both resolve url(#lg-dist)).
+ *
+ * Provides:
+ * 1. #container-glass: High-refraction turbulence displacement for containers, cards, navbars, and panels.
+ * 2. #btn-glass: Apple macOS Liquid Glass normal map displacement for pill buttons and controls.
+ *
+ * Mounted once offscreen (0x0 sizing with position: absolute, left: -9999px)
+ * so that both Chromium & Firefox properly resolve url(#container-glass) and url(#btn-glass).
  */
 export const LiquidGlassSvgFilter = () => (
   <svg
@@ -20,7 +27,47 @@ export const LiquidGlassSvgFilter = () => (
     aria-hidden="true"
   >
     <defs>
-      {/* Standard Liquid Glass turbulence displacement for navbars, cards, & panels */}
+      {/* ── 1. Container Liquid Glass Displacement Filter (#container-glass) ── */}
+      <filter id="container-glass" x="0%" y="0%" width="100%" height="100%">
+        <feTurbulence
+          type="fractalNoise"
+          baseFrequency="0.008 0.008"
+          numOctaves="2"
+          seed="92"
+          result="noise"
+        />
+        <feGaussianBlur in="noise" stdDeviation="0.02" result="blur" />
+        <feDisplacementMap
+          in="SourceGraphic"
+          in2="blur"
+          scale="77"
+          xChannelSelector="R"
+          yChannelSelector="G"
+        />
+      </filter>
+
+      {/* ── 2. Button Liquid Glass Normal Map Filter (#btn-glass) ── */}
+      <filter id="btn-glass" primitiveUnits="objectBoundingBox">
+        <feImage
+          href={LIQUID_GLASS_NORMAL_MAP}
+          x="0"
+          y="0"
+          width="1"
+          height="1"
+          result="map"
+        />
+        <feGaussianBlur in="SourceGraphic" stdDeviation="0.02" result="blur" />
+        <feDisplacementMap
+          id="disp"
+          in="blur"
+          in2="map"
+          scale="1"
+          xChannelSelector="R"
+          yChannelSelector="G"
+        />
+      </filter>
+
+      {/* ── Backwards-Compatible Aliases (#lg-dist & #lg-dist-btn) ── */}
       <filter id="lg-dist" x="0%" y="0%" width="100%" height="100%">
         <feTurbulence
           type="fractalNoise"
@@ -29,30 +76,30 @@ export const LiquidGlassSvgFilter = () => (
           seed="92"
           result="noise"
         />
-        <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
+        <feGaussianBlur in="noise" stdDeviation="0.02" result="blur" />
         <feDisplacementMap
           in="SourceGraphic"
-          in2="blurred"
-          scale="55"
+          in2="blur"
+          scale="77"
           xChannelSelector="R"
           yChannelSelector="G"
         />
       </filter>
 
-      {/* Calibrated edge-refraction filter for pill buttons & compact controls */}
-      <filter id="lg-dist-btn" x="0%" y="0%" width="100%" height="100%">
-        <feTurbulence
-          type="fractalNoise"
-          baseFrequency="0.012 0.012"
-          numOctaves="2"
-          seed="92"
-          result="noise"
+      <filter id="lg-dist-btn" primitiveUnits="objectBoundingBox">
+        <feImage
+          href={LIQUID_GLASS_NORMAL_MAP}
+          x="0"
+          y="0"
+          width="1"
+          height="1"
+          result="map"
         />
-        <feGaussianBlur in="noise" stdDeviation="1.5" result="blurred" />
+        <feGaussianBlur in="SourceGraphic" stdDeviation="0.02" result="blur" />
         <feDisplacementMap
-          in="SourceGraphic"
-          in2="blurred"
-          scale="18"
+          in="blur"
+          in2="map"
+          scale="1"
           xChannelSelector="R"
           yChannelSelector="G"
         />
