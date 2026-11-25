@@ -175,16 +175,16 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
 
         {/* ── Typewriter Animation Words ── */}
         <div className="admin-section-box margin-bottom" style={{
-          border: '1px solid rgba(147, 97, 66, 0.35)',
           background: 'linear-gradient(135deg, rgba(147, 97, 66, 0.06) 0%, var(--admin-card-bg) 100%)'
         }}>
           <div className="flex-center gap-2" style={{ marginBottom: '0.3rem' }}>
             <Type size={20} style={{ color: 'var(--admin-accent)' }} />
             <h3 style={{ margin: 0, color: 'var(--admin-text-main)' }}>Typography Animation Words (Typewriter Rotation)</h3>
-            <span style={{
+            <span className="hero-role-badge" style={{
               marginLeft: 'auto',
               background: 'rgba(147, 97, 66, 0.12)',
-              border: '1px solid rgba(147, 97, 66, 0.35)',
+              border: '1px solid transparent',
+              boxShadow: '0 4px 12px -2px rgba(147, 97, 66, 0.22)',
               color: 'var(--admin-accent)',
               fontSize: '0.75rem',
               fontWeight: 700,
@@ -203,18 +203,21 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
 
           {/* ── Enhanced Input Row ── */}
           <div style={{ position: 'relative', marginBottom: '1rem' }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'stretch',
-              border: `2px solid ${inputFocused ? 'var(--admin-accent)' : 'rgba(172, 138, 105, 0.45)'}`,
-              borderRadius: '14px',
-              background: 'var(--admin-input-bg)',
-              overflow: 'hidden',
-              transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
-              boxShadow: inputFocused
-                ? '0 0 0 4px rgba(147, 97, 66, 0.15), 0 4px 18px rgba(147, 97, 66, 0.10)'
-                : 'none',
-            }}>
+            <div
+              className="hero-role-input-wrap"
+              style={{
+                display: 'flex',
+                alignItems: 'stretch',
+                border: `2px solid ${inputFocused ? 'var(--admin-accent)' : 'transparent'}`,
+                borderRadius: '14px',
+                background: 'var(--admin-input-bg)',
+                overflow: 'hidden',
+                transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                boxShadow: inputFocused
+                  ? '0 0 0 4px rgba(147, 97, 66, 0.15), 0 8px 22px -4px rgba(147, 97, 66, 0.24)'
+                  : 'var(--shadow-sm)',
+              }}
+            >
               <div style={{ flex: 1, position: 'relative' }}>
                 <input
                   type="text"
@@ -292,7 +295,8 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
                 Press{' '}
                 <kbd style={{
                   padding: '0.15rem 0.45rem',
-                  border: '1px solid rgba(172, 138, 105, 0.45)',
+                  border: '1px solid transparent',
+                  boxShadow: '0 2px 6px rgba(147, 97, 66, 0.20)',
                   borderRadius: '4px',
                   fontSize: '0.75rem',
                   fontWeight: 600,
@@ -307,21 +311,27 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
 
           {/* ── Word Chips ── */}
           {form.typewriterRoles.length > 0 ? (
-            <div style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '0.55rem',
-              padding: '0.75rem',
-              background: 'rgba(147, 97, 66, 0.05)',
-              borderRadius: '12px',
-              border: '1px dashed rgba(147, 97, 66, 0.35)',
-              minHeight: '64px',
-              alignItems: 'flex-start',
-              alignContent: 'flex-start',
-            }}>
+            <div
+              className="hero-chips-tray"
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '0.55rem',
+                padding: '0.75rem',
+                background: 'rgba(147, 97, 66, 0.05)',
+                borderRadius: '12px',
+                border: '1px solid transparent',
+                boxShadow: 'inset 0 2px 6px rgba(65, 73, 66, 0.05), 0 4px 14px -4px rgba(147, 97, 66, 0.12)',
+                minHeight: '64px',
+                alignItems: 'flex-start',
+                alignContent: 'flex-start',
+                transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+              }}
+            >
               {form.typewriterRoles.map((role, idx) => (
                 <div
                   key={idx}
+                  className="hero-role-chip"
                   draggable
                   onDragStart={() => handleDragStart(idx)}
                   onDragOver={(e) => handleDragOver(e, idx)}
@@ -338,7 +348,7 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
                       : 'linear-gradient(135deg, rgba(147, 97, 66, 0.16), rgba(147, 97, 66, 0.08))',
                     border: dragOverIdx === idx
                       ? '2px solid #936142'
-                      : '1.5px solid rgba(147, 97, 66, 0.40)',
+                      : '1.5px solid transparent',
                     color: 'var(--admin-accent)',
                     fontWeight: 700,
                     fontSize: '0.82rem',
@@ -346,7 +356,9 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
                     cursor: 'grab',
                     userSelect: 'none',
                     transition: 'all 0.15s ease',
-                    boxShadow: dragOverIdx === idx ? '0 0 0 3px rgba(147, 97, 66, 0.20)' : 'none',
+                    boxShadow: dragOverIdx === idx
+                      ? '0 0 0 3px rgba(147, 97, 66, 0.20), 0 8px 18px rgba(147, 97, 66, 0.25)'
+                      : '0 4px 12px -2px rgba(147, 97, 66, 0.20)',
                     transform: dragOverIdx === idx ? 'scale(1.04)' : 'scale(1)',
                   }}
                 >
@@ -389,7 +401,8 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
               textAlign: 'center',
               color: 'var(--admin-text-muted)',
               fontSize: '0.85rem',
-              border: '1px dashed rgba(147, 97, 66, 0.35)',
+              border: '1px solid transparent',
+              boxShadow: 'var(--shadow-sm)',
               borderRadius: '12px',
             }}>
               No words added yet. Add your first role above ↑

@@ -224,8 +224,8 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
                     <button
                       type="button"
                       onClick={handleClearResume}
-                      className="btn btn-outline flex-center gap-1"
-                      style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.4)', padding: '0.6rem 1rem' }}
+                      className="btn btn-outline btn-outline-danger flex-center gap-1"
+                      style={{ padding: '0.6rem 1rem' }}
                       title="Clear resume link"
                     >
                       <Trash2 size={15} /> Clear

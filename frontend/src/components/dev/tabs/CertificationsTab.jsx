@@ -260,8 +260,8 @@ export const CertificationsTab = ({ data, toggleSection, addCertification, updat
                         setForm(prev => ({ ...prev, certificateImg: '' }));
                         showToast('Certificate photo removed. Click "Save Certification" to confirm.', 'info');
                       }}
-                      className="btn btn-outline flex-center gap-1"
-                      style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.4)', fontSize: '0.85rem', padding: '0.45rem 0.85rem' }}
+                      className="btn btn-outline btn-outline-danger flex-center gap-1"
+                      style={{ fontSize: '0.85rem', padding: '0.45rem 0.85rem' }}
                     >
                       <Trash2 size={14} /> Remove Photo
                     </button>

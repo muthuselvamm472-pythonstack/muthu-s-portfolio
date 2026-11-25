@@ -99,7 +99,7 @@ export const ProjectsSection = () => {
                     <h4 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>{project.title}</h4>
                     <FormattedText text={project.shortDescription} className="secondary-project-desc" />
                     {project.image && (
-                      <div className="secondary-project-img-wrap" style={{ borderRadius: '10px', overflow: 'hidden', marginBottom: '1.25rem', maxHeight: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.25)', border: '1px solid var(--glass-border)', padding: '0.5rem' }}>
+                      <div className="secondary-project-img-wrap" style={{ borderRadius: '10px', overflow: 'hidden', marginBottom: '1.25rem', maxHeight: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.25)', border: '1px solid transparent', boxShadow: 'var(--shadow-sm)', padding: '0.5rem' }}>
                         <img
                           src={project.image}
                           alt={project.title}
