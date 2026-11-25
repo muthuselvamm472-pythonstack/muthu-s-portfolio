@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { Button } from '../common/Button';
-import { GlassBackdrop } from '../common/GlassLayers';
 import { resolveResumeUrl } from '../../apiConfig';
 import { Sun, Moon, Menu, X, FileText } from 'lucide-react';
 
@@ -111,10 +110,8 @@ export const Navbar = () => {
 
   return (
     <header className={`navbar-wrapper ${isScrolled ? 'is-scrolled' : ''} scroll-dir-${scrollDir}`}>
-      <nav className="navbar glass-container glassContainer container" style={{ overflow: 'visible' }}>
-        <GlassBackdrop overlayClassName="glass-overlay--nav" />
-
-        <div className="navbar-container glass-content">
+      <nav className="navbar container" style={{ overflow: 'visible' }}>
+        <div className="navbar-container">
           <a href="#hero" className="nav-brand" onClick={(e) => handleNavClick(e, 'hero')}>
             {renderBrand()}
           </a>
@@ -187,15 +184,12 @@ export const Navbar = () => {
 
           {/* Hamburger button */}
           <button
-            className="mobile-menu-btn glass-container glass-container--btn"
+            className="mobile-menu-btn"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
             aria-label="Toggle Menu"
             aria-expanded={mobileMenuOpen}
           >
-            <GlassBackdrop />
-            <span className="glass-content glass-content--inline">
-              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </span>
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </nav>

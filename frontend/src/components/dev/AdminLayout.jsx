@@ -3,7 +3,6 @@ import { useAuth } from '../../context/AuthContext';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { useTheme } from '../../context/ThemeContext';
 import { Toast } from '../common/Toast';
-import { GlassBackdrop } from '../common/GlassLayers';
 import {
   LayoutDashboard, User, Sliders, Info, Code, Briefcase, Award,
   FolderGit2, Mail, Share2, Palette, Layers, LogOut, Menu, X, ShieldCheck, ExternalLink, Sun, Moon
@@ -91,8 +90,7 @@ export const AdminLayout = () => {
       <Toast message={toast.message} type={toast.type} onClose={() => setToast({ message: '', type: 'success' })} />
 
       {/* Top Navbar */}
-      <header className="admin-topbar glass-container" style={{ overflow: 'visible' }}>
-        <GlassBackdrop overlayClassName="glass-overlay--nav" />
+      <header className="admin-topbar">
         <div className="topbar-left">
           <button className="mobile-drawer-toggle" onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}>
             {mobileDrawerOpen ? <X size={22} /> : <Menu size={22} />}

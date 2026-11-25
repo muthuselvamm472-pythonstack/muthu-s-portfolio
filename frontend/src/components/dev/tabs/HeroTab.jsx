@@ -27,9 +27,10 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
   const [inputFocused, setInputFocused] = useState(false);
   const [dragOverIdx, setDragOverIdx] = useState(null);
   const dragSrcIdx = useRef(null);
+  const isDirtyRef = useRef(false);
 
   useEffect(() => {
-    if (data.profile) {
+    if (data.profile && !isDirtyRef.current) {
       setForm(prev => ({
         ...prev,
         title: data.profile.title || prev.title,
@@ -49,6 +50,7 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    isDirtyRef.current = true;
     setForm(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
@@ -63,12 +65,13 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
       showToast('This title is already in the typewriter rotation.', 'warning');
       return;
     }
+    isDirtyRef.current = true;
     setForm(prev => ({
       ...prev,
       typewriterRoles: [...prev.typewriterRoles, trimmed]
     }));
     setNewRoleInput('');
-    showToast(`✨ Added "${trimmed}" to typewriter animation!`, 'info');
+    showToast(`✨ Added "${trimmed}" to typewriter animation! Click "Save Hero Changes" to publish.`, 'info');
   };
 
   const handleRemoveTypewriterRole = (indexToRemove) => {
@@ -76,6 +79,7 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
       showToast('You must keep at least 1 word in the typewriter rotation.', 'warning');
       return;
     }
+    isDirtyRef.current = true;
     setForm(prev => ({
       ...prev,
       typewriterRoles: prev.typewriterRoles.filter((_, idx) => idx !== indexToRemove)
@@ -91,6 +95,7 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
     const updated = [...form.typewriterRoles];
     const [removed] = updated.splice(src, 1);
     updated.splice(idx, 0, removed);
+    isDirtyRef.current = true;
     setForm(prev => ({ ...prev, typewriterRoles: updated }));
     dragSrcIdx.current = null;
     setDragOverIdx(null);
@@ -104,13 +109,14 @@ export const HeroTab = ({ data, updateProfile, showToast }) => {
     setIsSaving(true);
     try {
       const res = await updateProfile(form);
+      isDirtyRef.current = false;
       if (res && res.ok) {
-        showToast('🎉 Hero section saved & synced to live server!', 'success');
+        showToast('🎉 Hero section saved & synced to Cloud Database!', 'success');
       } else {
-        showToast('💾 Hero section saved in local browser storage.', 'success');
+        showToast(`⚠️ Saved locally — queued for Cloud Sync (${res?.error || 'Backend waking up'})`, 'warning');
       }
     } catch (_) {
-      showToast('💾 Saved in browser storage.', 'info');
+      showToast('⚠️ Saved locally — pending Cloud Sync.', 'warning');
     } finally {
       setIsSaving(false);
     }

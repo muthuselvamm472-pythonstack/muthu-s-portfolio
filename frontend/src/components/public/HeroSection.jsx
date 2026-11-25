@@ -6,7 +6,6 @@ import { Tech3DCarousel } from './Tech3DCarousel';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { resolveResumeUrl } from '../../apiConfig';
 import { SocialIcon } from '../common/SocialIcon';
-import { GlassBackdrop } from '../common/GlassLayers';
 import { Sparkles, FileText } from 'lucide-react';
 
 export const HeroSection = () => {
@@ -38,11 +37,8 @@ export const HeroSection = () => {
         <ScrollReveal delay={100} className="hero-content">
           {/* Status Pill */}
           {showStatusBadge && (
-            <div className="status-pill glass-container glass-container--btn">
-              <GlassBackdrop />
-              <span className="glass-content glass-content--inline">
-                <Sparkles size={14} /> {statusBadgeText}
-              </span>
+            <div className="status-pill">
+              <Sparkles size={14} /> {statusBadgeText}
             </div>
           )}
 
@@ -99,13 +95,10 @@ export const HeroSection = () => {
                 href={link.url}
                 target="_blank"
                 rel="noreferrer"
-                className="social-link-item glass-container glass-container--btn glassBtn"
+                className="social-link-item"
               >
-                <GlassBackdrop />
-                <span className="glass-content glass-content--inline">
-                  <SocialIcon platform={link.platform} size={18} />
-                  <span>{link.platform}</span>
-                </span>
+                <SocialIcon platform={link.platform} size={18} />
+                <span>{link.platform}</span>
               </a>
             ))}
           </div>

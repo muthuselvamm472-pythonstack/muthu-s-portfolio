@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { GlassBackdrop } from '../components/common/GlassLayers';
 import { ShieldCheck, Lock, User, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 import '../styles/admin.css';
 
@@ -31,8 +30,7 @@ export const AdminLoginPage = () => {
 
   return (
     <div className="admin-login-wrapper">
-      <div className="admin-login-card glass-container">
-        <GlassBackdrop overlayClassName="glass-overlay--card" />
+      <div className="admin-login-card">
         <div className="admin-login-header">
           <div className="admin-icon-badge">
             <ShieldCheck size={32} />

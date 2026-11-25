@@ -4,7 +4,6 @@ import { ThemeProvider } from './context/ThemeContext';
 import { PortfolioProvider } from './context/PortfolioContext';
 import { AuthProvider } from './context/AuthContext';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
-import { LiquidGlassSvgFilter } from './components/common/GlassLayers';
 import { PortfolioPage } from './pages/PortfolioPage';
 import './styles/global.css';
 import './styles/public.css';
@@ -17,7 +16,6 @@ const AdminDashboardPage = lazy(() =>
 export function App() {
   return (
     <ErrorBoundary>
-      <LiquidGlassSvgFilter />
       <HashRouter>
         <AuthProvider>
           <ThemeProvider>

@@ -86,12 +86,12 @@ class PortfolioAPITests(TestCase):
         self.assertEqual(profile.resume_data, self.sample_pdf_b64)
 
     def test_project_and_social_link_crud_with_placeholder_url(self):
-        """Creating a project with '#' URL and adding Instagram social link should both succeed."""
+        """Creating a project with '#' or scheme-less URL and adding Instagram social link should both succeed."""
         self.client.force_authenticate(user=self.admin_user)
         proj_res = self.client.post('/api/admin/projects/', {
             'title': 'New Portfolio App',
             'short_description': 'Built with React & Django',
-            'github_url': 'https://github.com/muthuselvamm472-pythonstack',
+            'github_url': 'github.com/muthuselvamm472-pythonstack/demo',
             'live_demo_url': '#',
             'technologies': ['React', 'Django'],
             'is_featured': True,
@@ -99,6 +99,8 @@ class PortfolioAPITests(TestCase):
         }, format='json')
         self.assertEqual(proj_res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Project.objects.count(), 1)
+        self.assertEqual(Project.objects.first().github_url, 'https://github.com/muthuselvamm472-pythonstack/demo')
+        self.assertEqual(Project.objects.first().live_demo_url, '')
 
         soc_res = self.client.post('/api/admin/social/', {
             'platform': 'Instagram',

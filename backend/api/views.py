@@ -513,12 +513,17 @@ class AdminExperienceDetailView(APIView):
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def _clean_optional_urls(request_data, url_fields):
-    """Normalize placeholder '#' or whitespace URL values to '' so URLField validation passes."""
+    """Normalize placeholder '#' and scheme-less URLs so URLField validation succeeds reliably."""
     cleaned = request_data.copy() if hasattr(request_data, 'copy') else dict(request_data)
     for field in url_fields:
         if field in cleaned and isinstance(cleaned[field], str):
             val = cleaned[field].strip()
-            cleaned[field] = '' if val in ('#', '') else val
+            if val in ('#', ''):
+                cleaned[field] = ''
+            elif not re.match(r'^(https?://|mailto:|/)', val, flags=re.IGNORECASE):
+                cleaned[field] = f'https://{val}'
+            else:
+                cleaned[field] = val
     return cleaned
 
 

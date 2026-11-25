@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Save, ShieldCheck, Lock, User, KeyRound, FileText, Upload, ExternalLink, Trash2, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { getApiUrl, resolveResumeUrl } from '../../../apiConfig';
@@ -19,6 +19,7 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
   const [pendingResumeBase64, setPendingResumeBase64] = useState(null);
   const [resumeCleared, setResumeCleared] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const isDirtyRef = useRef(false);
 
   // Admin Account Credentials form state
   const [credForm, setCredForm] = useState({
@@ -37,7 +38,7 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
 
   // Keep profile form in sync if parent data changes externally
   useEffect(() => {
-    if (data.profile) {
+    if (data.profile && !isDirtyRef.current) {
       setForm(prev => ({
         ...prev,
         fullName: data.profile.fullName || prev.fullName,
@@ -48,10 +49,11 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
         resumeUrl: data.profile.resumeUrl || prev.resumeUrl,
       }));
     }
-  }, [data.profile?.fullName, data.profile?.title, data.profile?.email, data.profile?.resumeUrl]);
+  }, [data.profile?.fullName, data.profile?.title, data.profile?.email, data.profile?.phone, data.profile?.location, data.profile?.resumeUrl]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    isDirtyRef.current = true;
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
@@ -69,6 +71,7 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
       return;
     }
 
+    isDirtyRef.current = true;
     setResumeCleared(false);
     setPendingResumeFile(file);
     setForm(prev => ({ ...prev, resumeUrl: `/api/resume/` }));
@@ -93,6 +96,7 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
   };
 
   const handleClearResume = () => {
+    isDirtyRef.current = true;
     setPendingResumeFile(null);
     setPendingResumeBase64(null);
     setResumeCleared(true);
@@ -111,6 +115,7 @@ export const ProfileTab = ({ data, updateProfile, showToast }) => {
         clearResume: resumeCleared && !pendingResumeBase64,
       };
       const res = await updateProfile(payload);
+      isDirtyRef.current = false;
       setPendingResumeBase64(null);
       setPendingResumeFile(null);
       setResumeCleared(false);

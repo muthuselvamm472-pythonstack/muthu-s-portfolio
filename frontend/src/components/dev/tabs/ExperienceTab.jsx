@@ -122,9 +122,13 @@ export const ExperienceTab = ({ data, toggleSection, addExperience, updateExperi
               <input
                 type="checkbox"
                 checked={isSectionVisible}
-                onChange={() => {
-                  toggleSection('experience');
-                  showToast(`Experience section turned ${!isSectionVisible ? 'ON' : 'OFF'}`, 'info');
+                onChange={async () => {
+                  const res = await toggleSection('experience');
+                  if (res && res.ok) {
+                    showToast(`Experience section turned ${!isSectionVisible ? 'ON' : 'OFF'} & synced to Cloud`, 'info');
+                  } else {
+                    showToast(`Experience section turned ${!isSectionVisible ? 'ON' : 'OFF'} locally — queued for Cloud Sync`, 'warning');
+                  }
                 }}
               />
               <span className="toggle-slider" />

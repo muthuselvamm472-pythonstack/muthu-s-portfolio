@@ -12,19 +12,10 @@
   --border-color: rgba(172, 138, 105, 0.35);
   --border-hover: #936142;
 
-  --glass-bg: rgba(238, 230, 222, 0.62);
-  --glass-border: rgba(255, 255, 255, 0.72);
-  --glass-shadow: 0 12px 32px -8px rgba(65, 73, 66, 0.14), 0 2px 8px rgba(65, 73, 66, 0.06);
-  --glass-blur: blur(18px);
-
-  /* Apple Liquid Glass Optical Stack Variables */
-  --lg-bg-color: rgba(238, 230, 222, 0.42);
-  --lg-bg-nav: rgba(238, 230, 222, 0.48);
-  --lg-bg-primary: linear-gradient(135deg, rgba(147, 97, 66, 0.84), rgba(131, 83, 54, 0.90));
-  --lg-bg-primary-hover: linear-gradient(135deg, rgba(168, 112, 80, 0.92), rgba(147, 97, 66, 0.96));
-  --lg-highlight: rgba(255, 255, 255, 0.78);
-  --lg-text: #414942;
-  --lg-hover-glow: rgba(255, 255, 255, 0.42);
+  --glass-bg: #EAE0D5;
+  --glass-border: rgba(172, 138, 105, 0.35);
+  --glass-shadow: 0 12px 32px -8px rgba(65, 73, 66, 0.12), 0 2px 8px rgba(65, 73, 66, 0.05);
+  --glass-blur: none;
 
   --text-primary: #414942;
   --text-secondary: #515952;
@@ -70,17 +61,9 @@
   --border-color: rgba(172, 138, 105, 0.35);
   --border-hover: #936142;
 
-  --glass-bg: rgba(238, 230, 222, 0.62);
-  --glass-border: rgba(255, 255, 255, 0.72);
-  --glass-shadow: 0 12px 32px -8px rgba(65, 73, 66, 0.14), 0 2px 8px rgba(65, 73, 66, 0.06);
-
-  --lg-bg-color: rgba(238, 230, 222, 0.42);
-  --lg-bg-nav: rgba(238, 230, 222, 0.48);
-  --lg-bg-primary: linear-gradient(135deg, rgba(147, 97, 66, 0.84), rgba(131, 83, 54, 0.90));
-  --lg-bg-primary-hover: linear-gradient(135deg, rgba(168, 112, 80, 0.92), rgba(147, 97, 66, 0.96));
-  --lg-highlight: rgba(255, 255, 255, 0.78);
-  --lg-text: #414942;
-  --lg-hover-glow: rgba(255, 255, 255, 0.42);
+  --glass-bg: #EAE0D5;
+  --glass-border: rgba(172, 138, 105, 0.35);
+  --glass-shadow: 0 12px 32px -8px rgba(65, 73, 66, 0.12), 0 2px 8px rgba(65, 73, 66, 0.05);
 
   --text-primary: #414942;
   --text-secondary: #515952;
@@ -114,17 +97,9 @@
   --border-color: rgba(172, 138, 105, 0.28);
   --border-hover: #C58970;
 
-  --glass-bg: rgba(43, 48, 44, 0.62);
-  --glass-border: rgba(255, 255, 255, 0.16);
-  --glass-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.48);
-
-  --lg-bg-color: rgba(43, 48, 44, 0.46);
-  --lg-bg-nav: rgba(35, 39, 36, 0.52);
-  --lg-bg-primary: linear-gradient(135deg, rgba(147, 97, 66, 0.86), rgba(131, 83, 54, 0.92));
-  --lg-bg-primary-hover: linear-gradient(135deg, rgba(178, 120, 86, 0.94), rgba(147, 97, 66, 0.98));
-  --lg-highlight: rgba(237, 227, 216, 0.30);
-  --lg-text: #EDE3D8;
-  --lg-hover-glow: rgba(197, 137, 112, 0.28);
+  --glass-bg: #353b36;
+  --glass-border: rgba(172, 138, 105, 0.30);
+  --glass-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.45);
 
   --text-primary: #EDE3D8;
   --text-secondary: #CCBBA9;

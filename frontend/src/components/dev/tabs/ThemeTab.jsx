@@ -31,6 +31,8 @@ export const ThemeTab = ({ data, updateThemeSettings, showToast }) => {
     }
   }, [data.themeSettings]);
 
+  const [isSaving, setIsSaving] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
@@ -43,12 +45,17 @@ export const ThemeTab = ({ data, updateThemeSettings, showToast }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await updateThemeSettings(form);
-    setAdminDefaultTheme(form.themeMode);
-    if (res && res.ok) {
-      showToast(`✅ Default website theme saved to Cloud Database as ${form.themeMode.toUpperCase()} mode!`, 'success');
-    } else {
-      showToast(`💾 Theme applied locally (${form.themeMode.toUpperCase()}). ${res?.error || 'Sync when online.'}`, 'warning');
+    setIsSaving(true);
+    try {
+      const res = await updateThemeSettings(form);
+      setAdminDefaultTheme(form.themeMode);
+      if (res && res.ok) {
+        showToast(`✅ Default website theme saved to Cloud Database as ${form.themeMode.toUpperCase()} mode!`, 'success');
+      } else {
+        showToast(`⚠️ Theme saved locally (${form.themeMode.toUpperCase()}). ${res?.error || 'Sync when online.'}`, 'warning');
+      }
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -126,8 +133,8 @@ export const ThemeTab = ({ data, updateThemeSettings, showToast }) => {
 
 
         <div className="form-actions">
-          <button type="submit" className="btn btn-primary flex-center gap-2">
-            <Save size={18} /> Save Default Theme Settings
+          <button type="submit" className="btn btn-primary flex-center gap-2" disabled={isSaving}>
+            <Save size={18} /> {isSaving ? 'Saving...' : 'Save Default Theme Settings'}
           </button>
         </div>
       </form>

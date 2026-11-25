@@ -1,7 +1,10 @@
 /**
  * PortfolioContext.jsx
- * Single source of truth for all portfolio data with Non-Destructive Persistent Merging,
- * Multi-Tab BroadcastChannel Sync, Local Resume Fallback, and Cloud Recovery Queue.
+ * Single source of truth for all portfolio data with:
+ * - Hybrid IndexedDB + Compact localStorage persistence (immune to QuotaExceededError)
+ * - Scoped Non-Destructive Merging & Per-Collection Deletion Tombstones
+ * - React-18 Safe Deterministic Updates + BroadcastChannel Multi-Tab Sync
+ * - Cold-Start Retry API Wrapper + 11-Section Cloud Reconciliation Engine
  */
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { mockPortfolioData } from '../mockData';
@@ -9,16 +12,25 @@ import {
   getApiUrl,
   getCachedResumeData,
   getCachedResumeFilename,
+  hydrateCachedResumeFromIdb,
   saveCachedResumeData,
   clearCachedResumeData,
 } from '../apiConfig';
+import {
+  persistSnapshot,
+  sanitizeCompactForInitialRender,
+  loadFullSnapshot,
+  idbGet,
+  idbSet,
+  IDB_KEYS,
+} from '../utils/persistentStorage';
 
 const PortfolioContext = createContext(null);
 
 const STORAGE_KEY = 'muthu_portfolio_v8';
-const DELETED_KEY = 'muthu_deleted_ids_v8';
+const DELETED_MAP_KEY = 'muthu_deleted_map_v9';
 
-// Clear legacy cache keys safely
+// Clear legacy cache keys safely (including old unscoped muthu_deleted_ids_v8)
 try {
   [
     'muthu_portfolio_v7',
@@ -28,31 +40,74 @@ try {
     'muthu_portfolio_v3',
     'muthu_portfolio_data_v2',
     'muthu_portfolio_data',
+    'muthu_deleted_ids_v8',
   ].forEach((k) => localStorage.removeItem(k));
 } catch (_) {}
 
-const getDeletedIds = () => {
+// ─── Scoped Deletion Tombstone Map ({ [collectionKey]: string[] }) ──────────
+const loadDeletedMap = () => {
   try {
-    const raw = localStorage.getItem(DELETED_KEY);
-    return raw ? new Set(JSON.parse(raw)) : new Set();
-  } catch (_) {
-    return new Set();
-  }
+    const raw = localStorage.getItem(DELETED_MAP_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        return parsed;
+      }
+    }
+  } catch (_) {}
+  return {};
 };
 
-const addDeletedId = (id) => {
-  if (!id) return;
+const saveDeletedMap = (mapObj) => {
   try {
-    const set = getDeletedIds();
-    set.add(String(id));
-    localStorage.setItem(DELETED_KEY, JSON.stringify(Array.from(set)));
+    localStorage.setItem(DELETED_MAP_KEY, JSON.stringify(mapObj));
   } catch (_) {}
+  idbSet(IDB_KEYS.DELETED_IDS, mapObj);
+};
+
+const getDeletedIds = (collectionKey) => {
+  const mapObj = loadDeletedMap();
+  const list = mapObj[collectionKey];
+  return new Set(Array.isArray(list) ? list.map(String) : []);
+};
+
+const addDeletedId = (collectionKey, id) => {
+  if (!collectionKey || !id) return;
+  const mapObj = loadDeletedMap();
+  const set = new Set(Array.isArray(mapObj[collectionKey]) ? mapObj[collectionKey].map(String) : []);
+  set.add(String(id));
+  mapObj[collectionKey] = Array.from(set);
+  saveDeletedMap(mapObj);
+};
+
+const removeDeletedId = (collectionKey, id) => {
+  if (!collectionKey || !id) return;
+  const mapObj = loadDeletedMap();
+  if (!Array.isArray(mapObj[collectionKey])) return;
+  mapObj[collectionKey] = mapObj[collectionKey].filter((item) => String(item) !== String(id));
+  saveDeletedMap(mapObj);
+};
+
+const countPendingDeletions = () => {
+  const mapObj = loadDeletedMap();
+  return Object.values(mapObj).reduce(
+    (sum, arr) => sum + (Array.isArray(arr) ? arr.filter(isNumericId).length : 0),
+    0
+  );
 };
 
 const isNumericId = (id) => {
   if (id === null || id === undefined) return false;
   const num = Number(id);
   return !isNaN(num) && Number.isInteger(num) && num > 0 && !String(id).includes('_');
+};
+
+const normalizeOptionalUrl = (val) => {
+  if (!val || typeof val !== 'string') return '';
+  const trimmed = val.trim();
+  if (!trimmed || trimmed === '#') return '';
+  if (/^(https?:\/\/|mailto:|\/|data:)/i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
 };
 
 const tryRefreshToken = async () => {
@@ -91,11 +146,13 @@ const formatApiError = (errBody, status) => {
   return `Request failed (${status})`;
 };
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 /**
- * Authenticated API wrapper with timeout protection, JWT auto-refresh,
- * and structured error parsing.
+ * Authenticated API wrapper with timeout protection, Render cold-start retry,
+ * JWT auto-refresh, and structured error parsing.
  */
-const apiRequest = async (url, method = 'GET', body = null, timeoutMs = 35000) => {
+const apiRequest = async (url, method = 'GET', body = null, timeoutMs = 35000, retries = 1) => {
   let token = localStorage.getItem('muthu_admin_jwt');
   const headers = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -109,53 +166,69 @@ const apiRequest = async (url, method = 'GET', body = null, timeoutMs = 35000) =
     return { opts, timer };
   };
 
-  let timer = null;
-  try {
-    let req = makeOpts();
-    timer = req.timer;
-    let res = await fetch(getApiUrl(url), req.opts);
-    clearTimeout(timer);
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    let timer = null;
+    try {
+      let req = makeOpts();
+      timer = req.timer;
+      let res = await fetch(getApiUrl(url), req.opts);
+      clearTimeout(timer);
 
-    if (res && res.status === 401) {
-      const freshToken = await tryRefreshToken();
-      if (freshToken) {
-        headers['Authorization'] = `Bearer ${freshToken}`;
-        req = makeOpts();
-        timer = req.timer;
-        res = await fetch(getApiUrl(url), req.opts);
-        clearTimeout(timer);
+      if (res && res.status === 401) {
+        const freshToken = await tryRefreshToken();
+        if (freshToken) {
+          headers['Authorization'] = `Bearer ${freshToken}`;
+          req = makeOpts();
+          timer = req.timer;
+          res = await fetch(getApiUrl(url), req.opts);
+          clearTimeout(timer);
+        }
       }
-    }
 
-    const contentType = res.headers.get('content-type') || '';
-    const isJson = contentType.includes('application/json');
-    const parsed = isJson ? await res.json().catch(() => null) : null;
+      const contentType = res.headers.get('content-type') || '';
+      const isJson = contentType.includes('application/json');
+      const parsed = isJson ? await res.json().catch(() => null) : null;
 
-    if (res.ok) {
-      return { ok: true, synced: true, status: res.status, data: parsed, error: null };
+      // Retry transient 502/503/504 or HTML splash screen during Render cold start
+      if (
+        attempt < retries &&
+        (res.status === 502 || res.status === 503 || res.status === 504 || (!isJson && res.status >= 500))
+      ) {
+        await sleep(1800 * (attempt + 1));
+        continue;
+      }
+
+      if (res.ok) {
+        return { ok: true, synced: true, status: res.status, data: parsed, error: null };
+      }
+      return {
+        ok: false,
+        synced: false,
+        status: res.status,
+        data: parsed,
+        error: formatApiError(parsed, res.status),
+      };
+    } catch (err) {
+      if (timer) clearTimeout(timer);
+      const isTimeout = err && err.name === 'AbortError';
+      if (attempt < retries && !isTimeout) {
+        await sleep(1500);
+        continue;
+      }
+      console.warn(`API ${method} ${url} failed:`, err);
+      return {
+        ok: false,
+        synced: false,
+        status: 0,
+        networkError: true,
+        data: null,
+        error: isTimeout
+          ? 'Backend server is waking up (timed out). Saved locally — retry Cloud Sync shortly.'
+          : 'Unable to reach backend server. Saved locally for Cloud Sync.',
+      };
     }
-    return {
-      ok: false,
-      synced: false,
-      status: res.status,
-      data: parsed,
-      error: formatApiError(parsed, res.status),
-    };
-  } catch (err) {
-    if (timer) clearTimeout(timer);
-    const isTimeout = err && err.name === 'AbortError';
-    console.warn(`API ${method} ${url} failed:`, err);
-    return {
-      ok: false,
-      synced: false,
-      status: 0,
-      networkError: true,
-      data: null,
-      error: isTimeout
-        ? 'Backend server is waking up (timed out). Saved locally — retry Cloud Sync shortly.'
-        : 'Unable to reach backend server. Saved locally for Cloud Sync.',
-    };
   }
+  return { ok: false, synced: false, error: 'Request failed after retries.' };
 };
 
 // Auto-sequence order numbers without collisions
@@ -174,14 +247,13 @@ const assignSequentialOrders = (list = []) => {
 };
 
 /**
- * Non-Destructive List Merger:
- * - Authoritative server items come first (unless explicitly deleted in deletedIds).
- * - Cached items (both temp IDs AND numeric IDs that disappeared during ephemeral server resets)
- *   are NEVER discarded unless explicitly in deletedIds!
- * - Prevents duplicate entries using semantic keys when offline temp items already synced.
+ * Non-Destructive List Merger (with per-collection deletion tombstones):
+ * - Authoritative server items come first (unless deleted in this collection's tombstone set).
+ * - Cached items with _needsSync or _userEdited keep local edits over older server versions.
+ * - Offline/temp/deleted-on-ephemeral-restart items in cache are preserved & flagged for Cloud Sync.
  */
-const mergeList = (apiItems = [], cachedItems = [], semanticKeyFn = null) => {
-  const deletedSet = getDeletedIds();
+const mergeList = (collectionKey, apiItems = [], cachedItems = [], semanticKeyFn = null) => {
+  const deletedSet = getDeletedIds(collectionKey);
   const resultMap = new Map();
   const seenSemanticKeys = new Set();
   const cachedMap = new Map();
@@ -197,7 +269,6 @@ const mergeList = (apiItems = [], cachedItems = [], semanticKeyFn = null) => {
     const key = String(itemId);
     if (deletedSet.has(key)) return;
 
-    // Check if user locally edited this item with pending sync
     const cached = cachedMap.get(key);
     if (cached && (cached._needsSync || cached._userEdited)) {
       resultMap.set(key, { ...item, ...cached, id: itemId });
@@ -237,7 +308,6 @@ const semanticKeys = {
   socialLinks: (sl) => `${(sl.platform || '').trim().toLowerCase()}|${(sl.url || '').trim().toLowerCase()}`,
 };
 
-// Strip blank or undefined fields when merging profile/about
 const pickEditedOrServer = (isEdited, prevVal, serverVal, fallbackVal) => {
   if (isEdited && prevVal !== undefined) return prevVal;
   if (serverVal !== undefined && serverVal !== null && serverVal !== '') return serverVal;
@@ -255,7 +325,6 @@ const formatAndMerge = (apiData, prev) => {
   const aboutEdited = prev?.about?._userEdited || {};
   const hasCachedResume = !!getCachedResumeData();
 
-  // Never allow an empty server resume_url to revert an active custom/cached resume to the old static PDF
   const serverResume = p.resume_url;
   let mergedResumeUrl;
   if (profileEdited.resumeUrl && prev?.profile?.resumeUrl) {
@@ -365,13 +434,20 @@ const formatAndMerge = (apiData, prev) => {
       phone: pickEditedOrServer(profileEdited.phone, prev?.profile?.phone, p.phone, mockPortfolioData.profile.phone),
       location: pickEditedOrServer(profileEdited.location, prev?.profile?.location, p.location, mockPortfolioData.profile.location),
       resumeUrl: mergedResumeUrl,
-      resumeFilename: p.resume_filename || prev?.profile?.resumeFilename || getCachedResumeFilename(),
-      showHeroButtons: p.show_hero_buttons !== false,
+      resumeFilename: profileEdited.resumeUrl
+        ? prev?.profile?.resumeFilename || getCachedResumeFilename()
+        : p.resume_filename || prev?.profile?.resumeFilename || getCachedResumeFilename(),
+      showHeroButtons: profileEdited.showHeroButtons
+        ? prev.profile.showHeroButtons
+        : p.show_hero_buttons !== undefined
+        ? p.show_hero_buttons !== false
+        : prev?.profile?.showHeroButtons ?? true,
       button1Text: pickEditedOrServer(profileEdited.button1Text, prev?.profile?.button1Text, p.button1_text, 'View My Work'),
       button1Url: pickEditedOrServer(profileEdited.button1Url, prev?.profile?.button1Url, p.button1_url, '#projects'),
       button2Text: pickEditedOrServer(profileEdited.button2Text, prev?.profile?.button2Text, p.button2_text, 'Download Resume'),
       button2Url: mergedResumeUrl,
       _userEdited: profileEdited,
+      _needsSync: !!prev?.profile?._needsSync,
       _clientUpdatedAt: prev?.profile?._clientUpdatedAt,
     },
     about: {
@@ -387,13 +463,14 @@ const formatAndMerge = (apiData, prev) => {
         : prev?.about?.showResumeButton ?? true,
       resumeUrl: mergedResumeUrl,
       _userEdited: aboutEdited,
+      _needsSync: !!prev?.about?._needsSync,
       _clientUpdatedAt: prev?.about?._clientUpdatedAt,
     },
-    skills: mergeList(apiSkills, prev?.skills || [], semanticKeys.skills),
-    experiences: mergeList(apiExp, prev?.experiences || [], semanticKeys.experiences),
-    certifications: mergeList(apiCerts, prev?.certifications || [], semanticKeys.certifications),
-    projects: mergeList(apiProj, prev?.projects || [], semanticKeys.projects),
-    socialLinks: mergeList(apiSocial, prev?.socialLinks || [], semanticKeys.socialLinks),
+    skills: mergeList('skills', apiSkills, prev?.skills || [], semanticKeys.skills),
+    experiences: mergeList('experiences', apiExp, prev?.experiences || [], semanticKeys.experiences),
+    certifications: mergeList('certifications', apiCerts, prev?.certifications || [], semanticKeys.certifications),
+    projects: mergeList('projects', apiProj, prev?.projects || [], semanticKeys.projects),
+    socialLinks: mergeList('socialLinks', apiSocial, prev?.socialLinks || [], semanticKeys.socialLinks),
     sectionVisibility: {
       hero: prev?.sectionVisibility?._userEdited?.hero !== undefined
         ? prev.sectionVisibility.hero
@@ -420,6 +497,7 @@ const formatAndMerge = (apiData, prev) => {
         ? prev.sectionVisibility.footer
         : (s.show_footer !== undefined ? s.show_footer : prev?.sectionVisibility?.footer ?? true),
       _userEdited: prev?.sectionVisibility?._userEdited || {},
+      _needsSync: !!prev?.sectionVisibility?._needsSync,
     },
     themeSettings: {
       ...(prev?.themeSettings || mockPortfolioData.themeSettings),
@@ -445,6 +523,7 @@ const formatAndMerge = (apiData, prev) => {
         ? prev.themeSettings.borderRadius
         : (s.border_radius || prev?.themeSettings?.borderRadius || mockPortfolioData.themeSettings.borderRadius),
       _userEdited: prev?.themeSettings?._userEdited || false,
+      _needsSync: !!prev?.themeSettings?._needsSync,
     },
     contact: {
       email: pickEditedOrServer(profileEdited.email, prev?.profile?.email, p.email, mockPortfolioData.contact.email),
@@ -457,25 +536,13 @@ const formatAndMerge = (apiData, prev) => {
 const loadCache = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) return sanitizeCompactForInitialRender(JSON.parse(raw));
   } catch (_) {}
   return null;
 };
 
 const saveCache = (portfolioData) => {
-  try {
-    // Strip any huge inline base64 resume copies before writing main state so STORAGE_KEY stays compact
-    const clean = portfolioData?.profile?.resumeUrl?.startsWith?.('data:')
-      ? {
-          ...portfolioData,
-          profile: { ...portfolioData.profile, resumeUrl: '/api/resume/' },
-          about: { ...(portfolioData.about || {}), resumeUrl: '/api/resume/' },
-        }
-      : portfolioData;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(clean));
-  } catch (err) {
-    console.warn('localStorage quota warning:', err);
-  }
+  persistSnapshot(STORAGE_KEY, portfolioData);
 };
 
 // Cross-tab / Cross-window zero-latency sync via BroadcastChannel
@@ -486,7 +553,6 @@ try {
   }
 } catch (_) {}
 
-// Field mappers for shared collection CRUD logic
 const collectionSpecs = {
   skills: {
     endpoint: '/api/admin/skills/',
@@ -524,7 +590,7 @@ const collectionSpecs = {
       name: item.name,
       organization: item.organization,
       issue_date: item.issueDate || '',
-      credential_url: item.credentialUrl === '#' ? '' : (item.credentialUrl || ''),
+      credential_url: normalizeOptionalUrl(item.credentialUrl),
       certificate_image_data: item.certificateImg || '',
       display_order: Number(item.order) || 1,
       is_visible: item.isVisible !== false,
@@ -540,8 +606,8 @@ const collectionSpecs = {
       detailed_description: item.detailedDescription || '',
       project_image_url: item.image || '',
       technologies: item.technologies || [],
-      github_url: item.githubUrl === '#' ? '' : (item.githubUrl || ''),
-      live_demo_url: item.liveDemoUrl === '#' ? '' : (item.liveDemoUrl || ''),
+      github_url: normalizeOptionalUrl(item.githubUrl),
+      live_demo_url: normalizeOptionalUrl(item.liveDemoUrl),
       is_featured: !!item.isFeatured,
       display_order: Number(item.order) || 1,
       is_visible: item.isVisible !== false,
@@ -553,7 +619,7 @@ const collectionSpecs = {
     prepend: false,
     toApi: (item) => ({
       platform: item.platform,
-      url: item.url,
+      url: normalizeOptionalUrl(item.url) || item.url,
       icon: item.icon || item.platform?.toLowerCase() || 'Globe',
       display_order: Number(item.order) || 1,
       is_visible: item.isVisible !== false,
@@ -563,10 +629,16 @@ const collectionSpecs = {
 
 const countPendingSync = (portfolioData) => {
   if (!portfolioData) return 0;
-  return ['skills', 'experiences', 'certifications', 'projects', 'socialLinks'].reduce(
+  const listCount = ['skills', 'experiences', 'certifications', 'projects', 'socialLinks'].reduce(
     (sum, key) => sum + (portfolioData[key] || []).filter((item) => item._needsSync).length,
     0
   );
+  const singletonCount =
+    (portfolioData.profile?._needsSync ? 1 : 0) +
+    (portfolioData.about?._needsSync ? 1 : 0) +
+    (portfolioData.sectionVisibility?._needsSync ? 1 : 0) +
+    (portfolioData.themeSettings?._needsSync ? 1 : 0);
+  return listCount + singletonCount + countPendingDeletions();
 };
 
 export const PortfolioProvider = ({ children }) => {
@@ -596,7 +668,6 @@ export const PortfolioProvider = ({ children }) => {
     });
   }, []);
 
-  // Recompute pending count cleanly whenever lists change
   useEffect(() => {
     const pendingCount = countPendingSync(data);
     setSyncStatus((prev) => (prev.pendingCount === pendingCount ? prev : { ...prev, pendingCount }));
@@ -617,7 +688,7 @@ export const PortfolioProvider = ({ children }) => {
             error: null,
           }));
 
-          if (apiData?.settings?.theme_mode) {
+          if (apiData?.settings?.theme_mode && !dataRef.current?.themeSettings?._userEdited) {
             localStorage.setItem('muthu_portfolio_default_theme', apiData.settings.theme_mode);
             const manualTheme = localStorage.getItem('muthu_portfolio_user_selected_theme');
             if (!manualTheme) {
@@ -629,7 +700,7 @@ export const PortfolioProvider = ({ children }) => {
         }
       }
     } catch (err) {
-      console.warn('Backend fetch failed, relying on local cache:', err);
+      console.warn('Backend fetch failed, relying on persistent local cache:', err);
       setSyncStatus((prev) => ({ ...prev, state: 'offline', error: 'Backend waking up / offline' }));
     } finally {
       setLoading(false);
@@ -637,8 +708,59 @@ export const PortfolioProvider = ({ children }) => {
     return false;
   }, [setData]);
 
+  // Hydrate full IndexedDB snapshot + binary assets first, then sync with live server
   useEffect(() => {
-    refreshPortfolioData();
+    let active = true;
+    (async () => {
+      try {
+        const [, idbSnap, idbDeleted] = await Promise.all([
+          hydrateCachedResumeFromIdb(),
+          loadFullSnapshot(),
+          idbGet(IDB_KEYS.DELETED_IDS),
+        ]);
+        if (!active) return;
+
+        if (idbDeleted && typeof idbDeleted === 'object' && !Array.isArray(idbDeleted)) {
+          try {
+            const existing = loadDeletedMap();
+            const merged = { ...existing };
+            Object.entries(idbDeleted).forEach(([k, arr]) => {
+              if (Array.isArray(arr)) {
+                merged[k] = Array.from(new Set([...(merged[k] || []).map(String), ...arr.map(String)]));
+              }
+            });
+            localStorage.setItem(DELETED_MAP_KEY, JSON.stringify(merged));
+          } catch (_) {}
+        }
+
+        if (idbSnap && typeof idbSnap === 'object') {
+          setDataRaw((prev) => {
+            const prevTime = Math.max(prev?.profile?._clientUpdatedAt || 0, prev?.about?._clientUpdatedAt || 0);
+            const idbTime = Math.max(idbSnap?.profile?._clientUpdatedAt || 0, idbSnap?.about?._clientUpdatedAt || 0);
+            const hasBinaryRestore =
+              (!prev?.profile?.profileImage && idbSnap?.profile?.profileImage) ||
+              (idbSnap?.projects || []).some((p, i) => p?.image && !prev?.projects?.[i]?.image) ||
+              (idbSnap?.certifications || []).some((c, i) => c?.certificateImg && !prev?.certifications?.[i]?.certificateImg);
+
+            if (idbTime >= prevTime || hasBinaryRestore) {
+              return {
+                ...prev,
+                ...idbSnap,
+                profile: { ...(prev?.profile || {}), ...(idbSnap.profile || {}) },
+                about: { ...(prev?.about || {}), ...(idbSnap.about || {}) },
+                sectionVisibility: { ...(prev?.sectionVisibility || {}), ...(idbSnap.sectionVisibility || {}) },
+                themeSettings: { ...(prev?.themeSettings || {}), ...(idbSnap.themeSettings || {}) },
+              };
+            }
+            return prev;
+          });
+        }
+      } catch (_) {}
+      if (active) refreshPortfolioData();
+    })();
+    return () => {
+      active = false;
+    };
   }, [refreshPortfolioData]);
 
   // Cross-tab instant synchronization
@@ -657,7 +779,7 @@ export const PortfolioProvider = ({ children }) => {
     const handleStorage = (e) => {
       if (e.key === STORAGE_KEY && e.newValue) {
         try {
-          setDataRaw(JSON.parse(e.newValue));
+          setDataRaw(sanitizeCompactForInitialRender(JSON.parse(e.newValue)));
         } catch (_) {}
       }
     };
@@ -681,7 +803,6 @@ export const PortfolioProvider = ({ children }) => {
   // ─── PROFILE & HERO ────────────────────────────────────────────────────────
   const updateProfile = useCallback(
     async (fields) => {
-      // Cache resume locally when uploaded so offline/restarts never revert it
       if (typeof fields.resumeUrl === 'string' && fields.resumeUrl.startsWith('data:')) {
         saveCachedResumeData(fields.resumeUrl, fields.resumeFilename || 'Muthu_Selvam_Resume.pdf');
       } else if (fields.clearResume || fields.resumeUrl === '/Muthu_Selvam_Resume.pdf' || fields.resumeUrl === '') {
@@ -706,6 +827,7 @@ export const PortfolioProvider = ({ children }) => {
             resumeUrl: nextResumeUrl,
             button2Url: nextResumeUrl,
             _userEdited: userEdited,
+            _needsSync: true,
             _clientUpdatedAt: Date.now(),
           },
           about: {
@@ -721,7 +843,6 @@ export const PortfolioProvider = ({ children }) => {
         };
       });
 
-      // Only send fields explicitly present so HeroTab never touches resume fields on the backend!
       const apiPayload = {};
       const fieldMap = {
         fullName: 'full_name',
@@ -758,22 +879,24 @@ export const PortfolioProvider = ({ children }) => {
       }
 
       const result = await apiRequest('/api/admin/profile/', 'PUT', apiPayload);
-      if (result.ok && result.data) {
-        if (result.data.resume_url) {
-          setData((prev) => ({
-            ...prev,
-            profile: {
-              ...prev.profile,
-              resumeUrl: result.data.resume_url,
-              button2Url: result.data.resume_url,
-              resumeFilename: result.data.resume_filename || prev.profile.resumeFilename,
-            },
-            about: {
-              ...prev.about,
-              resumeUrl: result.data.resume_url,
-            },
-          }));
-        }
+      if (result.ok) {
+        setData((prev) => ({
+          ...prev,
+          profile: {
+            ...prev.profile,
+            _needsSync: false,
+            ...(result.data?.resume_url
+              ? {
+                  resumeUrl: result.data.resume_url,
+                  button2Url: result.data.resume_url,
+                  resumeFilename: result.data.resume_filename || prev.profile.resumeFilename,
+                }
+              : {}),
+          },
+          ...(result.data?.resume_url
+            ? { about: { ...prev.about, resumeUrl: result.data.resume_url } }
+            : {}),
+        }));
       }
       return result;
     },
@@ -794,6 +917,7 @@ export const PortfolioProvider = ({ children }) => {
             ...prev.about,
             ...fields,
             _userEdited: userEdited,
+            _needsSync: true,
             _clientUpdatedAt: Date.now(),
           },
         };
@@ -806,7 +930,11 @@ export const PortfolioProvider = ({ children }) => {
       if (fields.coreTechnologies !== undefined) payload.core_technologies = fields.coreTechnologies;
       if (fields.showResumeButton !== undefined) payload.show_resume_button = fields.showResumeButton;
 
-      return await apiRequest('/api/admin/about/', 'PUT', payload);
+      const result = await apiRequest('/api/admin/about/', 'PUT', payload);
+      if (result.ok) {
+        setData((prev) => ({ ...prev, about: { ...prev.about, _needsSync: false } }));
+      }
+      return result;
     },
     [setData]
   );
@@ -853,28 +981,25 @@ export const PortfolioProvider = ({ children }) => {
   const updateCollectionItem = useCallback(
     async (collectionKey, id, fields) => {
       const spec = collectionSpecs[collectionKey];
-      let updatedItem = null;
-
-      setData((prev) => {
-        const list = (prev[collectionKey] || []).map((entry) => {
-          if (String(entry.id) === String(id)) {
-            updatedItem = {
-              ...entry,
-              ...fields,
-              _needsSync: true,
-              _userEdited: true,
-              _clientUpdatedAt: Date.now(),
-            };
-            return updatedItem;
-          }
-          return entry;
-        });
-        return { ...prev, [collectionKey]: list };
-      });
-
-      if (!updatedItem) {
+      const existing = (dataRef.current?.[collectionKey] || []).find((entry) => String(entry.id) === String(id));
+      if (!existing) {
         return { ok: false, synced: false, error: 'Item not found locally.' };
       }
+
+      const updatedItem = {
+        ...existing,
+        ...fields,
+        _needsSync: true,
+        _userEdited: true,
+        _clientUpdatedAt: Date.now(),
+      };
+
+      setData((prev) => ({
+        ...prev,
+        [collectionKey]: (prev[collectionKey] || []).map((entry) =>
+          String(entry.id) === String(id) ? updatedItem : entry
+        ),
+      }));
 
       if (isNumericId(id)) {
         const result = await apiRequest(`${spec.endpoint}${id}/`, 'PUT', spec.toApi(updatedItem));
@@ -909,14 +1034,19 @@ export const PortfolioProvider = ({ children }) => {
   const deleteCollectionItem = useCallback(
     async (collectionKey, id) => {
       const spec = collectionSpecs[collectionKey];
-      addDeletedId(id);
+      addDeletedId(collectionKey, id);
       setData((prev) => ({
         ...prev,
         [collectionKey]: (prev[collectionKey] || []).filter((entry) => String(entry.id) !== String(id)),
       }));
       if (isNumericId(id)) {
-        return await apiRequest(`${spec.endpoint}${id}/`, 'DELETE');
+        const res = await apiRequest(`${spec.endpoint}${id}/`, 'DELETE');
+        if (res.ok || res.status === 404) {
+          removeDeletedId(collectionKey, id);
+        }
+        return res;
       }
+      removeDeletedId(collectionKey, id);
       return { ok: true, synced: true, status: 204 };
     },
     [setData]
@@ -945,14 +1075,19 @@ export const PortfolioProvider = ({ children }) => {
   // ─── SECTION VISIBILITY & THEME ────────────────────────────────────────────
   const toggleSection = useCallback(
     async (key) => {
-      let nextValue;
+      const currentValue = dataRef.current?.sectionVisibility?.[key] !== false;
+      const nextValue = !currentValue;
+
       setData((prev) => {
-        const currentValue = prev.sectionVisibility?.[key] !== false;
-        nextValue = !currentValue;
         const userEdited = { ...(prev.sectionVisibility?._userEdited || {}), [key]: true };
         return {
           ...prev,
-          sectionVisibility: { ...(prev.sectionVisibility || {}), [key]: nextValue, _userEdited: userEdited },
+          sectionVisibility: {
+            ...(prev.sectionVisibility || {}),
+            [key]: nextValue,
+            _userEdited: userEdited,
+            _needsSync: true,
+          },
         };
       });
 
@@ -967,8 +1102,15 @@ export const PortfolioProvider = ({ children }) => {
         footer: 'show_footer',
       };
 
-      if (fieldMap[key] && nextValue !== undefined) {
-        return await apiRequest('/api/admin/settings/', 'PUT', { [fieldMap[key]]: nextValue });
+      if (fieldMap[key]) {
+        const res = await apiRequest('/api/admin/settings/', 'PUT', { [fieldMap[key]]: nextValue });
+        if (res.ok) {
+          setData((prev) => ({
+            ...prev,
+            sectionVisibility: { ...(prev.sectionVisibility || {}), _needsSync: false },
+          }));
+        }
+        return res;
       }
       return { ok: false, synced: false };
     },
@@ -979,7 +1121,12 @@ export const PortfolioProvider = ({ children }) => {
     async (newSettings) => {
       setData((prev) => ({
         ...prev,
-        themeSettings: { ...(prev.themeSettings || {}), ...newSettings, _userEdited: true },
+        themeSettings: {
+          ...(prev.themeSettings || {}),
+          ...newSettings,
+          _userEdited: true,
+          _needsSync: true,
+        },
       }));
 
       if (newSettings.themeMode) {
@@ -993,7 +1140,7 @@ export const PortfolioProvider = ({ children }) => {
         }
       }
 
-      return await apiRequest('/api/admin/settings/', 'PUT', {
+      const res = await apiRequest('/api/admin/settings/', 'PUT', {
         theme_mode: newSettings.themeMode,
         primary_color: newSettings.primaryColor,
         accent_color: newSettings.accentColor,
@@ -1002,11 +1149,18 @@ export const PortfolioProvider = ({ children }) => {
         card_color: newSettings.cardColor,
         border_radius: newSettings.borderRadius,
       });
+      if (res.ok) {
+        setData((prev) => ({
+          ...prev,
+          themeSettings: { ...(prev.themeSettings || {}), _needsSync: false },
+        }));
+      }
+      return res;
     },
     [setData]
   );
 
-  // ─── FULL CLOUD SYNC ENGINE (Reconciles all 11 sections + resume + pending items) ─
+  // ─── FULL CLOUD SYNC ENGINE (Reconciles all 11 sections + resume + pending items + deletions) ─
   const syncAllToCloud = useCallback(async () => {
     const token = localStorage.getItem('muthu_admin_jwt');
     if (!token) {
@@ -1018,15 +1172,15 @@ export const PortfolioProvider = ({ children }) => {
     let errors = [];
     let syncedCount = 0;
 
-    // 1. Fetch live backend snapshot to detect what items are missing on server
+    // 1. Fetch live backend snapshot to detect missing items & pending server deletions
     let serverSnapshot = null;
     try {
       const snapRes = await fetch(getApiUrl('/api/portfolio/'));
       if (snapRes.ok) serverSnapshot = await snapRes.json();
     } catch (_) {}
 
-    // 2. Sync Profile & Hero (plus locally cached Base64 resume if available)
-    const cachedResumeB64 = getCachedResumeData();
+    // 2. Sync Profile & Hero (plus locally/IDB cached Base64 resume if available)
+    const cachedResumeB64 = getCachedResumeData() || (await hydrateCachedResumeFromIdb());
     const profilePayload = {
       ...current.profile,
       resumeUrl: cachedResumeB64 || current.profile?.resumeUrl,
@@ -1034,12 +1188,17 @@ export const PortfolioProvider = ({ children }) => {
     };
     delete profilePayload._userEdited;
     delete profilePayload._clientUpdatedAt;
+    delete profilePayload._needsSync;
     const pRes = await updateProfile(profilePayload);
     if (pRes.ok) syncedCount++;
     else errors.push(`Profile/Hero: ${pRes.error}`);
 
     // 3. Sync About
-    const aRes = await updateAbout(current.about || {});
+    const aboutPayload = { ...(current.about || {}) };
+    delete aboutPayload._userEdited;
+    delete aboutPayload._clientUpdatedAt;
+    delete aboutPayload._needsSync;
+    const aRes = await updateAbout(aboutPayload);
     if (aRes.ok) syncedCount++;
     else errors.push(`About: ${aRes.error}`);
 
@@ -1063,10 +1222,18 @@ export const PortfolioProvider = ({ children }) => {
       card_color: ts.cardColor,
       border_radius: ts.borderRadius,
     });
-    if (sRes.ok) syncedCount++;
-    else errors.push(`Settings/Theme: ${sRes.error}`);
+    if (sRes.ok) {
+      syncedCount++;
+      setData((prev) => ({
+        ...prev,
+        sectionVisibility: { ...(prev.sectionVisibility || {}), _needsSync: false },
+        themeSettings: { ...(prev.themeSettings || {}), _needsSync: false },
+      }));
+    } else {
+      errors.push(`Settings/Theme: ${sRes.error}`);
+    }
 
-    // 5. Reconcile all 5 list collections (push any item with _needsSync or missing from server)
+    // 5. Reconcile all 5 list collections (flush pending deletions + push pending creates/updates)
     const serverKeyMap = {
       skills: serverSnapshot?.skills || [],
       experiences: serverSnapshot?.experiences || [],
@@ -1078,10 +1245,32 @@ export const PortfolioProvider = ({ children }) => {
     for (const key of Object.keys(collectionSpecs)) {
       const spec = collectionSpecs[key];
       const serverIds = new Set((serverKeyMap[key] || []).map((row) => String(row.id)));
-      const localItems = current[key] || [];
 
+      // 5a. Flush pending offline deletions to server
+      const pendingDeleteIds = getDeletedIds(key);
+      for (const delId of pendingDeleteIds) {
+        if (!isNumericId(delId)) {
+          removeDeletedId(key, delId);
+          continue;
+        }
+        if (serverSnapshot && !serverIds.has(String(delId))) {
+          removeDeletedId(key, delId);
+          continue;
+        }
+        const delRes = await apiRequest(`${spec.endpoint}${delId}/`, 'DELETE');
+        if (delRes.ok || delRes.status === 404) {
+          removeDeletedId(key, delId);
+          syncedCount++;
+        } else {
+          errors.push(`Delete ${key} #${delId}: ${delRes.error}`);
+        }
+      }
+
+      // 5b. Push pending creations/updates
+      const localItems = current[key] || [];
       for (const item of localItems) {
-        const missingOnServer = item._needsSync || !isNumericId(item.id) || (serverSnapshot && !serverIds.has(String(item.id)));
+        const missingOnServer =
+          item._needsSync || !isNumericId(item.id) || (serverSnapshot && !serverIds.has(String(item.id)));
         if (!missingOnServer) continue;
 
         const apiBody = spec.toApi(item);
@@ -1185,6 +1374,6 @@ export const PortfolioProvider = ({ children }) => {
 
 export const usePortfolio = () => {
   const ctx = useContext(PortfolioContext);
-  if (!ctx) throw new Error('usePortfolio must be used inside PortfolioProvider');
+  if (!ctx) throw new Error('usePortfolio must be used within a PortfolioProvider');
   return ctx;
 };

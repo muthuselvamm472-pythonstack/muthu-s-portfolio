@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Save } from 'lucide-react';
 
 export const AboutTab = ({ data, updateAbout, showToast }) => {
@@ -10,9 +10,10 @@ export const AboutTab = ({ data, updateAbout, showToast }) => {
     coreTechnologies: data.about?.coreTechnologies || '',
     showResumeButton: data.about?.showResumeButton !== false,
   });
+  const isDirtyRef = useRef(false);
 
   useEffect(() => {
-    if (data.about) {
+    if (data.about && !isDirtyRef.current) {
       setForm(prev => ({
         ...prev,
         heading: data.about.heading || '',
@@ -27,6 +28,7 @@ export const AboutTab = ({ data, updateAbout, showToast }) => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    isDirtyRef.current = true;
     setForm(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
@@ -40,13 +42,14 @@ export const AboutTab = ({ data, updateAbout, showToast }) => {
     setIsSaving(true);
     try {
       const res = await updateAbout(form);
+      isDirtyRef.current = false;
       if (res && res.ok) {
-        showToast('🎉 About section saved & synced to live server!', 'success');
+        showToast('🎉 About section saved & synced to Cloud Database!', 'success');
       } else {
-        showToast('💾 About section saved in local browser storage.', 'success');
+        showToast(`⚠️ Saved locally — queued for Cloud Sync (${res?.error || 'Backend waking up'})`, 'warning');
       }
     } catch (_) {
-      showToast('💾 Saved in browser storage.', 'info');
+      showToast('⚠️ Saved locally — pending Cloud Sync.', 'warning');
     } finally {
       setIsSaving(false);
     }

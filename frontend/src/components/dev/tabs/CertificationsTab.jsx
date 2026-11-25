@@ -126,9 +126,13 @@ export const CertificationsTab = ({ data, toggleSection, addCertification, updat
               <input
                 type="checkbox"
                 checked={isSectionVisible}
-                onChange={() => {
-                  toggleSection('certifications');
-                  showToast(`Certifications section turned ${!isSectionVisible ? 'ON' : 'OFF'}`, 'info');
+                onChange={async () => {
+                  const res = await toggleSection('certifications');
+                  if (res && res.ok) {
+                    showToast(`Certifications section turned ${!isSectionVisible ? 'ON' : 'OFF'} & synced to Cloud`, 'info');
+                  } else {
+                    showToast(`Certifications section turned ${!isSectionVisible ? 'ON' : 'OFF'} locally — queued for Cloud Sync`, 'warning');
+                  }
                 }}
               />
               <span className="toggle-slider" />
