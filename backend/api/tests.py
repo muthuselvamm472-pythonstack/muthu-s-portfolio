@@ -111,3 +111,30 @@ class PortfolioAPITests(TestCase):
         self.assertEqual(soc_res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(SocialLink.objects.filter(platform='Instagram').count(), 1)
 
+    def test_refresh_token_rotation_and_blacklist(self):
+        """POST /api/auth/token/refresh/ rotates refresh tokens and blacklists the spent token."""
+        login_res = self.client.post('/api/auth/login/', {
+            'username': 'testadmin',
+            'password': 'Password123!'
+        }, format='json')
+        self.assertEqual(login_res.status_code, status.HTTP_200_OK)
+        first_refresh = login_res.data['refresh']
+
+        # First rotation should return a new access and rotated refresh token
+        rot1 = self.client.post('/api/auth/token/refresh/', {'refresh': first_refresh}, format='json')
+        self.assertEqual(rot1.status_code, status.HTTP_200_OK)
+        self.assertIn('access', rot1.data)
+        self.assertIn('refresh', rot1.data)
+        second_refresh = rot1.data['refresh']
+        self.assertNotEqual(second_refresh, first_refresh)
+
+        # Replaying the spent first refresh token must be rejected
+        replay = self.client.post('/api/auth/token/refresh/', {'refresh': first_refresh}, format='json')
+        self.assertEqual(replay.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # Using the rotated refresh token for a second cycle succeeds
+        rot2 = self.client.post('/api/auth/token/refresh/', {'refresh': second_refresh}, format='json')
+        self.assertEqual(rot2.status_code, status.HTTP_200_OK)
+        self.assertIn('access', rot2.data)
+        self.assertIn('refresh', rot2.data)
+

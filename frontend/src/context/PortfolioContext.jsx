@@ -24,6 +24,7 @@ import {
   idbSet,
   IDB_KEYS,
 } from '../utils/persistentStorage';
+import { ACCESS_TOKEN_KEY, rotateAccessToken } from '../utils/tokenRefresh';
 
 const PortfolioContext = createContext(null);
 
@@ -110,28 +111,6 @@ const normalizeOptionalUrl = (val) => {
   return `https://${trimmed}`;
 };
 
-const tryRefreshToken = async () => {
-  const refresh = localStorage.getItem('muthu_admin_jwt_refresh');
-  if (!refresh) return null;
-  try {
-    const res = await fetch(getApiUrl('/api/auth/token/refresh/'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh }),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.access) {
-        localStorage.setItem('muthu_admin_jwt', data.access);
-        return data.access;
-      }
-    }
-  } catch (err) {
-    console.warn('Silent token refresh failed:', err);
-  }
-  return null;
-};
-
 const formatApiError = (errBody, status) => {
   if (!errBody) return `Server responded with status ${status}`;
   if (typeof errBody === 'string') return errBody;
@@ -153,7 +132,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
  * JWT auto-refresh, and structured error parsing.
  */
 const apiRequest = async (url, method = 'GET', body = null, timeoutMs = 35000, retries = 1) => {
-  let token = localStorage.getItem('muthu_admin_jwt');
+  let token = localStorage.getItem(ACCESS_TOKEN_KEY);
   const headers = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (body !== null && body !== undefined) headers['Content-Type'] = 'application/json';
@@ -175,7 +154,7 @@ const apiRequest = async (url, method = 'GET', body = null, timeoutMs = 35000, r
       clearTimeout(timer);
 
       if (res && res.status === 401) {
-        const freshToken = await tryRefreshToken();
+        const freshToken = await rotateAccessToken();
         if (freshToken) {
           headers['Authorization'] = `Bearer ${freshToken}`;
           req = makeOpts();
@@ -1162,7 +1141,7 @@ export const PortfolioProvider = ({ children }) => {
 
   // ─── FULL CLOUD SYNC ENGINE (Reconciles all 11 sections + resume + pending items + deletions) ─
   const syncAllToCloud = useCallback(async () => {
-    const token = localStorage.getItem('muthu_admin_jwt');
+    const token = localStorage.getItem(ACCESS_TOKEN_KEY);
     if (!token) {
       return { ok: false, error: 'Admin login required to sync to Cloud Database.' };
     }

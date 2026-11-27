@@ -1,25 +1,64 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { getApiUrl } from '../apiConfig';
+import {
+  ACCESS_TOKEN_KEY,
+  REFRESH_TOKEN_KEY,
+  AUTH_EVENTS,
+  parseJwtPayload,
+  isTokenUnexpired,
+  isTokenExpiringSoon,
+  persistAuthTokens,
+  clearAuthTokens,
+  rotateAccessToken,
+} from '../utils/tokenRefresh';
 
 const AuthContext = createContext();
 
-const parseJwtPayload = (jwt) => {
-  try {
-    const part = jwt.split('.')[1];
-    if (!part) return null;
-    const base64 = part.replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(atob(base64));
-  } catch (_) {
-    return null;
-  }
-};
-
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(() => localStorage.getItem('muthu_admin_jwt'));
-  const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('muthu_admin_jwt_refresh'));
+  const [token, setToken] = useState(() => localStorage.getItem(ACCESS_TOKEN_KEY));
+  const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem(REFRESH_TOKEN_KEY));
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const skipNextVerifyRef = useRef(false);
+
+  // Sync React token state across silent rotations and proactively refresh on tab wake
+  useEffect(() => {
+    const handleTokensUpdated = (event) => {
+      const { access, refresh } = event.detail || {};
+      skipNextVerifyRef.current = true;
+      if (access) setToken(access);
+      if (refresh) setRefreshToken(refresh);
+    };
+
+    const handleSessionExpired = () => {
+      skipNextVerifyRef.current = true;
+      setToken(null);
+      setRefreshToken(null);
+      setUser(null);
+    };
+
+    const handleWakeRefresh = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+      const currentRefresh = localStorage.getItem(REFRESH_TOKEN_KEY);
+      if (!currentRefresh) return;
+      const currentAccess = localStorage.getItem(ACCESS_TOKEN_KEY);
+      if (!currentAccess || isTokenExpiringSoon(currentAccess, 300)) {
+        rotateAccessToken();
+      }
+    };
+
+    window.addEventListener(AUTH_EVENTS.TOKENS_UPDATED, handleTokensUpdated);
+    window.addEventListener(AUTH_EVENTS.SESSION_EXPIRED, handleSessionExpired);
+    document.addEventListener('visibilitychange', handleWakeRefresh);
+    window.addEventListener('focus', handleWakeRefresh);
+
+    return () => {
+      window.removeEventListener(AUTH_EVENTS.TOKENS_UPDATED, handleTokensUpdated);
+      window.removeEventListener(AUTH_EVENTS.SESSION_EXPIRED, handleSessionExpired);
+      document.removeEventListener('visibilitychange', handleWakeRefresh);
+      window.removeEventListener('focus', handleWakeRefresh);
+    };
+  }, []);
 
   // Check auth state on mount or external token change
   useEffect(() => {
@@ -30,36 +69,13 @@ export const AuthProvider = ({ children }) => {
     }
 
     const verifyAuth = async () => {
-      let currentToken = token || localStorage.getItem('muthu_admin_jwt');
-      const currentRefresh = refreshToken || localStorage.getItem('muthu_admin_jwt_refresh');
+      let currentToken = token || localStorage.getItem(ACCESS_TOKEN_KEY);
+      const currentRefresh = refreshToken || localStorage.getItem(REFRESH_TOKEN_KEY);
 
       if (!currentToken && !currentRefresh) {
         setLoading(false);
         return;
       }
-
-      const doRefresh = async () => {
-        if (!currentRefresh) return null;
-        try {
-          const rfRes = await fetch(getApiUrl('/api/auth/token/refresh/'), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refresh: currentRefresh })
-          });
-          if (rfRes.ok) {
-            const data = await rfRes.json();
-            if (data.access) {
-              localStorage.setItem('muthu_admin_jwt', data.access);
-              skipNextVerifyRef.current = true;
-              setToken(data.access);
-              return data.access;
-            }
-          }
-        } catch (e) {
-          console.warn('Silent refresh error:', e);
-        }
-        return null;
-      };
 
       try {
         let res = null;
@@ -69,9 +85,9 @@ export const AuthProvider = ({ children }) => {
           });
         }
 
-        // If no token or token expired (401), try refreshing
+        // If no token or token expired (401), rotate silently
         if (!res || res.status === 401) {
-          const newAccess = await doRefresh();
+          const newAccess = await rotateAccessToken();
           if (newAccess) {
             currentToken = newAccess;
             res = await fetch(getApiUrl('/api/auth/me/'), {
@@ -88,29 +104,25 @@ export const AuthProvider = ({ children }) => {
           } else {
             // Unexpected HTML (e.g. Render cold start splash) — keep local session intact if token unexpired
             const payload = currentToken ? parseJwtPayload(currentToken) : null;
-            if (payload && (!payload.exp || payload.exp * 1000 > Date.now())) {
-              setUser({ username: payload.username || 'admin', offlineFallback: true });
+            if (isTokenUnexpired(currentToken)) {
+              setUser({ username: payload?.username || 'admin', offlineFallback: true });
             }
           }
         } else if (res && (res.status === 401 || res.status === 403)) {
           // Explicit auth rejection after refresh attempt — sign out
-          localStorage.removeItem('muthu_admin_jwt');
-          localStorage.removeItem('muthu_admin_jwt_refresh');
-          setToken(null);
-          setRefreshToken(null);
-          setUser(null);
+          clearAuthTokens();
         } else {
           // Network or 5xx while backend sleeps — preserve valid unexpired session
           const payload = currentToken ? parseJwtPayload(currentToken) : null;
-          if (payload && (!payload.exp || payload.exp * 1000 > Date.now())) {
-            setUser({ username: payload.username || 'admin', offlineFallback: true });
+          if (isTokenUnexpired(currentToken)) {
+            setUser({ username: payload?.username || 'admin', offlineFallback: true });
           }
         }
       } catch (err) {
         console.warn('Auth verification deferred (backend waking up/offline):', err);
         const payload = currentToken ? parseJwtPayload(currentToken) : null;
-        if (payload && (!payload.exp || payload.exp * 1000 > Date.now())) {
-          setUser({ username: payload.username || 'admin', offlineFallback: true });
+        if (isTokenUnexpired(currentToken)) {
+          setUser({ username: payload?.username || 'admin', offlineFallback: true });
         }
       } finally {
         setLoading(false);
@@ -150,11 +162,8 @@ export const AuthProvider = ({ children }) => {
       }
 
       // Save tokens
-      localStorage.setItem('muthu_admin_jwt', data.access);
-      localStorage.setItem('muthu_admin_jwt_refresh', data.refresh);
       skipNextVerifyRef.current = true;
-      setToken(data.access);
-      setRefreshToken(data.refresh);
+      persistAuthTokens(data.access, data.refresh);
       setUser(data.user);
 
       return { success: true };
@@ -174,35 +183,34 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    if (token && refreshToken) {
+    const activeToken = token || localStorage.getItem(ACCESS_TOKEN_KEY);
+    const activeRefresh = refreshToken || localStorage.getItem(REFRESH_TOKEN_KEY);
+    if (activeToken && activeRefresh) {
       try {
         await fetch(getApiUrl('/api/auth/logout/'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${activeToken}`
           },
-          body: JSON.stringify({ refresh: refreshToken })
+          body: JSON.stringify({ refresh: activeRefresh })
         });
       } catch (err) {
         console.error('Logout error:', err);
       }
     }
 
-    localStorage.removeItem('muthu_admin_jwt');
-    localStorage.removeItem('muthu_admin_jwt_refresh');
-    setToken(null);
-    setRefreshToken(null);
-    setUser(null);
+    clearAuthTokens();
   };
 
   const changeCredentials = async (newUsername, currentPassword, newPassword) => {
+    const activeToken = token || localStorage.getItem(ACCESS_TOKEN_KEY);
     try {
       const res = await fetch(getApiUrl('/api/auth/change-credentials/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${activeToken}`
         },
         body: JSON.stringify({
           new_username: newUsername,
@@ -222,10 +230,8 @@ export const AuthProvider = ({ children }) => {
       }
 
       if (data.access && data.refresh) {
-        localStorage.setItem('muthu_admin_jwt', data.access);
-        localStorage.setItem('muthu_admin_jwt_refresh', data.refresh);
-        setToken(data.access);
-        setRefreshToken(data.refresh);
+        skipNextVerifyRef.current = true;
+        persistAuthTokens(data.access, data.refresh);
       }
 
       if (data.user) {
